@@ -2,8 +2,9 @@
 ---
 ##### Stakeholders
 > Any group, individual or organisation that may be affected by or percieve themselves to be affected by the product.
-- Highschool students
-- University/TAFE students
+- Students
+    - Highschool students
+    - University/TAFE students
 - Young adults with busy schedules
 
 ##### User Story Format
@@ -11,7 +12,7 @@
 
 ##### User Stories
 1. As a university student, I want to be able to import my university timetable, so that I can quickly set up my personal timetable.
-2. 
+2. As a student, I want to have a persistent account, so that I can access my timetable from any device.
 3. 
 4. 
 5. 
