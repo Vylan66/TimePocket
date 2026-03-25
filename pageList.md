@@ -1,5 +1,13 @@
+**Jason's pages***
+1. Home (dashboard)
+2. calendar (group/personal)
+3. profile
+4. Settings/Login/Sign-up/Logout
+
+
+
 **Charlee's pages**
-**Main Pages**
+*Main Pages*
 - Home page
     - Information about what site is
     - Link to sign up/sign in page
@@ -21,7 +29,7 @@
     - Contains information about a user’s profile
     - Place where overall settings are managed
 
-**Supplementary pages**
+*Supplementary pages*
 - Sign up/sign in
 
 
