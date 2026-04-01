@@ -1,3 +1,18 @@
-# CITS3403-Project
-(Will rename when we come up with a name)git config --global credential.helper ""
-git push origin tasveer/user-stories
+# TimePocket
+---
+### Group Members
+| **Student Number** | **Name** | **GitHub Username** |
+| :--- | :--- | :--- |
+| 24273132 | Charlee Thornett | thornch-12 |
+| 23585984 | Tasveer Mann | tassiemann123 |
+| 24314441 | Dylan Hu | Vylan66 |
+| 24618514 | Jieh Shuen Chia (Jason) | Jason-CJS |
+
+### Purpose
+---
+
+### How to Launch
+---
+
+### How to Run Tests
+---
