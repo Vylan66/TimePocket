@@ -1,18 +1,238 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        <title>TimePocket - Welcome!</title>
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimePocket</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        :root {
+            --blue: #1252D3;
+            --blue-light: #4A7FE8;
+            --dark: #1A1714;
+        }
 
-        <h1 class="text-center text-4xl font-bold">
-            Welcome to TimePocket!
-        </h1>
-        <p class="text-center">Make collaborative calendars with your friends!</p>
-        <p>This is the home landing page for unregistered users</p>
+        .btn-blue {
+            background: var(--blue);
+            color: #fff;
+            font-weight: 500;
+            border-radius: 9999px;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            padding: 0.6em 1.5em;
+        }
+        .btn-blue:hover {
+            background: var(--blue-light);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 22px rgba(18,82,211,0.42);
+        }
 
-    </body>
+        .auth-overlay {
+            position: fixed; inset: 0;
+            background: rgba(26,23,20,0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s;
+        }
+        .auth-overlay.open { opacity: 1; pointer-events: all; }
+
+        .auth-box {
+            background: rgba(239,239,238,0.85);
+            backdrop-filter: blur(28px) saturate(1.8);
+            -webkit-backdrop-filter: blur(28px) saturate(1.8);
+            border: 1px solid rgba(255,255,255,0.65);
+            border-radius: 1.5rem;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.16);
+            width: 100%;
+            max-width: 410px;
+            padding: 2.25rem;
+            position: relative;
+            transform: translateY(16px) scale(0.97);
+            transition: transform 0.32s cubic-bezier(0.34,1.3,0.64,1);
+        }
+        .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+
+        .tp-input {
+            width: 100%;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.65);
+            border-radius: 0.75rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.875rem;
+            color: var(--dark);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .tp-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(18,82,211,0.14);
+        }
+        .tp-input::placeholder { color: rgba(26,23,20,0.35); }
+
+        .auth-tab {
+            flex: 1; text-align: center;
+            padding: 0.46rem 0;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background 0.22s, color 0.22s;
+            color: rgba(26,23,20,0.42);
+        }
+        .auth-tab.active { background: var(--blue); color: #fff; }
+    </style>
+</head>
+
+<body class="h-screen flex flex-col overflow-hidden font-mono [#EFEFEE]">
+    <!-- NAVBAR -->
+    <nav class="flex items-center justify-between px-10 h-16 shrink-0">
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-full border-2 border-gray-400"></div>
+        <span class="text-gray-400 font-semibold">Logo</span>
+        </div>
+        <!-- Login -->
+        <button onclick="openAuth('login')" class="btn-blue px-5 py-2 text-sm">Login</button>
+    </nav>
+    
+    
+    <!-- MAIN: two equal columns -->
+    <main class="flex flex-1 overflow-hidden">
+    
+        <!-- Left Column: Intro-->
+        <div class="flex-1 flex items-center justify-center p-10">
+            <!-- Box -->
+            <div class="w-full max-w-sm h-full max-h-[520px] rounded-3xl border-2 border-gray-300 flex flex-col justify-between p-8">
+                <!-- Title -->
+                <div>
+                    <h1>Welcome To</h1>
+                    <p>TimePocket</p>
+                </div>
+                <!-- "Get started" button -->
+                <div>
+                    <button class="border border-gray-400 text-gray-400 px-5 py-2 rounded-lg text-sm">get started</button>
+                </div>
+            </div>
+        </div>
+    
+
+        <!-- Right Column: Instructions -->
+        <div class="flex-1 flex flex-col items-center justify-center p-10 gap-4">
+            <!-- Title -->
+            <div class="border-2 border-gray-300 rounded-full px-10 py-3 w-full max-w-lg text-center">
+                <h2>How it works:</h2>
+            </div>
+            <!-- Slideshow -->
+            <div class="w-full max-w-lg flex-1 max-h-[340px] rounded-3xl border-2 border-gray-300 flex items-center justify-center">
+                <p class="text-gray-400 text-sm">slideshow</p>
+            </div>
+        </div>
+    </main>
+
+
+    <footer></footer>
+
+
+    <!-- Login auth pop-up -->
+    <div id="auth-tab" class="auth-overlay" onclick="handleOverlayClick(event)">
+        <div class="auth-box" onclick="event.stopPropagation()">
+
+            <!-- Panels -->
+            <div class="flex gap-1 p-1 rounded-full mb-6" style="background: rgba(26,23,20,0.07);">
+                <button id="tab-login"  class="auth-tab active" onclick="switchTab('login')">Log in</button>
+                <button id="tab-signup" class="auth-tab"        onclick="switchTab('signup')">Sign up</button>
+            </div>
+
+            <!-- Login panel -->
+            <div id="panel-login">
+                <h2 class="text-2xl font-semibold mb-1">Welcome back!</h2>
+                <p class="text-sm mb-5" style="color:rgba(26,23,20,0.48)">Sign in to your TimePocket account</p>
+                <div class="flex flex-col gap-3">
+                    <input class="tp-input" type="email"    placeholder="Email address" id="login-email" />
+                    <input class="tp-input" type="password" placeholder="Password"      id="login-password" />
+                </div>
+                <div class="flex items-center justify-between mt-3 mb-5">
+                    <label class="flex items-center gap-2 text-xs cursor-pointer select-none" style="color:rgba(26,23,20,0.45)">
+                        <input type="checkbox" style="accent-color:var(--blue)" /> Remember me
+                    </label>
+                    <a href="#" class="text-xs hover:underline" style="color:var(--blue)">Forgot password?</a>
+                </div>
+                <button onclick="handleLogin()" class="btn-blue w-full py-3 text-sm">Log in</button>
+                <div id="mfa-block" class="hidden mt-4">
+                    <p class="text-xs mb-2 text-center" style="color:rgba(26,23,20,0.45)">Enter the 6-digit code from your authenticator app</p>
+                    <input class="tp-input text-center text-lg tracking-widest" maxlength="6" placeholder="· · · · · ·" id="mfa-code" />
+                    <button class="btn-blue w-full py-3 text-sm mt-3">Verify &amp; continue</button>
+                </div>
+                <p class="text-xs text-center mt-5" style="color:rgba(26,23,20,0.38)">
+                    No account? <button onclick="switchTab('signup')" class="hover:underline font-medium" style="color:var(--blue)">Sign up</button>
+                </p>
+            </div>
+
+            <!-- Signup panel -->
+            <div id="panel-signup" class="hidden">
+                <h2 class="text-2xl font-semibold mb-1">Create account</h2>
+                <p class="text-sm mb-5" style="color:rgba(26,23,20,0.48)">Join TimePocket!</p>
+                <div class="flex flex-col gap-3">
+                    <div class="flex gap-2.5">
+                        <input class="tp-input" type="text" placeholder="First name" />
+                        <input class="tp-input" type="text" placeholder="Last name"  />
+                    </div>
+                    <input class="tp-input" type="text"     placeholder="Username"         />
+                    <input class="tp-input" type="email"    placeholder="Email address"    />
+                    <input class="tp-input" type="password" placeholder="Password"         />
+                    <input class="tp-input" type="password" placeholder="Confirm password" />
+                </div>
+                <p class="text-xs mt-3 leading-relaxed" style="color:rgba(26,23,20,0.38)">
+                    By signing up you agree to our <a href="#" class="hover:underline" style="color:var(--blue)">Terms</a> and <a href="#" class="hover:underline" style="color:var(--blue)">Privacy Policy</a>.
+                </p>
+                <button class="btn-blue w-full py-3 text-sm mt-5">Create my account</button>
+                <p class="text-xs text-center mt-5" style="color:rgba(26,23,20,0.38)">
+                    Already have an account? <button onclick="switchTab('login')" class="hover:underline font-medium" style="color:var(--blue)">Log in</button>
+                </p>
+            </div>
+
+            <!-- Close -->
+            <button onclick="closeAuth()" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none transition-colors" style="background:rgba(255,255,255,0.3);color:rgba(26,23,20,0.45)">×</button>
+        </div>
+    </div>
+</body>
+
+<!-- JavaScript -->
+<script>
+    // Modal 
+    const modal = document.getElementById('auth-tab');
+
+    function openAuth(tab = 'login') {
+      modal.classList.add('open');
+      switchTab(tab);
+    }
+    function closeAuth() { modal.classList.remove('open'); }
+    function handleOverlayClick(e) { if (e.target === modal) closeModal(); }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // Auth tabs 
+    function switchTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('panel-login').classList.toggle('hidden', !isLogin);
+      document.getElementById('panel-signup').classList.toggle('hidden', isLogin);
+      document.getElementById('tab-login').classList.toggle('active', isLogin);
+      document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+    }
+
+    // MFA reveal 
+    function handleLogin() {
+      const email = document.getElementById('login-email').value;
+      const pass  = document.getElementById('login-password').value;
+      if (email && pass) {
+        document.getElementById('mfa-block').classList.remove('hidden');
+        document.getElementById('mfa-code').focus();
+      }
+    }
+</script>
 </html>
