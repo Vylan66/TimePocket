@@ -8,16 +8,84 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         :root {
-            --blue: #1252D3;
+            /* GLOBAL COLOURS */
+            /* Theme colours */
+            --blue:       #1252D3;
             --blue-light: #4A7FE8;
-            --dark: #1A1714;
+            --blue-ring:  rgba(18,82,211,0.14);
+            --dark:       #1A1714;
+
+            /* Background colours */
+            --bg-page:      rgba(239,239,238,0.85);
+            --bg-surface:   rgba(239,239,238,0.85);
+            --bg-input:     rgba(255,255,255,0.5);
+            --bg-tab-pill:  rgba(26,23,20,0.07);
+            --bg-close-btn: rgba(255,255,255,0.3);
+            --overlay-bg:   rgba(26,23,20,0.5);
+
+            /* Border colours */
+            --border-glass: rgba(255,255,255,0.65);
+            --border-card:  #d1d5db;
+            --border-ui:    #9ca3af;
+
+            /* Text colours */
+            --text-ui:          #9ca3af;
+            --text-subtitle:    rgba(26,23,20,0.48);
+            --text-label:       rgba(26,23,20,0.45);
+            --text-tab:         rgba(26,23,20,0.42);
+            --text-fine:        rgba(26,23,20,0.38);
+            --text-placeholder: rgba(26,23,20,0.35);
         }
+
+        /* Dark mode overrides */
+        html.dark {
+            --dark:       #ece9e6;
+
+            --bg-page:      #1e1c1a;
+            --bg-surface:   #27231f;
+            --bg-input:     rgba(255,255,255,0.07);
+            --bg-tab-pill:  rgba(255,255,255,0.07);
+            --bg-close-btn: rgba(255,255,255,0.1);
+            --overlay-bg:   rgba(0,0,0,0.65);
+
+            --border-glass: rgba(255,255,255,0.1);
+            --border-card:  #3d3a37;
+            --border-ui:    #5c5956;
+
+            --text-ui:          #7a7774;
+            --text-subtitle:    rgba(236,233,230,0.6);
+            --text-label:       rgba(236,233,230,0.55);
+            --text-tab:         rgba(236,233,230,0.5);
+            --text-fine:        rgba(236,233,230,0.45);
+            --text-placeholder: rgba(236,233,230,0.35);
+        }
+
+        /* Tailwind gray overrides — use vars instead of hardcoded grays */
+        .border-card { border-color: var(--border-card); }
+        .border-ui   { border-color: var(--border-ui); }
+        .text-ui     { color: var(--text-ui); }
+
+        .btn-icon {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-ui);
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-icon:hover { background: var(--bg-tab-pill); }
 
         .btn-blue {
             background: var(--blue);
             color: #fff;
             font-weight: 500;
             border-radius: 9999px;
+            cursor: pointer;
             transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
             padding: 0.6em 1.5em;
         }
@@ -29,7 +97,7 @@
 
         .auth-overlay {
             position: fixed; inset: 0;
-            background: rgba(26,23,20,0.5);
+            background: var(--overlay-bg);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             z-index: 50;
@@ -43,10 +111,10 @@
         .auth-overlay.open { opacity: 1; pointer-events: all; }
 
         .auth-box {
-            background: rgba(239,239,238,0.85);
+            background: var(--bg-surface);
             backdrop-filter: blur(28px) saturate(1.8);
             -webkit-backdrop-filter: blur(28px) saturate(1.8);
-            border: 1px solid rgba(255,255,255,0.65);
+            border: 1px solid var(--border-glass);
             border-radius: 1.5rem;
             box-shadow: 0 30px 80px rgba(0,0,0,0.16);
             width: 100%;
@@ -60,8 +128,8 @@
 
         .tp-input {
             width: 100%;
-            background: rgba(255,255,255,0.5);
-            border: 1px solid rgba(255,255,255,0.65);
+            background: var(--bg-input);
+            border: 1px solid var(--border-glass);
             border-radius: 0.75rem;
             padding: 0.6rem 1rem;
             font-size: 0.875rem;
@@ -71,9 +139,9 @@
         }
         .tp-input:focus {
             border-color: var(--blue);
-            box-shadow: 0 0 0 3px rgba(18,82,211,0.14);
+            box-shadow: 0 0 0 3px var(--blue-ring);
         }
-        .tp-input::placeholder { color: rgba(26,23,20,0.35); }
+        .tp-input::placeholder { color: var(--text-placeholder); }
 
         .auth-tab {
             flex: 1; text-align: center;
@@ -83,32 +151,52 @@
             border-radius: 9999px;
             cursor: pointer;
             transition: background 0.22s, color 0.22s;
-            color: rgba(26,23,20,0.42);
+            color: var(--text-tab);
         }
         .auth-tab.active { background: var(--blue); color: #fff; }
     </style>
 </head>
 
-<body class="h-screen flex flex-col overflow-hidden font-mono [#EFEFEE]">
+<body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
         <!-- Logo -->
         <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-full border-2 border-gray-400"></div>
-        <span class="text-gray-400 font-semibold">Logo</span>
+        <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
+        <span class="text-ui font-semibold">Logo</span>
         </div>
-        <!-- Login -->
-        <button onclick="openAuth('login')" class="btn-blue px-5 py-2 text-sm">Login</button>
+        <!-- Login tab and dark mode toggle -->
+        <div class="flex items-center gap-3">
+            <button id="theme-toggle" onclick="toggleTheme()" class="btn-icon" title="Toggle dark mode">
+                <!-- Dark mode toggle: Moon (shown in light mode) -->
+                <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+                <!-- Light mode toggle: Sun (shown in dark mode) -->
+                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+            </button>
+            <button onclick="openAuth('login')" class="btn-blue px-5 py-2 text-sm">Login</button>
+        </div>
     </nav>
-    
-    
-    <!-- MAIN: two equal columns -->
-    <main class="flex flex-1 overflow-hidden">
-    
+
+
+    <!-- MAIN: two equal columns (stacks vertically on mobile) -->
+    <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden">
+
         <!-- Left Column: Intro-->
-        <div class="flex-1 flex items-center justify-center p-10">
+        <div class="w-full md:flex-1 flex items-center justify-center p-10">
             <!-- Box -->
-            <div class="w-full max-w-sm h-full max-h-[520px] rounded-3xl border-2 border-gray-300 flex flex-col justify-between p-8">
+            <div class="w-full max-w-sm h-[480px] md:h-full md:max-h-[520px] rounded-3xl border-2 border-card flex flex-col justify-between p-8">
                 <!-- Title -->
                 <div>
                     <h1>Welcome To</h1>
@@ -116,21 +204,21 @@
                 </div>
                 <!-- "Get started" button -->
                 <div>
-                    <button class="border border-gray-400 text-gray-400 px-5 py-2 rounded-lg text-sm">get started</button>
+                    <button class="border border-ui text-ui px-5 py-2 rounded-lg text-sm cursor-pointer">get started</button>
                 </div>
             </div>
         </div>
-    
+
 
         <!-- Right Column: Instructions -->
-        <div class="flex-1 flex flex-col items-center justify-center p-10 gap-4">
+        <div class="w-full md:flex-1 flex flex-col items-center justify-center p-10 gap-4">
             <!-- Title -->
-            <div class="border-2 border-gray-300 rounded-full px-10 py-3 w-full max-w-lg text-center">
+            <div class="border-2 border-card rounded-full px-10 py-3 w-full max-w-lg md:max-w-2xl text-center">
                 <h2>How it works:</h2>
             </div>
             <!-- Slideshow -->
-            <div class="w-full max-w-lg flex-1 max-h-[340px] rounded-3xl border-2 border-gray-300 flex items-center justify-center">
-                <p class="text-gray-400 text-sm">slideshow</p>
+            <div class="w-full max-w-lg md:max-w-2xl h-[320px] md:flex-1 md:max-h-[340px] rounded-3xl border-2 border-card flex items-center justify-center">
+                <p class="text-ui text-sm">slideshow</p>
             </div>
         </div>
     </main>
@@ -144,7 +232,7 @@
         <div class="auth-box" onclick="event.stopPropagation()">
 
             <!-- Panels -->
-            <div class="flex gap-1 p-1 rounded-full mb-6" style="background: rgba(26,23,20,0.07);">
+            <div class="flex gap-1 p-1 rounded-full mb-6" style="background: var(--bg-tab-pill);">
                 <button id="tab-login"  class="auth-tab active" onclick="switchTab('login')">Log in</button>
                 <button id="tab-signup" class="auth-tab"        onclick="switchTab('signup')">Sign up</button>
             </div>
@@ -152,32 +240,32 @@
             <!-- Login panel -->
             <div id="panel-login">
                 <h2 class="text-2xl font-semibold mb-1">Welcome back!</h2>
-                <p class="text-sm mb-5" style="color:rgba(26,23,20,0.48)">Sign in to your TimePocket account</p>
+                <p class="text-sm mb-5" style="color: var(--text-subtitle);">Sign in to your TimePocket account</p>
                 <div class="flex flex-col gap-3">
                     <input class="tp-input" type="email"    placeholder="Email address" id="login-email" />
                     <input class="tp-input" type="password" placeholder="Password"      id="login-password" />
                 </div>
                 <div class="flex items-center justify-between mt-3 mb-5">
-                    <label class="flex items-center gap-2 text-xs cursor-pointer select-none" style="color:rgba(26,23,20,0.45)">
-                        <input type="checkbox" style="accent-color:var(--blue)" /> Remember me
+                    <label class="flex items-center gap-2 text-xs cursor-pointer select-none" style="color: var(--text-label);">
+                        <input type="checkbox" style="accent-color: var(--blue);" /> Remember me
                     </label>
-                    <a href="#" class="text-xs hover:underline" style="color:var(--blue)">Forgot password?</a>
+                    <a href="#" class="text-xs hover:underline" style="color: var(--blue);">Forgot password?</a>
                 </div>
                 <button onclick="handleLogin()" class="btn-blue w-full py-3 text-sm">Log in</button>
                 <div id="mfa-block" class="hidden mt-4">
-                    <p class="text-xs mb-2 text-center" style="color:rgba(26,23,20,0.45)">Enter the 6-digit code from your authenticator app</p>
+                    <p class="text-xs mb-2 text-center" style="color: var(--text-label);">Enter the 6-digit code from your authenticator app</p>
                     <input class="tp-input text-center text-lg tracking-widest" maxlength="6" placeholder="· · · · · ·" id="mfa-code" />
                     <button class="btn-blue w-full py-3 text-sm mt-3">Verify &amp; continue</button>
                 </div>
-                <p class="text-xs text-center mt-5" style="color:rgba(26,23,20,0.38)">
-                    No account? <button onclick="switchTab('signup')" class="hover:underline font-medium" style="color:var(--blue)">Sign up</button>
+                <p class="text-xs text-center mt-5" style="color: var(--text-fine);">
+                    No account? <button onclick="switchTab('signup')" class="hover:underline font-medium cursor-pointer" style="color: var(--blue);">Sign up</button>
                 </p>
             </div>
 
             <!-- Signup panel -->
             <div id="panel-signup" class="hidden">
                 <h2 class="text-2xl font-semibold mb-1">Create account</h2>
-                <p class="text-sm mb-5" style="color:rgba(26,23,20,0.48)">Join TimePocket!</p>
+                <p class="text-sm mb-5" style="color: var(--text-subtitle);">Join TimePocket!</p>
                 <div class="flex flex-col gap-3">
                     <div class="flex gap-2.5">
                         <input class="tp-input" type="text" placeholder="First name" />
@@ -188,35 +276,35 @@
                     <input class="tp-input" type="password" placeholder="Password"         />
                     <input class="tp-input" type="password" placeholder="Confirm password" />
                 </div>
-                <p class="text-xs mt-3 leading-relaxed" style="color:rgba(26,23,20,0.38)">
-                    By signing up you agree to our <a href="#" class="hover:underline" style="color:var(--blue)">Terms</a> and <a href="#" class="hover:underline" style="color:var(--blue)">Privacy Policy</a>.
+                <p class="text-xs mt-3 leading-relaxed" style="color: var(--text-fine);">
+                    By signing up you agree to our <a href="#" class="hover:underline" style="color: var(--blue);">Terms</a> and <a href="#" class="hover:underline" style="color: var(--blue);">Privacy Policy</a>.
                 </p>
                 <button class="btn-blue w-full py-3 text-sm mt-5">Create my account</button>
-                <p class="text-xs text-center mt-5" style="color:rgba(26,23,20,0.38)">
-                    Already have an account? <button onclick="switchTab('login')" class="hover:underline font-medium" style="color:var(--blue)">Log in</button>
+                <p class="text-xs text-center mt-5" style="color: var(--text-fine);">
+                    Already have an account? <button onclick="switchTab('login')" class="hover:underline font-medium cursor-pointer" style="color: var(--blue);">Log in</button>
                 </p>
             </div>
 
             <!-- Close -->
-            <button onclick="closeAuth()" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none transition-colors" style="background:rgba(255,255,255,0.3);color:rgba(26,23,20,0.45)">×</button>
+            <button onclick="closeAuth()" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer transition-colors" style="background: var(--bg-close-btn); color: var(--text-label);">×</button>
         </div>
     </div>
 </body>
 
 <!-- JavaScript -->
 <script>
-    // Modal 
-    const modal = document.getElementById('auth-tab');
+    // Auth
+    const auth = document.getElementById('auth-tab');
 
     function openAuth(tab = 'login') {
-      modal.classList.add('open');
+      auth.classList.add('open');
       switchTab(tab);
     }
-    function closeAuth() { modal.classList.remove('open'); }
-    function handleOverlayClick(e) { if (e.target === modal) closeModal(); }
+    function closeAuth() { auth.classList.remove('open'); }
+    function handleOverlayClick(e) { if (e.target === auth) closeModal(); }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-    // Auth tabs 
+    // Auth tabs
     function switchTab(tab) {
       const isLogin = tab === 'login';
       document.getElementById('panel-login').classList.toggle('hidden', !isLogin);
@@ -225,7 +313,7 @@
       document.getElementById('tab-signup').classList.toggle('active', !isLogin);
     }
 
-    // MFA reveal 
+    // MFA reveal
     function handleLogin() {
       const email = document.getElementById('login-email').value;
       const pass  = document.getElementById('login-password').value;
@@ -233,6 +321,13 @@
         document.getElementById('mfa-block').classList.remove('hidden');
         document.getElementById('mfa-code').focus();
       }
+    }
+
+    // Dark mode toggle
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      document.getElementById('icon-moon').style.display = isDark ? 'none' : '';
+      document.getElementById('icon-sun').style.display  = isDark ? ''     : 'none';
     }
 </script>
 </html>
