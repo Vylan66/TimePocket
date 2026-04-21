@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
+
 <body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
@@ -74,11 +75,7 @@
             </div>
         </div>
     </main>
-
-
-    <footer></footer>
-
-
+    
     <!-- LOGIN AUTH POP-UP -->
      <!-- Backend to take over -->
     <div id="auth-overlay" class="auth-overlay">
@@ -150,6 +147,7 @@
     </div>
 </body>
 
+
 <!-- JavaScript -->
 <script>
     // Theme
@@ -176,6 +174,7 @@
         authOverlay.classList.add('open');
         switchTab(tab || 'login');
     }
+
     function closeAuth() { authOverlay.classList.remove('open'); }
 
     function switchTab(tab) {
