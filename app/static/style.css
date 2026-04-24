@@ -7,13 +7,14 @@
     --dark:       #1A1714;
 
     /* Background colours */
-    --bg-page:      rgba(239,239,238,0.85);
-    --bg-surface:   rgba(239,239,238,0.85);
+    --bg-page:           rgba(239,239,238,0.85);
+    --bg-surface:        rgba(239,239,238,0.85);
     --bg-input:          rgba(255,255,255,0.5);
     --bg-input-autofill: #f8f8f7;
     --bg-tab-pill:       rgba(26,23,20,0.07);
-    --bg-close-btn: rgba(255,255,255,0.3);
-    --overlay-bg:   rgba(26,23,20,0.5);
+    --bg-close-btn:      rgba(255,255,255,0.3);
+    --overlay-bg:        rgba(26,23,20,0.5);
+    --bg-timetable:      #c4d5f9;
 
     /* Border colours */
     --border-glass: rgba(255,255,255,0.65);
@@ -33,13 +34,14 @@
 html.dark {
     --dark:       #ece9e6;
 
-    --bg-page:      #1e1c1a;
-    --bg-surface:   #27231f;
+    --bg-page:           #1e1c1a;
+    --bg-surface:        #27231f;
     --bg-input:          rgba(255,255,255,0.07);
     --bg-input-autofill: #36322f;
     --bg-tab-pill:       rgba(255,255,255,0.07);
-    --bg-close-btn: rgba(255,255,255,0.1);
-    --overlay-bg:   rgba(0,0,0,0.65);
+    --bg-close-btn:      rgba(255,255,255,0.1);
+    --overlay-bg:        rgba(0,0,0,0.65);
+    --bg-timetable:      #13213d;
 
     --border-glass: rgba(255,255,255,0.1);
     --border-card:  #3d3a37;
