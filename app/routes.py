@@ -26,6 +26,17 @@ def add_availability():
     db.session.commit()
     return jsonify({'message': 'Availability added!'})
 
+@main.route('/availability/<int:slot_id>', methods=['PUT'])
+@login_required
+def update_availability(slot_id):
+    slot = Availability.query.get_or_404(slot_id)
+    data = request.get_json()
+    slot.day = data.get('day', slot.day)
+    slot.start_time = data.get('start_time', slot.start_time)
+    slot.end_time = data.get('end_time', slot.end_time)
+    db.session.commit()
+    return jsonify({'message': 'Availability updated!'})
+
 @main.route('/availability/<int:slot_id>', methods=['DELETE'])
 @login_required
 def delete_availability(slot_id):

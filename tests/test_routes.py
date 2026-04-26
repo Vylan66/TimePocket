@@ -38,6 +38,21 @@ def test_add_availability(client):
     assert res.status_code == 200
     assert res.get_json()['message'] == 'Availability added!'
 
+def test_update_availability(client):
+    register_and_login(client)
+    client.post('/availability', json={
+        'day': 'Monday',
+        'start_time': '09:00',
+        'end_time': '11:00'
+    })
+    res = client.put('/availability/1', json={
+        'day': 'Tuesday',
+        'start_time': '10:00',
+        'end_time': '12:00'
+    })
+    assert res.status_code == 200
+    assert res.get_json()['message'] == 'Availability updated!'
+
 def test_get_all_availability(client):
     register_and_login(client)
     client.post('/availability', json={
