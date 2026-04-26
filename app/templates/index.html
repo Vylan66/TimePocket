@@ -112,7 +112,6 @@
             <button id="btn-auth-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer transition-colors" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
         </div>
     </div>
-</body>
 
 <script src="{{ url_for('static', filename='dark_mode.js') }}"></script>
 <script>
@@ -174,4 +173,5 @@
     document.getElementById('btn-to-login').addEventListener('click', function() { switchTab('login'); });
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAuth(); });
 </script>
+</body>
 </html>
