@@ -1,7 +1,6 @@
 // JavaScript file for mini calendar view on Personal calendar page
-const CAL_DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-const CAL_MONTHS = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
+const CAL_DAYS   = ['S','M','T','W','T','F','S'];
+const CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 let calCurrent    = new Date();
 let calSelected   = null;
