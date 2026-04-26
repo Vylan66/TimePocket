@@ -55,11 +55,6 @@ html.dark {
     --text-placeholder: rgba(236,233,230,0.35);
 }
 
-/* Tailwind gray overrides — use vars instead of hardcoded grays */
-.border-card { border-color: var(--border-card); }
-.border-ui   { border-color: var(--border-ui); }
-.text-ui     { color: var(--text-ui); }
-
 /* Global button styles */
 button {
     cursor: pointer;

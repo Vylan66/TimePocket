@@ -8,16 +8,16 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Reference style.css stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='calendar.css') }}">
 </head>
-
 
 <body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
         <!-- Logo -->
         <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
-        <span class="text-ui font-semibold">Logo</span>
+           <div class="w-9 h-9 rounded-full border-2 [border-color:var(--border-ui)]"></div>
+           <span class="font-semibold [color:var(--text-ui)]">Logo</span>
         </div>
         <!-- Login tab and dark mode toggle -->
         <div class="flex items-center gap-3">
@@ -47,21 +47,163 @@
     </nav>
 
     <!-- MAIN: two equal columns (stacks vertically on mobile) -->
+    <!-- Add in these attributes to see the border: rounded-3xl border-1 border-black  -->
     <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden" style="background-color: var(--bg-timetable);">
 
-        <!-- Left Column: Intro-->
-        <div class="w-full md:flex-1 flex items-center justify-center p-10">
-            <!-- Add in these attributes to see the border: rounded-3xl border-2 border-card  -->
-            <div class="w-full max-w-sm h-[480px] md:h-full md:max-h-[520px] flex flex-col justify-center p-8">
+        <!-- Left Column: Mini Calendar + Categories -->
+        <div class="w-full md:w-72 shrink-0 flex flex-col gap-4 p-4 overflow-y-auto">
+
+            <!-- Mini Calendar -->
+            <div class="cal-widget rounded-[20px]">
+                <div class="cal-header">
+                    <button class="cal-nav" id="prevBtn">&#8249;</button>
+                    <div class="cal-title" id="calTitle">
+                        <span id="calTitleText"></span>
+                        <span class="cal-arrow">&#9660;</span>
+                    </div>
+                    <button class="cal-nav" id="nextBtn">&#8250;</button>
+                </div>
+                <div class="cal-picker" id="calPicker">
+                    <div class="picker-row">
+                        <span class="picker-label">Month</span>
+                        <select class="picker-select" id="pickMonth"></select>
+                    </div>
+                    <div class="picker-row">
+                        <span class="picker-label">Year</span>
+                        <select class="picker-select" id="pickYear"></select>
+                    </div>
+                    <button class="picker-go" id="pickerGo">Save</button>
+                </div>
+                <div class="cal-grid" id="calGrid"></div>
             </div>
+
+            <!-- Event Categories (placeholder) -->
+            <div class="rounded-[20px] p-4 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]">
+                <p class="text-xs tracking-widest [color:var(--text-label)]">Categories</p>
+            </div>
+
         </div>
 
         <!-- Right Column: Instructions -->
-        <div class="w-full md:flex-1 flex flex-col items-center justify-center p-20">
+        <div class="w-full flex-1 flex flex-col items-center justify-center p-20">
         </div>
     </main>
-    
+
 <!-- JavaScript -->
 <script src="{{ url_for('static', filename='dark_mode.js') }}"></script>
+<script>
+    const CAL_DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const CAL_MONTHS = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+
+    let calCurrent    = new Date();
+    let calSelected   = null;
+    let calPickerOpen = false;
+
+    const pickMonth = document.getElementById('pickMonth');
+    CAL_MONTHS.forEach((m, i) => {
+        const opt = document.createElement('option');
+        opt.value = i; opt.textContent = m;
+        pickMonth.appendChild(opt);
+    });
+
+    const pickYear = document.getElementById('pickYear');
+    const thisYear = new Date().getFullYear();
+    for (let y = thisYear - 50; y <= thisYear + 50; y++) {
+        const opt = document.createElement('option');
+        opt.value = y; opt.textContent = y;
+        pickYear.appendChild(opt);
+    }
+
+    function openCalPicker() {
+        calPickerOpen = true;
+        document.getElementById('calPicker').classList.add('open');
+        document.getElementById('calTitle').classList.add('open');
+        pickMonth.value = calCurrent.getMonth();
+        pickYear.value  = calCurrent.getFullYear();
+    }
+
+    function closeCalPicker() {
+        calPickerOpen = false;
+        document.getElementById('calPicker').classList.remove('open');
+        document.getElementById('calTitle').classList.remove('open');
+    }
+
+    document.getElementById('calTitle').addEventListener('click', () => {
+        calPickerOpen ? closeCalPicker() : openCalPicker();
+    });
+
+    document.getElementById('pickerGo').addEventListener('click', () => {
+        calCurrent.setFullYear(parseInt(pickYear.value));
+        calCurrent.setMonth(parseInt(pickMonth.value));
+        closeCalPicker();
+        renderCal();
+    });
+
+    document.addEventListener('click', e => {
+        if (calPickerOpen &&
+            !document.getElementById('calPicker').contains(e.target) &&
+            !document.getElementById('calTitle').contains(e.target)) {
+            closeCalPicker();
+        }
+    });
+
+    function renderCal() {
+        const year  = calCurrent.getFullYear();
+        const month = calCurrent.getMonth();
+        const today = new Date();
+
+        document.getElementById('calTitleText').textContent = `${CAL_MONTHS[month]} ${year}`;
+
+        const grid = document.getElementById('calGrid');
+        grid.innerHTML = '';
+
+        CAL_DAYS.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'cal-day-label';
+            el.textContent = d;
+            grid.appendChild(el);
+        });
+
+        const firstDay    = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const prevDays    = new Date(year, month, 0).getDate();
+
+        for (let i = firstDay - 1; i >= 0; i--) addCalDay(grid, prevDays - i, true);
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+            const isSel   = calSelected && d === calSelected.getDate() && month === calSelected.getMonth() && year === calSelected.getFullYear();
+            addCalDay(grid, d, false, isToday, isSel, () => {
+                calSelected = new Date(year, month, d);
+                renderCal();
+            });
+        }
+
+        const total     = firstDay + daysInMonth;
+        const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+        for (let d = 1; d <= remaining; d++) addCalDay(grid, d, true);
+    }
+
+    function addCalDay(grid, num, otherMonth, isToday, isSel, onClick) {
+        const el = document.createElement('div');
+        el.className = 'cal-day';
+        if (otherMonth) el.classList.add('other-month');
+        if (isToday)    el.classList.add('today');
+        if (isSel)      el.classList.add('selected');
+        el.textContent = num;
+        if (onClick) el.addEventListener('click', onClick);
+        grid.appendChild(el);
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        calCurrent.setMonth(calCurrent.getMonth() - 1); renderCal();
+    });
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        calCurrent.setMonth(calCurrent.getMonth() + 1); renderCal();
+    });
+
+    renderCal();
+</script>
 </body>
 </html>
