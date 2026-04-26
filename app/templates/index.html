@@ -4,32 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimePocket</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Reference style.css stylesheet -->
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 
 <body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
-        <!-- Logo -->
         <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
-        <span class="text-ui font-semibold">Logo</span>
+            <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
+            <span class="text-ui font-semibold">Logo</span>
         </div>
-        <!-- Login tab and dark mode toggle -->
         <div class="flex items-center gap-3">
-            <!-- Dark mode toggle -->
-            <!-- Within the svg tag, its best practice to include xmlns="http://www.w3.org/2000/svg" to reference to the standalone svg file -->
-            <!-- These are custom svg designs rendered on the spot -->
             <button id="theme-toggle" class="btn-icon" title="Toggle dark mode">
-                <!-- Dark mode toggle: Moon (shown in light mode) -->
                 <svg id="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                 </svg>
-                <!-- Light mode toggle: Sun (shown in dark mode) -->
                 <svg id="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
                     <circle cx="12" cy="12" r="5"/>
                     <line x1="12" y1="1" x2="12" y2="3"/>
@@ -46,13 +36,10 @@
         </div>
     </nav>
 
-    <!-- MAIN: two equal columns (stacks vertically on mobile) -->
+    <!-- MAIN -->
     <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden">
-
-        <!-- Left Column: Intro-->
+        <!-- Left Column -->
         <div class="w-full md:flex-1 flex items-center justify-center p-10">
-            <!-- Box -->
-            <!-- Add in these attributes to see the border: rounded-3xl border-2 border-card  -->
             <div class="w-full max-w-sm h-[480px] md:h-full md:max-h-[520px] flex flex-col justify-center p-8">
                 <p class="font-mono font-normal text-5xl leading-tight">Welcome to</p>
                 <h1 class="font-mono font-bold text-5xl leading-tight mb-4" style="color: var(--blue);">TimePocket</h1>
@@ -60,30 +47,22 @@
                 <button id="btn-jump-signup" class="btn-blue text-sm self-start">Get started</button>
             </div>
         </div>
-
-
-        <!-- Right Column: Instructions -->
+        <!-- Right Column -->
         <div class="w-full md:flex-1 flex flex-col items-center justify-center p-20">
-            <!-- Title -->
-            <!-- Add in these attributes to see the border: border-2 border-card rounded-full  -->
             <div class="px-10 py-3 w-full max-w-lg md:max-w-2xl text-center">
                 <h2>How it works:</h2>
             </div>
-            <!-- Slideshow -->
             <div class="w-full max-w-lg md:max-w-2xl h-[320px] md:flex-1 md:max-h-[340px] rounded-3xl border-2 border-card flex items-center justify-center">
                 <p class="text-ui text-sm">slideshow</p>
             </div>
         </div>
     </main>
-    
-    <!-- LOGIN AUTH POP-UP -->
-     <!-- Backend to take over -->
+
+    <!-- AUTH OVERLAY -->
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-box">
-
-            <!-- Panels -->
             <div class="flex gap-1 p-1 rounded-full mb-6" style="background: var(--bg-tab-pill);">
-                <button id="tab-login"  class="auth-tab active">Log in</button>
+                <button id="tab-login" class="auth-tab active">Log in</button>
                 <button id="tab-signup" class="auth-tab">Sign up</button>
             </div>
 
@@ -92,25 +71,16 @@
                 <h2 class="text-2xl font-semibold mb-1">Welcome back!</h2>
                 <p class="text-sm mb-5" style="color: var(--text-subtitle);">Sign in to your TimePocket account</p>
                 <div class="flex flex-col gap-3">
-                    <!-- User's email: id="login-email" -->
-                    <input class="tp-input" type="email"    placeholder="Email address" id="login-email" />
-                    <!-- User's password: id="login-password" -->
-                    <input class="tp-input" type="password" placeholder="Password"      id="login-password" />
+                    <input class="tp-input" type="email" placeholder="Email address" id="login-email" />
+                    <input class="tp-input" type="password" placeholder="Password" id="login-password" />
                 </div>
                 <div class="flex items-center justify-between mt-3 mb-5">
                     <label class="flex items-center gap-2 text-xs cursor-pointer select-none" style="color: var(--text-label);">
-                        <!-- For backend, could remove if unnecessary -->
                         <input type="checkbox" style="accent-color: var(--blue);" /> Remember me
                     </label>
-                    <!-- href would ideally refer the user to a password recovery scheme, if too complicated we can remove -->
                     <a href="#" class="text-xs hover:underline" style="color: var(--blue);">Forgot password?</a>
                 </div>
                 <button id="btn-login-submit" class="btn-blue w-full py-3 text-sm">Log in</button>
-                <div id="mfa-block" class="hidden mt-4">
-                    <p class="text-xs mb-2 text-center" style="color: var(--text-label);">Enter the 6-digit code from your authenticator app</p>
-                    <input class="tp-input text-center text-lg tracking-widest" maxlength="6" placeholder="· · · · · ·" id="mfa-code" />
-                    <button class="btn-blue w-full py-3 text-sm mt-3">Verify & continue</button>
-                </div>
                 <p class="text-xs text-center mt-5" style="color: var(--text-fine);">
                     No account? <button id="btn-to-signup" class="hover:underline font-medium cursor-pointer" style="color: var(--blue);">Sign up</button>
                 </p>
@@ -122,35 +92,29 @@
                 <p class="text-sm mb-5" style="color: var(--text-subtitle);">Join TimePocket!</p>
                 <div class="flex flex-col gap-3">
                     <div class="flex gap-2.5">
-                        <input class="tp-input" type="text" placeholder="First name" />
-                        <input class="tp-input" type="text" placeholder="Last name"  />
+                        <input class="tp-input" type="text" placeholder="First name" id="signup-firstname" />
+                        <input class="tp-input" type="text" placeholder="Last name" id="signup-lastname" />
                     </div>
-                    <input class="tp-input" type="text"     placeholder="Username"         />
-                    <input class="tp-input" type="email"    placeholder="Email address"    />
-                    <input class="tp-input" type="password" placeholder="Password"         />
-                    <input class="tp-input" type="password" placeholder="Confirm password" />
+                    <input class="tp-input" type="text" placeholder="Username" id="signup-username" />
+                    <input class="tp-input" type="email" placeholder="Email address" id="signup-email" />
+                    <input class="tp-input" type="password" placeholder="Password" id="signup-password" />
+                    <input class="tp-input" type="password" placeholder="Confirm password" id="signup-confirm" />
                 </div>
-                <!-- We could remove this as well potentially -->
                 <p class="text-xs mt-3 leading-relaxed" style="color: var(--text-fine);">
                     By signing up you agree to our <a href="#" class="hover:underline" style="color: var(--blue);">Terms</a> and <a href="#" class="hover:underline" style="color: var(--blue);">Privacy Policy</a>.
                 </p>
-                <button class="btn-blue w-full py-3 text-sm mt-5">Create my account</button>
+                <button id="btn-signup-submit" class="btn-blue w-full py-3 text-sm mt-5">Create my account</button>
                 <p class="text-xs text-center mt-5" style="color: var(--text-fine);">
                     Already have an account? <button id="btn-to-login" class="hover:underline font-medium cursor-pointer" style="color: var(--blue);">Log in</button>
                 </p>
             </div>
 
-            <!-- Close button -->
-             <!-- Uses &times; to symoblise the X symbol -->
-            <button id="btn-auth-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer transition-colors" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button> 
+            <button id="btn-auth-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer transition-colors" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
         </div>
     </div>
 </body>
 
-
-<!-- JavaScript -->
 <script>
-    // Theme
     const root = document.documentElement;
 
     function applyTheme(dark) {
@@ -167,14 +131,9 @@
 
     applyTheme(localStorage.getItem('theme') === 'dark');
 
-    // Authentication
     const authOverlay = document.getElementById('auth-overlay');
 
-    function openAuth(tab) {
-        authOverlay.classList.add('open');
-        switchTab(tab || 'login');
-    }
-
+    function openAuth(tab) { authOverlay.classList.add('open'); switchTab(tab || 'login'); }
     function closeAuth() { authOverlay.classList.remove('open'); }
 
     function switchTab(tab) {
@@ -185,23 +144,47 @@
         document.getElementById('tab-signup').classList.toggle('active', !isLogin);
     }
 
-    function handleLogin() {
+    // Login via AJAX
+    document.getElementById('btn-login-submit').addEventListener('click', function() {
         const email = document.getElementById('login-email').value;
-        const pass  = document.getElementById('login-password').value;
-        if (email && pass) {
-            document.getElementById('mfa-block').classList.remove('hidden');
-            document.getElementById('mfa-code').focus();
-        }
-    }
+        const password = document.getElementById('login-password').value;
+        fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) { window.location.href = '/dashboard'; }
+            else { alert(data.message || 'Invalid credentials.'); }
+        });
+    });
 
-    // Event listeners
+    // Signup via AJAX
+    document.getElementById('btn-signup-submit').addEventListener('click', function() {
+        const username = document.getElementById('signup-username').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const confirm = document.getElementById('signup-confirm').value;
+        if (password !== confirm) { alert('Passwords do not match!'); return; }
+        fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) { window.location.href = '/dashboard'; }
+            else { alert(data.message || 'Registration failed.'); }
+        });
+    });
+
     document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
     document.getElementById('btn-jump-signup').addEventListener('click', function() { openAuth('signup'); });
     document.getElementById('btn-nav-login').addEventListener('click', function() { openAuth('login'); });
     authOverlay.addEventListener('click', function(e) { if (e.target === authOverlay) closeAuth(); });
     document.getElementById('tab-login').addEventListener('click', function() { switchTab('login'); });
     document.getElementById('tab-signup').addEventListener('click', function() { switchTab('signup'); });
-    document.getElementById('btn-login-submit').addEventListener('click', handleLogin);
     document.getElementById('btn-auth-close').addEventListener('click', closeAuth);
     document.getElementById('btn-to-signup').addEventListener('click', function() { switchTab('signup'); });
     document.getElementById('btn-to-login').addEventListener('click', function() { switchTab('login'); });
