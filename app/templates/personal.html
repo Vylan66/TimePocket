@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TimePocket</title>
+    <title>TimePocket - Personal Calendar</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Reference style.css stylesheet -->
@@ -64,25 +64,5 @@
 
 
 <!-- JavaScript -->
-<script>
-    // Theme
-    const root = document.documentElement;
-
-    function applyTheme(dark) {
-        root.classList.toggle('dark', dark);
-        document.getElementById('icon-moon').style.display = dark ? 'none' : '';
-        document.getElementById('icon-sun').style.display  = dark ? '' : 'none';
-    }
-
-    function toggleTheme() {
-        const isDark = !root.classList.contains('dark');
-        applyTheme(isDark);
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    }
-
-    applyTheme(localStorage.getItem('theme') === 'dark');
-
-    // Event listeners
-    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-</script>
+<script src="{{ url_for('static', filename='dark_mode.js') }}"></script>
 </html>
