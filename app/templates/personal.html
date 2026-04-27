@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='mini_cal.css') }}">
 </head>
 
-<body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
+<body class="h-screen flex flex-col overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
         <!-- Logo -->
@@ -85,7 +85,10 @@
         </div>
 
         <!-- Right Column: Instructions -->
-        <div class="w-full flex-1 flex flex-col items-center justify-center p-20">
+        <div class="flex-1 flex gap-4 p-4 pt-0 md:p-4 md:pl-0 overflow-y-auto">
+            <div class="h-full w-full rounded-[20px] [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+
+            </div>
         </div>
     </main>
 
