@@ -51,10 +51,10 @@
     <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden" style="background-color: var(--bg-timetable);">
 
         <!-- Left Column: Mini Calendar + Categories -->
-        <div class="w-full max-w-xs mx-auto md:max-w-none md:mx-0 md:w-68 shrink-0 flex flex-col gap-4 p-4 overflow-y-auto rounded-3xl border-1 border-black">
+        <div class="w-full md:w-68 shrink-0 flex flex-row md:flex-col gap-4 p-4 overflow-y-auto">
 
             <!-- Mini Calendar -->
-            <div class="cal-widget rounded-[20px]">
+            <div class="cal-widget rounded-[20px] flex-1 md:flex-none">
                 <div class="cal-header">
                     <button class="cal-nav" id="prevBtn">&#8249;</button>
                     <div class="cal-title" id="calTitle">
@@ -78,14 +78,14 @@
             </div>
 
             <!-- Event Categories (placeholder) -->
-            <div class="rounded-[20px] p-4 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]">
+            <div class="flex-1 md:h-full rounded-[20px] p-4 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
                 <p class="text-xs tracking-widest [color:var(--text-label)]">Categories</p>
             </div>
 
         </div>
 
         <!-- Right Column: Instructions -->
-        <div class="w-full flex-1 flex flex-col items-center justify-center p-20 rounded-3xl border-1 border-black">
+        <div class="w-full flex-1 flex flex-col items-center justify-center p-20">
         </div>
     </main>
 
