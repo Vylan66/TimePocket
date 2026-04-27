@@ -149,9 +149,11 @@ html.dark .cal-widget .picker-select option {
 }
 .cal-widget .cal-day {
     text-align: center;
-    padding: 5px 2px;
+    padding: 4px 3px;
     font-size: 0.72rem;
-    border-radius: 50px;
+    width: 25px;
+    height: 25px;
+    border-radius: 100px;
     cursor: pointer;
     transition: background 0.12s;
 }
