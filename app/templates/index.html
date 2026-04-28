@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimePocket</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
@@ -113,7 +113,7 @@
         </div>
     </div>
 
-<script src="{{ url_for('static', filename='dark_mode.js') }}"></script>
-<script src="{{ url_for('static', filename='auth.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
 </html>

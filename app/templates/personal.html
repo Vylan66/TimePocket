@@ -7,9 +7,9 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Reference style.css stylesheet -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='mini_cal.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='timetable.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mini_cal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/timetable.css') }}">
 </head>
 
 <body class="h-screen flex flex-col overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
@@ -268,8 +268,8 @@
     </div>
 
 <!-- JavaScript -->
-<script src="{{ url_for('static', filename='dark_mode.js') }}"></script>
-<script src="{{ url_for('static', filename='mini_cal.js') }}"></script>
-<script src="{{ url_for('static', filename='timetable.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mini_cal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/timetable.js') }}"></script>
 </body>
 </html>
