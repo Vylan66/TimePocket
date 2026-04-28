@@ -20,6 +20,7 @@
     --border-glass: rgba(255,255,255,0.65);
     --border-card:  #d1d5db;
     --border-ui:    #9ca3af;
+    --grid-line:    #bcc0c9;
 
     /* Text colours */
     --text-ui:          #9ca3af;
@@ -46,6 +47,7 @@ html.dark {
     --border-glass: rgba(255,255,255,0.1);
     --border-card:  #3d3a37;
     --border-ui:    #5c5956;
+    --grid-line:    #3d3a37;
 
     --text-ui:          #7a7774;
     --text-subtitle:    rgba(236,233,230,0.6);
@@ -159,3 +161,17 @@ button {
     color: var(--text-tab);
 }
 .auth-tab.active { background: var(--blue); color: #fff; }
+
+select.tp-input {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+html.dark select.tp-input option {
+    background: #27231f;
+    color: #ece9e6;
+}
