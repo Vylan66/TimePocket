@@ -9,27 +9,21 @@
     <!-- Reference style.css stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='mini_cal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='timetable.css') }}">
 </head>
 
 <body class="h-screen flex flex-col overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
-        <!-- Logo -->
         <div class="flex items-center gap-2">
            <div class="w-9 h-9 rounded-full border-2 [border-color:var(--border-ui)]"></div>
            <span class="font-semibold [color:var(--text-ui)]">Logo</span>
         </div>
-        <!-- Login tab and dark mode toggle -->
         <div class="flex items-center gap-3">
-            <!-- Dark mode toggle -->
-            <!-- Within the svg tag, its best practice to include xmlns="http://www.w3.org/2000/svg" to reference to the standalone svg file -->
-            <!-- These are custom svg designs rendered on the spot -->
             <button id="theme-toggle" class="btn-icon" title="Toggle dark mode">
-                <!-- Dark mode toggle: Moon (shown in light mode) -->
                 <svg id="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                 </svg>
-                <!-- Light mode toggle: Sun (shown in dark mode) -->
                 <svg id="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
                     <circle cx="12" cy="12" r="5"/>
                     <line x1="12" y1="1" x2="12" y2="3"/>
@@ -46,22 +40,19 @@
         </div>
     </nav>
 
-    <!-- MAIN: two equal columns (stacks vertically on mobile) -->
-    <!-- Add in these attributes to see the border: rounded-3xl border-1 border-black  -->
+    <!-- MAIN -->
     <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden" style="background-color: var(--bg-timetable);">
 
         <!-- Left Column: Mini Calendar + Categories -->
         <div class="w-full md:w-68 shrink-0 flex flex-row md:flex-col gap-4 p-4 overflow-y-auto">
-
-            <!-- Mini Calendar -->
             <div class="cal-widget rounded-[20px] flex-1 md:flex-none">
                 <div class="cal-header">
-                    <button class="cal-nav" id="prevBtn">&#8249;</button>
+                    <button class="btn-icon text-base leading-none" id="prevBtn">&#8249;</button>
                     <div class="cal-title" id="calTitle">
                         <span id="calTitleText"></span>
                         <span class="cal-arrow">&#9660;</span>
                     </div>
-                    <button class="cal-nav" id="nextBtn">&#8250;</button>
+                    <button class="btn-icon text-base leading-none" id="nextBtn">&#8250;</button>
                 </div>
                 <div class="cal-picker" id="calPicker">
                     <div class="picker-row">
@@ -76,24 +67,209 @@
                 </div>
                 <div class="cal-grid" id="calGrid"></div>
             </div>
-
-            <!-- Event Categories (placeholder) -->
             <div class="flex-1 md:h-full rounded-[20px] p-4 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
                 <p class="text-xs tracking-widest [color:var(--text-label)]">Categories</p>
             </div>
-
         </div>
 
-        <!-- Right Column: Instructions -->
+        <!-- Right Column: Timetable -->
         <div class="flex-1 flex gap-4 p-4 pt-0 md:p-4 md:pl-0 overflow-y-auto">
-            <div class="h-full w-full rounded-[20px] [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+            <div class="h-full w-full rounded-[20px] flex flex-col overflow-hidden [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
 
+                <!-- Toolbar -->
+                <div class="flex shrink-0 items-center justify-between px-4 py-2">
+                    <span id="weekLabel" class="text-xs" style="color: var(--text-fine);"></span>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="changeWeek(-1)" class="btn-icon text-base leading-none">&#8249;</button>
+                        <button id="todayBtn" class="btn-today text-xs px-3 py-1 rounded-full border" style="border-color: var(--border-card); color: var(--text-label); background: transparent;">Today</button>
+                        <button onclick="changeWeek(1)" class="btn-icon text-base leading-none">&#8250;</button>
+                        <button id="addEventBtn" class="btn-blue px-3 py-1 text-xs">+ New event</button>
+                    </div>
+                </div>
+
+                <!-- Day headers: 7 static shells, JS updates text + today highlight -->
+                <div class="flex shrink-0 border-b" style="border-color: var(--grid-line);" id="day-headers">
+                    <div class="w-14 shrink-0"></div>
+                    <div class="grid grid-cols-7 flex-1" id="day-header-cells">
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <span class="text-xs" id="hdr-name-0" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-0"></span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <span class="text-xs" id="hdr-name-1" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-1"></span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <span class="text-xs" id="hdr-name-2" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-2"></span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <span class="text-xs" id="hdr-name-3" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-3"></span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <span class="text-xs" id="hdr-name-4" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-4"></span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <span class="text-xs" id="hdr-name-5" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-5"></span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <span class="text-xs" id="hdr-name-6" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-6"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scrollable time body -->
+                <div class="flex min-h-0 flex-1 overflow-y-scroll styled-scroll" id="time-body">
+
+                    <!-- Time gutter: pure HTML+CSS, no JS required -->
+                    <div class="w-14 shrink-0 border-r flex flex-col" style="border-color: var(--grid-line);" id="time-gutter">
+                        <div class="hour-slot"></div><!-- 4 AM — no label, aligns with first grid row -->
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">5 AM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">6 AM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">7 AM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">8 AM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">9 AM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">10 AM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">11 AM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">12 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">1 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">2 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">3 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">4 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">5 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">6 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">7 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">8 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">9 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">10 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">11 PM</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
+                        </div>
+                    </div>
+
+                    <!-- Day columns: height + grid lines handled entirely by CSS -->
+                    <div class="grid grid-cols-7 flex-1 relative" id="day-columns">
+                        <div class="border-r" style="border-color: var(--grid-line);" id="col-0"></div>
+                        <div class="border-r" style="border-color: var(--grid-line);" id="col-1"></div>
+                        <div class="border-r" style="border-color: var(--grid-line);" id="col-2"></div>
+                        <div class="border-r" style="border-color: var(--grid-line);" id="col-3"></div>
+                        <div class="border-r" style="border-color: var(--grid-line);" id="col-4"></div>
+                        <div class="border-r" style="border-color: var(--grid-line);" id="col-5"></div>
+                        <div id="col-6"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
+    <!-- Add Event Pop-up -->
+    <div id="popupOverlay" style="display:none; position:fixed; inset:0; z-index:50; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);" onclick="handleOverlayClick(event)">
+        <div class="popup-box w-full max-w-sm mx-4 relative border" style="background: var(--bg-surface); border-color: var(--border-glass); box-shadow: 0 30px 80px rgba(0,0,0,0.16); border-radius: 1.5rem; padding: 2.25rem; backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8);">
+            <h2 class="text-lg font-semibold mb-4" style="color: var(--dark);">New Event</h2>
+
+            <div class="mb-3">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Title</label>
+                <input id="evTitle" type="text" placeholder="e.g. Team standup" class="tp-input" />
+            </div>
+
+            <div class="mb-3">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Day</label>
+                <select id="evDay" class="tp-input"></select>
+            </div>
+
+            <div class="flex gap-3 mb-3">
+                <div class="flex-1">
+                    <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Start</label>
+                    <input id="evStart" type="time" value="09:00" class="tp-input" />
+                </div>
+                <div class="flex-1">
+                    <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">End</label>
+                    <input id="evEnd" type="time" value="10:00" class="tp-input" />
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Colour</label>
+                <select id="evColor" class="tp-input">
+                    <option value="bg-blue-500">Blue</option>
+                    <option value="bg-emerald-500">Green</option>
+                    <option value="bg-orange-500">Orange</option>
+                    <option value="bg-rose-500">Red</option>
+                    <option value="bg-purple-500">Purple</option>
+                </select>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button id="cancelBtn" class="px-4 py-2 text-sm rounded-full border" style="border-color: var(--border-card); color: var(--text-label); background: transparent;">Cancel</button>
+                <button id="saveBtn" class="btn-blue px-4 py-2 text-sm">Save</button>
+            </div>
+
+            <button id="btn-popup-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
+        </div>
+    </div>
+
 <!-- JavaScript -->
 <script src="{{ url_for('static', filename='dark_mode.js') }}"></script>
 <script src="{{ url_for('static', filename='mini_cal.js') }}"></script>
+<script src="{{ url_for('static', filename='timetable.js') }}"></script>
 </body>
 </html>
