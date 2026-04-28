@@ -109,12 +109,4 @@ document.getElementById('nextBtn').addEventListener('click', () => {
     calCurrent.setMonth(calCurrent.getMonth() + 1); renderCal();
 });
 
-renderCal();entListener('click', () => {
-    calCurrent.setMonth(calCurrent.getMonth() + 1); renderCal();
-});
-
-renderCal();entListener('click', () => {
-    calCurrent.setMonth(calCurrent.getMonth() + 1); renderCal();
-});
-
 renderCal();

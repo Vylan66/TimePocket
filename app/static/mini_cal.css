@@ -36,20 +36,6 @@
     transition: transform 0.2s;
     display: inline-block;
 }
-.cal-widget .cal-nav {
-    background: none;
-    color: var(--dark);
-    width: 30px;
-    height: 30px;
-    border-radius: 50px;
-    cursor: pointer;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s;
-}
-.cal-widget .cal-nav:hover { background: var(--bg-tab-pill); }
 
 /* Picker dropdown — frosted glass */
 .cal-widget .cal-picker {
