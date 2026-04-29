@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TimePocket - Profile</title>
+        <title>TimePocket - Dashboard</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
@@ -14,7 +14,7 @@
          <div class="flex justify-between flex-row p-4 items-center">
             <div id="logo" class="flex flex-row justify-center items-center gap-2">
                 <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
-                <span class="text-ui font-semibold">Logo</span>
+                <span class="text-ui font-semibold">TimePocket</span>
             </div>
 
             <div id="nav-bar" class="flex flex-row justify-evenly gap-16 items-center">
@@ -31,7 +31,7 @@
 
             <div id="profile-container" class="flex flex-row justify-end gap-4 items-center">
                 <div id="dark-toggle">
-
+                    <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
                 </div>
                 <div id="profile-link">
                     Profile
@@ -40,8 +40,17 @@
          </div>
 
         <!-- DASHBOARD INFO -->
-         <div>
-
+         <div class="grid grid-cols-2 gap-2 m-4">
+            <div id="current-day-events" class="border-2">
+            </div>
+            
+            <div id="sub-dash-grid" class="grid-cols-subgrid">
+                <div id="upcoming-events">
+                </div>
+                
+                <div id="upcoming-plans">
+                </div>
+            </div>
          </div>
     </body>
 
