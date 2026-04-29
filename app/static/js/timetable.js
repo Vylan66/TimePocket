@@ -113,50 +113,57 @@ function buildColumns() {
         }
     }
 
-    // Populate popup day select
+    // Populate popup day select (only present on personal page)
     const evDay = document.getElementById('evDay');
-    evDay.innerHTML = '';
-    for (let i = 0; i < 7; i++) {
-        const d   = new Date(weekStart); d.setDate(d.getDate() + i);
-        const opt = document.createElement('option');
-        opt.value       = i;
-        opt.textContent = `${DAY_NAMES[d.getDay()]} ${d.getDate()}`;
-        evDay.appendChild(opt);
+    if (evDay) {
+        evDay.innerHTML = '';
+        for (let i = 0; i < 7; i++) {
+            const d   = new Date(weekStart); d.setDate(d.getDate() + i);
+            const opt = document.createElement('option');
+            opt.value       = i;
+            opt.textContent = `${DAY_NAMES[d.getDay()]} ${d.getDate()}`;
+            evDay.appendChild(opt);
+        }
     }
+
+    if (typeof window.onAfterBuildColumns === 'function') window.onAfterBuildColumns();
 }
 
-// New Event Pop-up 
+// New Event Pop-up (only on personal page)
 const popupOverlay = document.getElementById('popupOverlay');
 
-document.getElementById('addEventBtn').addEventListener('click', () => {
-    popupOverlay.style.display    = 'flex';
-    popupOverlay.style.background = 'var(--overlay-bg)';
-    document.getElementById('evTitle').focus();
-});
-
-function closepopup() { popupOverlay.style.display = 'none'; }
+function closepopup() { if (popupOverlay) popupOverlay.style.display = 'none'; }
 function handleOverlayClick(e) { if (e.target === popupOverlay) closepopup(); }
 
-document.getElementById('cancelBtn').addEventListener('click', closepopup);
-document.getElementById('btn-popup-close').addEventListener('click', closepopup);
+if (document.getElementById('addEventBtn')) {
+    document.getElementById('addEventBtn').addEventListener('click', () => {
+        popupOverlay.style.display    = 'flex';
+        popupOverlay.style.background = 'var(--overlay-bg)';
+        document.getElementById('evTitle').focus();
+    });
+}
+if (document.getElementById('cancelBtn'))   document.getElementById('cancelBtn').addEventListener('click', closepopup);
+if (document.getElementById('btn-popup-close')) document.getElementById('btn-popup-close').addEventListener('click', closepopup);
 
-document.getElementById('saveBtn').addEventListener('click', () => {
-    const title = document.getElementById('evTitle').value.trim();
-    const day   = parseInt(document.getElementById('evDay').value);
-    const start = document.getElementById('evStart').value;
-    const end   = document.getElementById('evEnd').value;
-    const color = document.getElementById('evColor').value;
+if (document.getElementById('saveBtn')) {
+    document.getElementById('saveBtn').addEventListener('click', () => {
+        const title = document.getElementById('evTitle').value.trim();
+        const day   = parseInt(document.getElementById('evDay').value);
+        const start = document.getElementById('evStart').value;
+        const end   = document.getElementById('evEnd').value;
+        const color = document.getElementById('evColor').value;
 
-    if (!title || !start || !end || start >= end) {
-        alert('Please fill in all fields and ensure start time is before end time.');
-        return;
-    }
+        if (!title || !start || !end || start >= end) {
+            alert('Please fill in all fields and ensure start time is before end time.');
+            return;
+        }
 
-    events.push({ title, day, start, end, color });
-    closepopup();
-    buildColumns();
-    document.getElementById('evTitle').value = '';
-});
+        events.push({ title, day, start, end, color });
+        closepopup();
+        buildColumns();
+        document.getElementById('evTitle').value = '';
+    });
+}
 
 document.getElementById('todayBtn').addEventListener('click', () => {
     weekOffset = 0;
