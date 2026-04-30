@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>TimePocket - Dashboard</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="../static/style.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
 
     <body class="font-mono flex flex-col justify-between h-screen" style="background: var(--blue-light); color: var(--dark); transition: background 0.3s, color 0.3s">

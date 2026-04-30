@@ -12,6 +12,14 @@ def dashboard():
     my_availability = Availability.query.filter_by(user_id=current_user.id).all()
     return render_template('dashboard.html', users=all_users, my_availability=my_availability)
 
+@main.route('/test/dashboard')
+def dashboardTest():
+    return render_template('dashboard.html')
+
+@main.route('/test/profile')
+def profileTest():
+    return render_template('profile.html')
+
 @main.route('/availability', methods=['POST'])
 @login_required
 def add_availability():
