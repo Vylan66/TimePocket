@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="../static/style.css">
     </head>
 
-    <body class="font-mono flex flex-col" style="background: var(--blue-light); color: var(--dark); transition: background 0.3s, color 0.3s">
+    <body class="font-mono flex flex-col justify-between h-screen" style="background: var(--blue-light); color: var(--dark); transition: background 0.3s, color 0.3s">
         <!-- NAV BAR-->
          <div class="flex justify-between flex-row p-4 items-center" style="background-color: var(--bg-page);">
             <div id="logo" class="flex flex-row justify-center items-center gap-2">
@@ -40,16 +40,13 @@
          </div>
 
         <!-- DASHBOARD INFO -->
-         <div class="grid grid-cols-2 gap-2 m-4">
-            <div id="current-day-events" class="border-2">
+         <div class="grid grid-cols-4 grid-rows-2 gap-8 m-8 grow">
+            <div id="current-day-events" class="rounded-3xl row-span-2" style="background-color: var(--bg-page);">
             </div>
-            
-            <div id="sub-dash-grid" class="grid-cols-subgrid">
-                <div id="upcoming-events">
-                </div>
+            <div id="upcoming-events" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
+            </div>
                 
-                <div id="upcoming-plans">
-                </div>
+            <div id="upcoming-plans" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
             </div>
          </div>
     </body>
