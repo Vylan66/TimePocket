@@ -22,6 +22,17 @@ def dashboard():
     my_availability = Availability.query.filter_by(user_id=current_user.id).all()
     return render_template('dashboard.html', users=all_users, my_availability=my_availability)
 
+@main.route('/availability', methods=['GET'])
+@login_required
+def get_my_availability():
+    slots = Availability.query.filter_by(user_id=current_user.id).all()
+    return jsonify([{
+        'id': s.id,
+        'day': s.day,
+        'start_time': s.start_time,
+        'end_time': s.end_time
+    } for s in slots])
+
 @main.route('/availability', methods=['POST'])
 @login_required
 def add_availability():

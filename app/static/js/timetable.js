@@ -13,16 +13,7 @@ _timeBody.style.setProperty('--num-hours', NUM_HOURS);
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 let weekOffset  = 0;
 
-// Example events (to remove)
-let events = [
-    { title: '9am — Lecture',       day: 0, start: '09:00', end: '10:00', color: 'bg-blue-400'   },
-    { title: '1pm — Lunch',         day: 0, start: '13:00', end: '14:00', color: 'bg-green-400'  },
-    { title: '10am — Tutorial',     day: 2, start: '10:00', end: '11:30', color: 'bg-blue-400'   },
-    { title: '3pm — Gym',           day: 2, start: '15:00', end: '16:00', color: 'bg-orange-400' },
-    { title: 'Busy',                day: 4, start: '09:00', end: '09:30', color: 'bg-red-300'    },
-    { title: '2pm — Study session', day: 4, start: '14:00', end: '17:00', color: 'bg-blue-300'   },
-    { title: '11am — Brunch',       day: 5, start: '11:00', end: '13:00', color: 'bg-orange-300' },
-];
+let events = [];
 
 // Helpers 
 function getWeekStart() {
@@ -159,6 +150,7 @@ if (document.getElementById('saveBtn')) {
         }
 
         events.push({ title, day, start, end, color });
+        if (typeof window.onEventSave === 'function') window.onEventSave({ title, day, start, end, color });
         closepopup();
         buildColumns();
         document.getElementById('evTitle').value = '';

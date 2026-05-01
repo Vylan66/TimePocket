@@ -99,14 +99,10 @@ async function selectGroup(id, name, role) {
             `<p class="text-xs text-center mt-4" style="color:var(--text-fine);">Failed to load members</p>`;
     }
 
-    try {
-        const res  = await fetch(`/groups/${id}/heatmap`);
-        const data = await res.json();
-        currentHeatmapData = data;
-        renderHeatmap(data);
-    } catch {
-        currentHeatmapData = null;
-    }
+    const hmRes  = await fetch(`/groups/${id}/heatmap`);
+    const hmData = await hmRes.json();
+    currentHeatmapData = hmData;
+    renderHeatmap(hmData);
 }
 
 function backToGroups() {
@@ -290,7 +286,7 @@ function renderSettingsMembersList(members, isOwner) {
             ${m.role === 'owner'
                 ? `<span class="text-[10px] px-1.5 py-0.5 rounded-full" style="background:rgba(124,58,237,0.1);color:#7c3aed;">owner</span>`
                 : isOwner
-                    ? `<button onclick="removeMember(${m.user_id})" class="text-[10px] px-1.5 py-0.5 rounded-full border transition-colors"
+                    ? `<button onclick="removeMember(${m.id})" class="text-[10px] px-1.5 py-0.5 rounded-full border transition-colors"
                         style="border-color:#ef4444;color:#ef4444;"
                         onmouseover="this.style.background='rgba(239,68,68,0.08)'"
                         onmouseout="this.style.background='transparent'">Remove</button>`
@@ -338,6 +334,10 @@ async function removeMember(userId) {
         const data = await (await fetch(`/groups/${selectedGroupId}`)).json();
         renderSettingsMembersList(data.members, true);
         renderMembersList(data.members);
+        const hmRes  = await fetch(`/groups/${selectedGroupId}/heatmap`);
+        const hmData = await hmRes.json();
+        currentHeatmapData = hmData;
+        renderHeatmap(hmData);
     }
 }
 
