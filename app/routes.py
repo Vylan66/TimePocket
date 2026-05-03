@@ -5,6 +5,11 @@ from app.models import Availability, User
 
 main = Blueprint('main', __name__)
 
+@main.route('/personal')
+@login_required
+def personal():
+    return render_template('personal.html')
+
 @main.route('/dashboard')
 @login_required
 def dashboard():

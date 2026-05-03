@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimePocket</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
-            <span class="text-ui font-semibold">Logo</span>
+            <div class="w-9 h-9 rounded-full border-2 [border-color:var(--border-ui)]"></div>
+            <span class="font-semibold [color:var(--text-ui)]">Logo</span>
         </div>
         <div class="flex items-center gap-3">
             <button id="theme-toggle" class="btn-icon" title="Toggle dark mode">
@@ -52,8 +52,8 @@
             <div class="px-10 py-3 w-full max-w-lg md:max-w-2xl text-center">
                 <h2>How it works:</h2>
             </div>
-            <div class="w-full max-w-lg md:max-w-2xl h-[320px] md:flex-1 md:max-h-[340px] rounded-3xl border-2 border-card flex items-center justify-center">
-                <p class="text-ui text-sm">slideshow</p>
+            <div class="w-full max-w-lg md:max-w-2xl h-[320px] md:flex-1 md:max-h-[340px] rounded-3xl border-2 [border-color:var(--border-card)] flex items-center justify-center">
+                <p class="text-sm [color:var(--text-ui)]">slideshow</p>
             </div>
         </div>
     </main>
@@ -112,82 +112,8 @@
             <button id="btn-auth-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer transition-colors" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
         </div>
     </div>
+
+<script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
-
-<script>
-    const root = document.documentElement;
-
-    function applyTheme(dark) {
-        root.classList.toggle('dark', dark);
-        document.getElementById('icon-moon').style.display = dark ? 'none' : '';
-        document.getElementById('icon-sun').style.display  = dark ? '' : 'none';
-    }
-
-    function toggleTheme() {
-        const isDark = !root.classList.contains('dark');
-        applyTheme(isDark);
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    }
-
-    applyTheme(localStorage.getItem('theme') === 'dark');
-
-    const authOverlay = document.getElementById('auth-overlay');
-
-    function openAuth(tab) { authOverlay.classList.add('open'); switchTab(tab || 'login'); }
-    function closeAuth() { authOverlay.classList.remove('open'); }
-
-    function switchTab(tab) {
-        const isLogin = tab === 'login';
-        document.getElementById('panel-login').classList.toggle('hidden', !isLogin);
-        document.getElementById('panel-signup').classList.toggle('hidden', isLogin);
-        document.getElementById('tab-login').classList.toggle('active', isLogin);
-        document.getElementById('tab-signup').classList.toggle('active', !isLogin);
-    }
-
-    // Login via AJAX
-    document.getElementById('btn-login-submit').addEventListener('click', function() {
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) { window.location.href = '/dashboard'; }
-            else { alert(data.message || 'Invalid credentials.'); }
-        });
-    });
-
-    // Signup via AJAX
-    document.getElementById('btn-signup-submit').addEventListener('click', function() {
-        const username = document.getElementById('signup-username').value;
-        const email = document.getElementById('signup-email').value;
-        const password = document.getElementById('signup-password').value;
-        const confirm = document.getElementById('signup-confirm').value;
-        if (password !== confirm) { alert('Passwords do not match!'); return; }
-        fetch('/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) { window.location.href = '/dashboard'; }
-            else { alert(data.message || 'Registration failed.'); }
-        });
-    });
-
-    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-    document.getElementById('btn-jump-signup').addEventListener('click', function() { openAuth('signup'); });
-    document.getElementById('btn-nav-login').addEventListener('click', function() { openAuth('login'); });
-    authOverlay.addEventListener('click', function(e) { if (e.target === authOverlay) closeAuth(); });
-    document.getElementById('tab-login').addEventListener('click', function() { switchTab('login'); });
-    document.getElementById('tab-signup').addEventListener('click', function() { switchTab('signup'); });
-    document.getElementById('btn-auth-close').addEventListener('click', closeAuth);
-    document.getElementById('btn-to-signup').addEventListener('click', function() { switchTab('signup'); });
-    document.getElementById('btn-to-login').addEventListener('click', function() { switchTab('login'); });
-    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAuth(); });
-</script>
 </html>

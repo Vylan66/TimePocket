@@ -1,0 +1,94 @@
+/* Today button */
+.btn-today {
+    transition: background 0.15s;
+}
+.btn-today:hover { background: var(--bg-tab-pill) !important; }
+
+/* Timetable layout constants 
+   --hour-h   : height of one hour row — JS reads this so it's the
+                single source of truth for pixel calculations.
+   --num-hours: set by JS on init (END_HOUR - START_HOUR + 1).
+   Scoped to #time-body so these names don't bleed into the global page.
+*/
+#time-body {
+    --hour-h:        56px;
+    --num-hours:     20;  /* fallback; JS overrides immediately */
+    scrollbar-gutter: stable;
+}
+
+/* One hour-height row in the time gutter */
+.hour-slot { height: var(--hour-h); position: relative; flex-shrink: 0; }
+
+/* Horizontal grid lines — CSS background, always fully painted on scroll.
+   Explicit height prevents flex-stretch from capping the element at the
+   visible viewport height, which would clip the background on scroll. */
+#time-gutter, #day-columns {
+    height: calc(var(--hour-h) * var(--num-hours));
+}
+#day-columns {
+    background-image: repeating-linear-gradient(
+        to bottom,
+        var(--grid-line) 0px, var(--grid-line) 1px,
+        transparent 1px, transparent var(--hour-h)
+    );
+    background-position-y: var(--hour-h);
+}
+
+/* Column height and stacking context — driven by CSS vars, no JS needed */
+#day-columns > div {
+    height: calc(var(--hour-h) * var(--num-hours));
+    position: relative;
+}
+
+/* Scrollbar */
+.styled-scroll::-webkit-scrollbar { width: 4px; }
+.styled-scroll::-webkit-scrollbar-track { background: transparent; }
+.styled-scroll::-webkit-scrollbar-thumb { background: var(--border-card); border-radius: 99px; }
+.styled-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-ui); }
+
+/* Event blocks */
+.cal-event {
+    position: absolute;
+    left: 4px; right: 4px;
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    transition: transform 0.1s, box-shadow 0.1s;
+    z-index: 1;
+}
+.cal-event:hover {transform: scale(1.02); box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+.cal-event .ev-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-event .ev-time  { font-size: 0.65rem; opacity: 0.85; margin-top: 2px; }
+
+/* Now-line */
+.now-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--blue);
+    z-index: 3;
+    pointer-events: none;
+}
+.now-line::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--blue);
+}
+
+/* Popup animation */
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.94) translateY(8px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+.popup-box { animation: popIn 0.18s ease; }

@@ -1,0 +1,143 @@
+/* ── Mini Calendar Widget ── */
+.cal-widget {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-card);
+    color: var(--dark);
+    padding: 18px;
+    width: 100%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    position: relative;
+}
+.cal-widget .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+.cal-widget .cal-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 10px;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+    letter-spacing: 0.01em;
+}
+.cal-widget .cal-title:hover { background: var(--bg-tab-pill); }
+.cal-widget .cal-title.open .cal-arrow { transform: rotate(180deg); }
+.cal-widget .cal-arrow {
+    font-size: 0.5rem;
+    color: var(--text-ui);
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+/* Picker dropdown */
+.cal-widget .cal-picker {
+    display: none;
+    position: absolute;
+    top: 56px;
+    left: 18px;
+    right: 18px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-card);
+    border-radius: 16px;
+    padding: 14px;
+    z-index: 10;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    animation: calFadeIn 0.15s ease;
+}
+.cal-widget .cal-picker.open { display: block; }
+
+@keyframes calFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.cal-widget .picker-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.cal-widget .picker-label {
+    font-size: 0.58rem;
+    color: var(--text-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    width: 38px;
+    flex-shrink: 0;
+}
+.cal-widget .picker-select {
+    flex: 1;
+    background: var(--bg-input);
+    color: var(--dark);
+    border: 1px solid var(--border-card);
+    border-radius: 8px;
+    padding: 5px 22px 5px 8px;
+    font-family: inherit;
+    font-size: 0.72rem;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 7px center;
+}
+html.dark .cal-widget .picker-select option {
+    background: #27231f;
+    color: #ece9e6;
+}
+.cal-widget .picker-select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-ring);
+}
+.cal-widget .picker-go {
+    width: 100%;
+    margin-top: 4px;
+    padding: 7px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.cal-widget .picker-go:hover { background: var(--blue-light); }
+
+/* Calendar grid */
+.cal-widget .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+}
+.cal-widget .cal-day-label {
+    text-align: center;
+    font-size: 0.58rem;
+    color: var(--text-label);
+    padding: 3px 0 6px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.cal-widget .cal-day {
+    text-align: center;
+    padding: 4px 3px;
+    font-size: 0.72rem;
+    width: 25px;
+    height: 25px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+.cal-widget .cal-day:hover       { background: var(--bg-tab-pill); }
+.cal-widget .cal-day.other-month { color: var(--text-fine); }
+.cal-widget .cal-day.today       { background: var(--blue); color: #fff; font-weight: 500; }
+.cal-widget .cal-day.selected    { background: var(--blue-ring); color: var(--blue); font-weight: 500; }
