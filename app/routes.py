@@ -5,12 +5,25 @@ from app.models import Availability, User
 
 main = Blueprint('main', __name__)
 
+@main.route('/personal')
+@login_required
+def personal():
+    return render_template('personal.html')
+
 @main.route('/dashboard')
 @login_required
 def dashboard():
     all_users = User.query.all()
     my_availability = Availability.query.filter_by(user_id=current_user.id).all()
     return render_template('dashboard.html', users=all_users, my_availability=my_availability)
+
+@main.route('/test/dashboard')
+def dashboardTest():
+    return render_template('dashboard.html')
+
+@main.route('/test/profile')
+def profileTest():
+    return render_template('profile.html')
 
 @main.route('/availability', methods=['POST'])
 @login_required
