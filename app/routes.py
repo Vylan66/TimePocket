@@ -32,6 +32,13 @@ def get_my_availability():
         'start_time': s.start_time,
         'end_time': s.end_time
     } for s in slots])
+@main.route('/test/dashboard')
+def dashboardTest():
+    return render_template('dashboard.html')
+
+@main.route('/test/profile')
+def profileTest():
+    return render_template('profile.html')
 
 @main.route('/availability', methods=['POST'])
 @login_required

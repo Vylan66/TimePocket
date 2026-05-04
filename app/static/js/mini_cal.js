@@ -83,6 +83,7 @@ function renderCal() {
         addCalDay(grid, d, false, isToday, isSel, () => {
             calSelected = new Date(year, month, d);
             renderCal();
+            if (typeof goToWeekContaining === 'function') goToWeekContaining(calSelected);
         });
     }
 
@@ -95,8 +96,8 @@ function addCalDay(grid, num, otherMonth, isToday, isSel, onClick) {
     const el = document.createElement('div');
     el.className = 'cal-day';
     if (otherMonth) el.classList.add('other-month');
-    if (isToday)    el.classList.add('today');
-    if (isSel)      el.classList.add('selected');
+    if (isToday)         el.classList.add('today');
+    if (isSel && !isToday) el.classList.add('selected');
     el.textContent = num;
     if (onClick) el.addEventListener('click', onClick);
     grid.appendChild(el);
@@ -108,5 +109,11 @@ document.getElementById('prevBtn').addEventListener('click', () => {
 document.getElementById('nextBtn').addEventListener('click', () => {
     calCurrent.setMonth(calCurrent.getMonth() + 1); renderCal();
 });
+
+function jumpToDate(date) {
+    calSelected = new Date(date);
+    calCurrent  = new Date(date.getFullYear(), date.getMonth(), 1);
+    renderCal();
+}
 
 renderCal();

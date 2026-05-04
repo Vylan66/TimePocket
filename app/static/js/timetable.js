@@ -69,6 +69,16 @@ function changeWeek(dir) {
     buildColumns();
 }
 
+function goToWeekContaining(date) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const d     = new Date(date); d.setHours(0, 0, 0, 0);
+    const targetSunday  = new Date(d);    targetSunday.setDate(d.getDate() - d.getDay());
+    const currentSunday = new Date(today); currentSunday.setDate(today.getDate() - today.getDay());
+    weekOffset = Math.round((targetSunday - currentSunday) / (7 * 24 * 60 * 60 * 1000));
+    renderWeekHeaders();
+    buildColumns();
+}
+
 // Day columns — only injects events + now-line; layout is CSS 
 function buildColumns() {
     const weekStart = getWeekStart();
@@ -161,6 +171,7 @@ document.getElementById('todayBtn').addEventListener('click', () => {
     weekOffset = 0;
     renderWeekHeaders();
     buildColumns();
+    if (typeof jumpToDate === 'function') jumpToDate(new Date());
 });
 
 // Init 
