@@ -225,3 +225,8 @@ def search_users():
         User.id != current_user.id
     ).limit(10).all()
     return jsonify({'users': [{'id': u.id, 'username': u.username} for u in users]})
+
+@main.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html')
