@@ -140,6 +140,20 @@ if (document.getElementById('addEventBtn')) {
     document.getElementById('addEventBtn').addEventListener('click', () => {
         popupOverlay.style.display    = 'flex';
         popupOverlay.style.background = 'var(--overlay-bg)';
+
+        // Default day: mini cal selection if it falls in current week, else today
+        const weekStart = getWeekStart();
+        const target    = (typeof calSelected !== 'undefined' && calSelected)
+                            ? new Date(calSelected)
+                            : new Date();
+        target.setHours(0, 0, 0, 0);
+        let defaultDay = 0;
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(weekStart); d.setDate(d.getDate() + i);
+            if (sameDay(d, target)) { defaultDay = i; break; }
+        }
+        document.getElementById('evDay').value = defaultDay;
+
         document.getElementById('evTitle').focus();
     });
 }
