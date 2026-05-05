@@ -13,6 +13,15 @@ _timeBody.style.setProperty('--num-hours', NUM_HOURS);
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 let weekOffset  = 0;
 
+const CATEGORY_COLORS = {
+    'Personal': '#d6bf6c',
+    'Studies':  '#5e99f0',
+    'Work':     '#f68383',
+    'Social':   '#a729d0',
+    'Health':   '#f2a061',
+    'Finance':  '#5bbb81',
+};
+
 let events = [];
 
 // Helpers 
@@ -95,10 +104,11 @@ function buildColumns() {
             const top    = fracToY(timeToFrac(ev.start));
             const height = fracToY(timeToFrac(ev.end)) - top;
             const el     = document.createElement('div');
-            el.className    = `cal-event ${ev.color}`;
-            el.style.top    = `${top}px`;
-            el.style.height = `${Math.max(height - 4, 20)}px`;
-            el.innerHTML    = `<div class="ev-title">${ev.title}</div><div class="ev-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>`;
+            el.className             = 'cal-event';
+            el.style.top             = `${top}px`;
+            el.style.height          = `${Math.max(height - 4, 20)}px`;
+            el.style.backgroundColor = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
+            el.innerHTML             = `<div class="ev-title">${ev.title}</div><div class="ev-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>`;
             col.appendChild(el);
         });
 
@@ -162,22 +172,24 @@ if (document.getElementById('btn-popup-close')) document.getElementById('btn-pop
 
 if (document.getElementById('saveBtn')) {
     document.getElementById('saveBtn').addEventListener('click', () => {
-        const title = document.getElementById('evTitle').value.trim();
-        const day   = parseInt(document.getElementById('evDay').value);
-        const start = document.getElementById('evStart').value;
-        const end   = document.getElementById('evEnd').value;
-        const color = document.getElementById('evColor').value;
+        const title    = document.getElementById('evTitle').value.trim();
+        const day      = parseInt(document.getElementById('evDay').value);
+        const start    = document.getElementById('evStart').value;
+        const end      = document.getElementById('evEnd').value;
+        const category = document.getElementById('evCategory').value;
+        const note     = document.getElementById('evNote').value.trim();
 
         if (!title || !start || !end || start >= end) {
             alert('Please fill in all fields and ensure start time is before end time.');
             return;
         }
 
-        events.push({ title, day, start, end, color });
-        if (typeof window.onEventSave === 'function') window.onEventSave({ title, day, start, end, color });
+        events.push({ title, day, start, end, category, note });
+        if (typeof window.onEventSave === 'function') window.onEventSave({ title, day, start, end, category, note });
         closepopup();
         buildColumns();
         document.getElementById('evTitle').value = '';
+        document.getElementById('evNote').value  = '';
     });
 }
 

@@ -247,15 +247,21 @@
                 </div>
             </div>
 
-            <div class="mb-5">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Colour</label>
-                <select id="evColor" class="tp-input">
-                    <option value="bg-blue-500">Blue</option>
-                    <option value="bg-emerald-500">Green</option>
-                    <option value="bg-orange-500">Orange</option>
-                    <option value="bg-rose-500">Red</option>
-                    <option value="bg-purple-500">Purple</option>
+            <div class="mb-3">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Category</label>
+                <select id="evCategory" class="tp-input">
+                    <option value="Personal">Personal</option>
+                    <option value="Studies">Studies</option>
+                    <option value="Work">Work</option>
+                    <option value="Social">Social</option>
+                    <option value="Health">Health</option>
+                    <option value="Finance">Finance</option>
                 </select>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Note <span style="color: var(--text-fine);">(optional)</span></label>
+                <textarea id="evNote" placeholder="Add a note…" class="tp-input" rows="2" style="resize: none;"></textarea>
             </div>
 
             <div class="flex justify-end gap-2">
