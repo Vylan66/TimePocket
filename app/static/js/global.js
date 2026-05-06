@@ -17,3 +17,30 @@ function toggleTheme() {
 applyTheme(localStorage.getItem('theme') === 'dark');
 
 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+
+// Navbar
+function openPage(pageRequested) {
+    if (pageRequested === "dashboard") {
+        window.location.href = '/dashboard';
+    }
+    if (pageRequested === "personal") {
+        window.location.href = '/personal';
+    }
+    if (pageRequested === "group") {
+        window.location.href = '/group';
+    }
+    if (pageRequested === "profile") {
+        window.location.href = '/profile';
+    }
+}
+
+const navLinks = {
+    'dash-link': 'dashboard',
+    'personal-timetable-link': 'personal',
+    'groups-link': 'group',
+    'profile-link': 'profile',
+};
+Object.entries(navLinks).forEach(([id, page]) => {
+    document.getElementById(id)?.addEventListener('click', () => openPage(page));
+});
