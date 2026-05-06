@@ -52,3 +52,35 @@ const pathMap = {
     '/group':     'groups-link',
 };
 document.getElementById(pathMap[window.location.pathname])?.classList.add('active');
+
+// Mobile hamburger
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const mobileNav    = document.getElementById('mobile-nav');
+
+hamburgerBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mobileNav?.classList.toggle('open');
+});
+
+document.addEventListener('click', (e) => {
+    if (mobileNav?.classList.contains('open') &&
+        !mobileNav.contains(e.target) &&
+        !hamburgerBtn?.contains(e.target)) {
+        mobileNav.classList.remove('open');
+    }
+});
+
+// Mobile nav item clicks + active state
+const mobilePageMap = {
+    '/dashboard': 'dashboard',
+    '/personal':  'personal',
+    '/group':     'group',
+};
+const activeMobilePage = mobilePageMap[window.location.pathname];
+document.querySelectorAll('.mobile-nav-item').forEach(btn => {
+    if (btn.dataset.page === activeMobilePage) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+        const page = btn.dataset.page;
+        if (page) openPage(page);
+    });
+});
