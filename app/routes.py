@@ -1,6 +1,10 @@
 from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required, current_user
+<<<<<<< HEAD
 from datetime import datetime, timedelta
+=======
+from werkzeug.security import check_password_hash, generate_password_hash
+>>>>>>> main
 from app import db
 from app.models import Availability, User, Group, GroupMember
 
@@ -36,6 +40,7 @@ def get_my_availability():
         'category':   s.category or 'Personal',
         'notes':      s.notes or '',
     } for s in slots])
+
 @main.route('/test/dashboard')
 def dashboardTest():
     return render_template('dashboard.html')
@@ -213,8 +218,13 @@ def group_heatmap(group_id):
         Availability.date <= end_str,
     ).all()
 
+    avail = Availability.query.filter(Availability.user_id.in_(member_ids)).all()
+    day_map = {
+        'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6,
+        'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
+        'thursday': 4, 'friday': 5, 'saturday': 6
+    }
     heatmap = {str(i): {} for i in range(7)}
-
     for slot in avail:
         try:
             dt = datetime.strptime(slot.date, '%Y-%m-%d')
@@ -230,7 +240,6 @@ def group_heatmap(group_id):
         day_key = str(day_idx)
         for h in range(start_h, end_h):
             heatmap[day_key][str(h)] = heatmap[day_key].get(str(h), 0) + 1
-
     return jsonify({'heatmap': heatmap, 'total': total})
 
 @main.route('/users/search', methods=['GET'])
@@ -249,3 +258,37 @@ def search_users():
 @login_required
 def profile():
     return render_template('profile.html')
+
+# Profile API routes
+
+@main.route('/api/user', methods=['GET'])
+@login_required
+def get_user():
+    return jsonify({
+        'id': current_user.id,
+        'username': current_user.username,
+        'email': current_user.email
+    })
+
+@main.route('/api/user', methods=['PUT'])
+@login_required
+def update_user():
+    data = request.get_json()
+    if 'username' in data:
+        current_user.username = data['username']
+    if 'email' in data:
+        current_user.email = data['email']
+    db.session.commit()
+    return jsonify({'message': 'Profile updated!'})
+
+@main.route('/api/user/password', methods=['PUT'])
+@login_required
+def update_password():
+    data = request.get_json()
+    old_password = data.get('old_password')
+    new_password = data.get('new_password')
+    if not current_user.check_password(old_password):
+        return jsonify({'success': False, 'message': 'Current password is incorrect.'}), 400
+    current_user.set_password(new_password)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Password updated!'})
