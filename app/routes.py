@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required, current_user
+from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
 from app.models import Availability, User, Group, GroupMember
 
@@ -32,6 +33,7 @@ def get_my_availability():
         'start_time': s.start_time,
         'end_time': s.end_time
     } for s in slots])
+
 @main.route('/test/dashboard')
 def dashboardTest():
     return render_template('dashboard.html')
@@ -186,16 +188,13 @@ def group_heatmap(group_id):
     members = GroupMember.query.filter_by(group_id=group_id).all()
     member_ids = [m.user_id for m in members]
     total = len(member_ids)
-
     avail = Availability.query.filter(Availability.user_id.in_(member_ids)).all()
-
     day_map = {
         'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6,
         'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
         'thursday': 4, 'friday': 5, 'saturday': 6
     }
     heatmap = {str(i): {} for i in range(7)}
-
     for slot in avail:
         try:
             day_idx = int(slot.day)
@@ -211,7 +210,6 @@ def group_heatmap(group_id):
         day_key = str(day_idx)
         for h in range(start_h, end_h):
             heatmap[day_key][str(h)] = heatmap[day_key].get(str(h), 0) + 1
-
     return jsonify({'heatmap': heatmap, 'total': total})
 
 @main.route('/users/search', methods=['GET'])
@@ -230,3 +228,15 @@ def search_users():
 @login_required
 def profile():
     return render_template('profile.html')
+
+# Profile API routes
+
+@main.route('/api/user', methods=['GET'])
+@login_required
+def get_user():
+    return jsonify({
+        'id': current_user.id,
+        'username': current_user.username,
+        'email': current_user.email
+    })
+
