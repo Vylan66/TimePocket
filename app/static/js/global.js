@@ -80,6 +80,7 @@ const mobilePageMap = {
     '/dashboard': 'dashboard',
     '/personal':  'personal',
     '/group':     'group',
+    '/friends':   'friends',
 };
 const activeMobilePage = mobilePageMap[window.location.pathname];
 document.querySelectorAll('.mobile-nav-item').forEach(btn => {
