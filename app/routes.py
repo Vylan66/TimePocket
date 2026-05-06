@@ -1,10 +1,7 @@
 from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required, current_user
-<<<<<<< HEAD
 from datetime import datetime, timedelta
-=======
 from werkzeug.security import check_password_hash, generate_password_hash
->>>>>>> main
 from app import db
 from app.models import Availability, User, Group, GroupMember
 
