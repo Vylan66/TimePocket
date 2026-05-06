@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Reference style.css stylesheet -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mini_cal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/timetable.css') }}">
 </head>
@@ -18,6 +18,17 @@
         <div class="flex items-center gap-2">
            <div class="w-9 h-9 rounded-full border-2 [border-color:var(--border-ui)]"></div>
            <span class="font-semibold [color:var(--text-ui)]">Logo</span>
+        </div>
+        <div id="nav-bar" class="flex flex-row justify-evenly gap-16 items-center">
+            <button id="dash-link">
+                Dashboard
+            </button>
+            <button id="personal-timetable-link">
+                My Timetable
+            </button>
+            <button id="groups-link">
+                Groups
+            </button>
         </div>
         <div class="flex items-center gap-3">
             <button id="theme-toggle" class="btn-icon" title="Toggle dark mode">
@@ -298,9 +309,31 @@
     </div>
 
 <!-- JavaScript -->
-<script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
+<script src="{{ url_for('static', filename='js/global.js') }}"></script>
 <script src="{{ url_for('static', filename='js/mini_cal.js') }}"></script>
 <script src="{{ url_for('static', filename='js/timetable.js') }}"></script>
 <script src="{{ url_for('static', filename='js/personal.js') }}"></script>
+<script>
+    function openPage(pageRequested) {
+        if (pageRequested === "dashboard") {
+            console.log("dashboard");
+        }
+        if (pageRequested === "personal") {
+            console.log("personal");
+        }
+        if (pageRequested === "groups") {
+            console.log("groups");
+        }
+        if (pageRequested === "profile") {
+            console.log("profile");
+        }
+    }
+
+    document.getElementById("dash-link").addEventListener("click", function() {openPage("dashboard")});
+    document.getElementById("personal-timetable-link").addEventListener("click", function() {openPage("personal")});
+    document.getElementById("groups-link").addEventListener("click", function() {openPage("groups")});
+    document.getElementById("profile-link").addEventListener("click", function() {openPage("profile")});
+
+</script>
 </body>
 </html>
