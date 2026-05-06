@@ -264,7 +264,8 @@ def get_user():
     return jsonify({
         'id': current_user.id,
         'username': current_user.username,
-        'email': current_user.email
+        'email': current_user.email,
+        'avatar': current_user.avatar
     })
 
 @main.route('/api/user', methods=['PUT'])
@@ -289,3 +290,14 @@ def update_password():
     current_user.set_password(new_password)
     db.session.commit()
     return jsonify({'success': True, 'message': 'Password updated!'})
+
+@main.route('/api/user/avatar', methods=['PUT'])
+@login_required
+def update_avatar():
+    data = request.get_json()
+    avatar = data.get('avatar')
+    if not avatar:
+        return jsonify({'success': False, 'message': 'Avatar required.'}), 400
+    current_user.avatar = avatar
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Avatar updated!'})

@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
+    avatar = db.Column(db.String(20), default='avatar_1')
     availability = db.relationship('Availability', backref='user', lazy=True)
 
     def set_password(self, password):
@@ -23,7 +24,7 @@ class User(UserMixin, db.Model):
 class Availability(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
     user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    date       = db.Column(db.String(10), nullable=False)   # YYYY-MM-DD
+    date       = db.Column(db.String(10), nullable=False)
     start_time = db.Column(db.String(5),  nullable=False)
     end_time   = db.Column(db.String(5),  nullable=False)
     title      = db.Column(db.String(100), default='')
