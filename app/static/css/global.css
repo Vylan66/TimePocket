@@ -57,6 +57,35 @@ html.dark {
     --text-placeholder: rgba(236,233,230,0.35);
 }
 
+/* Navbar tabs */
+.nav-tab {
+    position: relative;
+    padding: 0 22px;
+    height: 50px;
+    z-index: 1;
+    white-space: nowrap;
+    background: transparent;
+    color: var(--text-subtitle);
+    transition: color 0.15s;
+    font-size: 0.875rem;
+    overflow: visible;
+}
+.nav-tab:hover { color: var(--dark); }
+
+.nav-tab.active {
+    background: var(--bg-timetable);
+    color: var(--dark);
+    font-weight: 600;
+    z-index: 3;
+    border-radius: 18px 18px 0 0;
+    overflow: visible;
+}
+
+/* Force-hide hamburger on md+ (overrides .btn-icon display:flex) */
+@media (min-width: 768px) {
+    #hamburger-btn { display: none; }
+}
+
 /* Global button styles */
 button {
     cursor: pointer;
@@ -175,3 +204,36 @@ html.dark select.tp-input option {
     background: #27231f;
     color: #ece9e6;
 }
+
+/* Mobile navigation dropdown */
+.mobile-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-page);
+    border-bottom: 1px solid var(--border-card);
+    z-index: 40;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.28s ease, box-shadow 0.28s;
+}
+.mobile-nav.open {
+    max-height: 260px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+}
+.mobile-nav-item {
+    display: block;
+    width: 100%;
+    padding: 0.875rem 2.5rem;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--border-card);
+    color: var(--text-subtitle);
+    font-size: 0.875rem;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+}
+.mobile-nav-item:hover { background: var(--bg-tab-pill); color: var(--dark); }
+.mobile-nav-item.active { color: var(--dark); font-weight: 600; }
