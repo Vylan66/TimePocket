@@ -21,11 +21,14 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 class Availability(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    day = db.Column(db.String(20), nullable=False)
-    start_time = db.Column(db.String(10), nullable=False)
-    end_time = db.Column(db.String(10), nullable=False)
+    id         = db.Column(db.Integer, primary_key=True)
+    user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date       = db.Column(db.String(10), nullable=False)   # YYYY-MM-DD
+    start_time = db.Column(db.String(5),  nullable=False)
+    end_time   = db.Column(db.String(5),  nullable=False)
+    title      = db.Column(db.String(100), default='')
+    category   = db.Column(db.String(50),  nullable=True)
+    notes      = db.Column(db.Text,        nullable=True)
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)

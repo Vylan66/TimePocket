@@ -52,6 +52,13 @@ function formatTime(t) {
     return m === 0 ? `${h12}${suffix}` : `${h12}:${String(m).padStart(2,'0')}${suffix}`;
 }
 
+function toDateStr(d) {
+    const yyyy = d.getFullYear();
+    const mm   = String(d.getMonth() + 1).padStart(2, '0');
+    const dd   = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
 // Week headers — updates existing static DOM elements 
 function renderWeekHeaders() {
     const weekStart = getWeekStart();
@@ -100,7 +107,8 @@ function buildColumns() {
 
         col.innerHTML = '';
 
-        events.filter(e => e.day === i).forEach(ev => {
+        const dateStr = toDateStr(day);
+        events.filter(e => e.date === dateStr).forEach(ev => {
             const top    = fracToY(timeToFrac(ev.start));
             const height = fracToY(timeToFrac(ev.end)) - top;
             const el     = document.createElement('div');
@@ -131,7 +139,7 @@ function buildColumns() {
         for (let i = 0; i < 7; i++) {
             const d   = new Date(weekStart); d.setDate(d.getDate() + i);
             const opt = document.createElement('option');
-            opt.value       = i;
+            opt.value       = toDateStr(d);
             opt.textContent = `${DAY_NAMES[d.getDay()]} ${d.getDate()}`;
             evDay.appendChild(opt);
         }
@@ -157,12 +165,12 @@ if (document.getElementById('addEventBtn')) {
                             ? new Date(calSelected)
                             : new Date();
         target.setHours(0, 0, 0, 0);
-        let defaultDay = 0;
+        let defaultDate = null;
         for (let i = 0; i < 7; i++) {
             const d = new Date(weekStart); d.setDate(d.getDate() + i);
-            if (sameDay(d, target)) { defaultDay = i; break; }
+            if (sameDay(d, target)) { defaultDate = toDateStr(d); break; }
         }
-        document.getElementById('evDay').value = defaultDay;
+        if (defaultDate) document.getElementById('evDay').value = defaultDate;
 
         document.getElementById('evTitle').focus();
     });
@@ -173,19 +181,19 @@ if (document.getElementById('btn-popup-close')) document.getElementById('btn-pop
 if (document.getElementById('saveBtn')) {
     document.getElementById('saveBtn').addEventListener('click', () => {
         const title    = document.getElementById('evTitle').value.trim();
-        const day      = parseInt(document.getElementById('evDay').value);
+        const date     = document.getElementById('evDay').value;
         const start    = document.getElementById('evStart').value;
         const end      = document.getElementById('evEnd').value;
         const category = document.getElementById('evCategory').value;
         const note     = document.getElementById('evNote').value.trim();
 
-        if (!title || !start || !end || start >= end) {
+        if (!title || !date || !start || !end || start >= end) {
             alert('Please fill in all fields and ensure start time is before end time.');
             return;
         }
 
-        events.push({ title, day, start, end, category, note });
-        if (typeof window.onEventSave === 'function') window.onEventSave({ title, day, start, end, category, note });
+        events.push({ title, date, start, end, category, note });
+        if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note });
         closepopup();
         buildColumns();
         document.getElementById('evTitle').value = '';
