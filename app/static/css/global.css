@@ -57,6 +57,30 @@ html.dark {
     --text-placeholder: rgba(236,233,230,0.35);
 }
 
+/* Navbar tabs */
+.nav-tab {
+    position: relative;
+    padding: 0 22px;
+    height: 50px;
+    z-index: 1;
+    white-space: nowrap;
+    background: transparent;
+    color: var(--text-subtitle);
+    transition: color 0.15s;
+    font-size: 0.875rem;
+    overflow: visible;
+}
+.nav-tab:hover { color: var(--dark); }
+
+.nav-tab.active {
+    background: var(--bg-timetable);
+    color: var(--dark);
+    font-weight: 600;
+    z-index: 3;
+    border-radius: 18px 18px 0 0;
+    overflow: visible;
+}
+
 /* Global button styles */
 button {
     cursor: pointer;

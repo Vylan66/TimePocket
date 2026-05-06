@@ -44,3 +44,11 @@ const navLinks = {
 Object.entries(navLinks).forEach(([id, page]) => {
     document.getElementById(id)?.addEventListener('click', () => openPage(page));
 });
+
+// Highlight active nav tab
+const pathMap = {
+    '/dashboard': 'dash-link',
+    '/personal':  'personal-timetable-link',
+    '/group':     'groups-link',
+};
+document.getElementById(pathMap[window.location.pathname])?.classList.add('active');
