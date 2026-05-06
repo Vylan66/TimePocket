@@ -250,3 +250,15 @@ def update_user():
         current_user.email = data['email']
     db.session.commit()
     return jsonify({'message': 'Profile updated!'})
+
+@main.route('/api/user/password', methods=['PUT'])
+@login_required
+def update_password():
+    data = request.get_json()
+    old_password = data.get('old_password')
+    new_password = data.get('new_password')
+    if not current_user.check_password(old_password):
+        return jsonify({'success': False, 'message': 'Current password is incorrect.'}), 400
+    current_user.set_password(new_password)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Password updated!'})
