@@ -22,7 +22,8 @@ const CATEGORY_COLORS = {
     'Finance':  '#5bbb81',
 };
 
-let events = [];
+let events     = [];
+let editingIdx = null;
 
 // Helpers 
 function getWeekStart() {
@@ -116,7 +117,10 @@ function buildColumns() {
             el.style.top             = `${top}px`;
             el.style.height          = `${Math.max(height - 4, 20)}px`;
             el.style.backgroundColor = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
-            el.innerHTML             = `<div class="ev-title">${ev.title}</div><div class="ev-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>`;
+            el.innerHTML   = `<div class="ev-title">${ev.title}</div><div class="ev-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>`;
+            el.style.cursor = 'pointer';
+            const capturedIdx = events.indexOf(ev);
+            el.addEventListener('click', (e) => { e.stopPropagation(); openEventDetail(capturedIdx); });
             col.appendChild(el);
         });
 
@@ -151,7 +155,12 @@ function buildColumns() {
 // New Event Pop-up (only on personal page)
 const popupOverlay = document.getElementById('popupOverlay');
 
-function closepopup() { if (popupOverlay) popupOverlay.style.display = 'none'; }
+function closepopup() {
+    if (popupOverlay) popupOverlay.style.display = 'none';
+    editingIdx = null;
+    const pt = document.getElementById('popup-title');
+    if (pt) pt.textContent = 'New Event';
+}
 function handleOverlayClick(e) { if (e.target === popupOverlay) closepopup(); }
 
 if (document.getElementById('addEventBtn')) {
@@ -192,8 +201,13 @@ if (document.getElementById('saveBtn')) {
             return;
         }
 
-        events.push({ title, date, start, end, category, note });
-        if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note });
+        if (editingIdx !== null) {
+            const old = events[editingIdx];
+            events.splice(editingIdx, 1, { title, date, start, end, category, note, dbId: old.dbId });
+        } else {
+            events.push({ title, date, start, end, category, note });
+            if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note });
+        }
         closepopup();
         buildColumns();
         document.getElementById('evTitle').value = '';
@@ -208,7 +222,42 @@ document.getElementById('todayBtn').addEventListener('click', () => {
     if (typeof jumpToDate === 'function') jumpToDate(new Date());
 });
 
-// Init 
+// Event detail popup
+const evDetailOverlay = document.getElementById('evDetailOverlay');
+
+function closeEventDetail() {
+    if (evDetailOverlay) evDetailOverlay.style.display = 'none';
+}
+
+function handleDetailOverlayClick(e) {
+    if (e.target === evDetailOverlay) closeEventDetail();
+}
+
+function openEventDetail(idx) {
+    const ev = events[idx];
+    if (!ev) return;
+
+    document.getElementById('det-color-bar').style.background = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
+    document.getElementById('det-title').textContent    = ev.title;
+    document.getElementById('det-category').textContent = ev.category;
+
+    const d = new Date(ev.date + 'T00:00:00');
+    document.getElementById('det-date').textContent = d.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('det-time').textContent = `${formatTime(ev.start)} – ${formatTime(ev.end)}`;
+
+    const noteRow = document.getElementById('det-note-row');
+    document.getElementById('det-note').textContent = ev.note || '';
+    noteRow.style.display = ev.note ? '' : 'none';
+
+    evDetailOverlay.style.display    = 'flex';
+    evDetailOverlay.style.background = 'var(--overlay-bg)';
+}
+
+if (document.getElementById('btn-detail-close')) {
+    document.getElementById('btn-detail-close').addEventListener('click', closeEventDetail);
+}
+
+// Init
 renderWeekHeaders();
 buildColumns();
 document.getElementById('time-body').scrollTop = (7 - START_HOUR) * HOUR_HEIGHT;
