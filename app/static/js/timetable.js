@@ -249,8 +249,36 @@ function openEventDetail(idx) {
     document.getElementById('det-note').textContent = ev.note || '';
     noteRow.style.display = ev.note ? '' : 'none';
 
+    document.getElementById('det-edit-btn').onclick   = () => editEvent(idx);
+    document.getElementById('det-delete-btn').onclick = () => deleteEvent(idx);
+
     evDetailOverlay.style.display    = 'flex';
     evDetailOverlay.style.background = 'var(--overlay-bg)';
+}
+
+function editEvent(idx) {
+    const ev = events[idx];
+    if (!ev) return;
+    closeEventDetail();
+    editingIdx = idx;
+
+    document.getElementById('evTitle').value    = ev.title;
+    document.getElementById('evDay').value      = ev.date;
+    document.getElementById('evStart').value    = ev.start;
+    document.getElementById('evEnd').value      = ev.end;
+    document.getElementById('evCategory').value = ev.category;
+    document.getElementById('evNote').value     = ev.note || '';
+
+    const pt = document.getElementById('popup-title');
+    if (pt) pt.textContent = 'Edit Event';
+
+    popupOverlay.style.display    = 'flex';
+    popupOverlay.style.background = 'var(--overlay-bg)';
+}
+
+function deleteEvent(idx) {
+    // Frontend-only placeholder — no action yet
+    closeEventDetail();
 }
 
 if (document.getElementById('btn-detail-close')) {
