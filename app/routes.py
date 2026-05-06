@@ -240,3 +240,13 @@ def get_user():
         'email': current_user.email
     })
 
+@main.route('/api/user', methods=['PUT'])
+@login_required
+def update_user():
+    data = request.get_json()
+    if 'username' in data:
+        current_user.username = data['username']
+    if 'email' in data:
+        current_user.email = data['email']
+    db.session.commit()
+    return jsonify({'message': 'Profile updated!'})
