@@ -5,10 +5,24 @@ let cachedGroups      = [];
 let currentHeatmapData = null;
 let pendingMembers    = []; // [{id, username}] for create group popup
 
-// Re-render heatmap after timetable rebuilds columns
+// Re-fetch heatmap for the newly displayed week whenever columns rebuild
 window.onAfterBuildColumns = function () {
-    if (currentHeatmapData) renderHeatmap(currentHeatmapData);
+    if (selectedGroupId) fetchHeatmap(selectedGroupId);
 };
+
+async function fetchHeatmap(groupId) {
+    const weekStart = getWeekStart();
+    const weekEnd   = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    const start = toDateStr(weekStart);
+    const end   = toDateStr(weekEnd);
+    try {
+        const res  = await fetch(`/groups/${groupId}/heatmap?start=${start}&end=${end}`);
+        const data = await res.json();
+        currentHeatmapData = data;
+        renderHeatmap(data);
+    } catch { /* ignore */ }
+}
 
 // ─── Init ────────────────────────────────────────────────────────────────────
 
@@ -99,10 +113,7 @@ async function selectGroup(id, name, role) {
             `<p class="text-xs text-center mt-4" style="color:var(--text-fine);">Failed to load members</p>`;
     }
 
-    const hmRes  = await fetch(`/groups/${id}/heatmap`);
-    const hmData = await hmRes.json();
-    currentHeatmapData = hmData;
-    renderHeatmap(hmData);
+    await fetchHeatmap(id);
 }
 
 function backToGroups() {
@@ -321,6 +332,11 @@ async function addMemberToGroup(userId, username) {
         document.getElementById('settings-member-results').innerHTML = '';
         const data = await (await fetch(`/groups/${selectedGroupId}`)).json();
         renderSettingsMembersList(data.members, true);
+        renderMembersList(data.members);
+        await fetchHeatmap(selectedGroupId);
+        const g = cachedGroups.find(x => x.id === selectedGroupId);
+        if (g) g.member_count = data.members.length;
+        renderGroupsList(cachedGroups);
     } else {
         const data = await res.json();
         alert(data.error || 'Failed to add member');
@@ -334,10 +350,10 @@ async function removeMember(userId) {
         const data = await (await fetch(`/groups/${selectedGroupId}`)).json();
         renderSettingsMembersList(data.members, true);
         renderMembersList(data.members);
-        const hmRes  = await fetch(`/groups/${selectedGroupId}/heatmap`);
-        const hmData = await hmRes.json();
-        currentHeatmapData = hmData;
-        renderHeatmap(hmData);
+        await fetchHeatmap(selectedGroupId);
+        const g = cachedGroups.find(x => x.id === selectedGroupId);
+        if (g) g.member_count = data.members.length;
+        renderGroupsList(cachedGroups);
     }
 }
 

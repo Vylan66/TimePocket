@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required, current_user
+from datetime import datetime, timedelta
 from app import db
 from app.models import Availability, User, Group, GroupMember
 
@@ -27,10 +28,13 @@ def dashboard():
 def get_my_availability():
     slots = Availability.query.filter_by(user_id=current_user.id).all()
     return jsonify([{
-        'id': s.id,
-        'day': s.day,
+        'id':         s.id,
+        'date':       s.date,
         'start_time': s.start_time,
-        'end_time': s.end_time
+        'end_time':   s.end_time,
+        'title':      s.title or '',
+        'category':   s.category or 'Personal',
+        'notes':      s.notes or '',
     } for s in slots])
 @main.route('/test/dashboard')
 def dashboardTest():
@@ -45,23 +49,29 @@ def profileTest():
 def add_availability():
     data = request.get_json()
     slot = Availability(
-        user_id=current_user.id,
-        day=data['day'],
-        start_time=data['start_time'],
-        end_time=data['end_time']
+        user_id    = current_user.id,
+        date       = data['date'],
+        start_time = data['start_time'],
+        end_time   = data['end_time'],
+        title      = data.get('title', ''),
+        category   = data.get('category'),
+        notes      = data.get('notes'),
     )
     db.session.add(slot)
     db.session.commit()
-    return jsonify({'message': 'Availability added!'})
+    return jsonify({'message': 'Availability added!', 'id': slot.id})
 
 @main.route('/availability/<int:slot_id>', methods=['PUT'])
 @login_required
 def update_availability(slot_id):
-    slot = Availability.query.get_or_404(slot_id)
+    slot = Availability.query.filter_by(id=slot_id, user_id=current_user.id).first_or_404()
     data = request.get_json()
-    slot.day = data.get('day', slot.day)
+    slot.date       = data.get('date',       slot.date)
     slot.start_time = data.get('start_time', slot.start_time)
-    slot.end_time = data.get('end_time', slot.end_time)
+    slot.end_time   = data.get('end_time',   slot.end_time)
+    slot.title      = data.get('title',      slot.title)
+    slot.category   = data.get('category',   slot.category)
+    slot.notes      = data.get('notes',      slot.notes)
     db.session.commit()
     return jsonify({'message': 'Availability updated!'})
 
@@ -80,10 +90,12 @@ def get_all_availability():
     result = []
     for slot in all_availability:
         result.append({
-            'username': slot.user.username,
-            'day': slot.day,
+            'username':   slot.user.username,
+            'date':       slot.date,
             'start_time': slot.start_time,
-            'end_time': slot.end_time
+            'end_time':   slot.end_time,
+            'title':      slot.title or '',
+            'category':   slot.category or 'Personal',
         })
     return jsonify(result)
 
@@ -187,25 +199,32 @@ def group_heatmap(group_id):
     member_ids = [m.user_id for m in members]
     total = len(member_ids)
 
-    avail = Availability.query.filter(Availability.user_id.in_(member_ids)).all()
+    start_str = request.args.get('start')
+    end_str   = request.args.get('end')
+    if not start_str or not end_str:
+        today       = datetime.now().date()
+        week_sunday = today - timedelta(days=(today.weekday() + 1) % 7)
+        start_str   = week_sunday.strftime('%Y-%m-%d')
+        end_str     = (week_sunday + timedelta(days=6)).strftime('%Y-%m-%d')
 
-    day_map = {
-        'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6,
-        'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
-        'thursday': 4, 'friday': 5, 'saturday': 6
-    }
+    avail = Availability.query.filter(
+        Availability.user_id.in_(member_ids),
+        Availability.date >= start_str,
+        Availability.date <= end_str,
+    ).all()
+
     heatmap = {str(i): {} for i in range(7)}
 
     for slot in avail:
         try:
-            day_idx = int(slot.day)
-        except (ValueError, TypeError):
-            day_idx = day_map.get(str(slot.day).lower(), -1)
-        if day_idx < 0 or day_idx > 6:
+            dt = datetime.strptime(slot.date, '%Y-%m-%d')
+            # Python weekday(): Mon=0…Sun=6 → JS getDay(): Sun=0, Mon=1…Sat=6
+            day_idx = (dt.weekday() + 1) % 7
+        except (ValueError, AttributeError):
             continue
         try:
             start_h = int(slot.start_time.split(':')[0])
-            end_h = int(slot.end_time.split(':')[0])
+            end_h   = int(slot.end_time.split(':')[0])
         except (ValueError, AttributeError):
             continue
         day_key = str(day_idx)

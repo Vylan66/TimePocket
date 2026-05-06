@@ -6,12 +6,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res  = await fetch('/availability');
         const data = await res.json();
         events = data.map(s => ({
-            title: availTitle(s.start_time, s.end_time),
-            day:   parseInt(s.day),
-            start: s.start_time,
-            end:   s.end_time,
-            color: 'bg-blue-500',
-            dbId:  s.id
+            title:    s.title || availTitle(s.start_time, s.end_time),
+            date:     s.date,
+            start:    s.start_time,
+            end:      s.end_time,
+            category: s.category || 'Personal',
+            note:     s.notes || '',
+            dbId:     s.id,
         }));
         buildColumns();
     } catch (e) {
@@ -19,13 +20,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-window.onEventSave = async function ({ day, start, end }) {
+window.onEventSave = async function ({ title, date, start, end, category, note }) {
     try {
-        await fetch('/availability', {
+        const res  = await fetch('/availability', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ day: String(day), start_time: start, end_time: end })
+            body:    JSON.stringify({
+                date,
+                start_time: start,
+                end_time:   end,
+                title,
+                category,
+                notes: note,
+            }),
         });
+        const data = await res.json();
+        // Backfill the db id onto the event we just pushed
+        const ev = events[events.length - 1];
+        if (ev && data.id) ev.dbId = data.id;
     } catch (e) {
         console.error('Failed to save availability:', e);
     }
