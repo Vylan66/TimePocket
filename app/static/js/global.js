@@ -1,6 +1,7 @@
-// JavaScript to enable dark mode for each page
+// Global JavaScript for each page
 const root = document.documentElement;
 
+// Dark mode toggle for each page
 function applyTheme(dark) {
     root.classList.toggle('dark', dark);
     document.getElementById('icon-moon').style.display = dark ? 'none' : '';
