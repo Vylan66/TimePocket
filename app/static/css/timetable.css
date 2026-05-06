@@ -86,6 +86,12 @@
     background: var(--blue);
 }
 
+/* Time input — pointer cursor on clock icon only + dark mode tint */
+input[type="time"].tp-input::-webkit-calendar-picker-indicator { cursor: pointer; }
+html.dark input[type="time"].tp-input::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.5);
+}
+
 /* Popup animation */
 @keyframes popIn {
     from { opacity: 0; transform: scale(0.94) translateY(8px); }

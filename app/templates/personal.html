@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/timetable.css') }}">
 </head>
 
-<body class="h-screen flex flex-col overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
+<body class="md:h-screen flex flex-col md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
         <div class="flex items-center gap-2">
@@ -67,13 +67,37 @@
                 </div>
                 <div class="cal-grid" id="calGrid"></div>
             </div>
-            <div class="flex-1 md:h-full rounded-[20px] p-4 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
-                <p class="text-xs tracking-widest [color:var(--text-label)]">Categories</p>
+            <div class="flex-1 md:h-full rounded-[20px] p-6 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+                <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-label)]">Categories</p>
+                <div class="flex items-center gap-2 px-1 py-1">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#f68383;"></span>
+                    <span class="text-xs [color:var(--text-label)]">Work</span>
+                </div>
+                <div class="flex items-center gap-2 px-1 py-1">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#f2a061;"></span>
+                    <span class="text-xs [color:var(--text-label)]">Health</span>
+                </div>
+                <div class="flex items-center gap-2 px-1 py-1">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#d6bf6c;"></span>
+                    <span class="text-xs [color:var(--text-label)]">Personal</span>
+                </div>
+                <div class="flex items-center gap-2 px-1 py-1">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#5bbb81;"></span>
+                    <span class="text-xs [color:var(--text-label)]">Finance</span>
+                </div>
+                <div class="flex items-center gap-2 px-1 py-1">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#5e99f0;"></span>
+                    <span class="text-xs [color:var(--text-label)]">Studies</span>
+                </div>
+                <div class="flex items-center gap-2 px-1 py-1">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#a729d0;"></span>
+                    <span class="text-xs [color:var(--text-label)]">Social</span>
+                </div>
             </div>
         </div>
 
         <!-- Right Column: Timetable -->
-        <div class="flex-1 flex gap-4 p-4 pt-0 md:p-4 md:pl-0 overflow-y-auto">
+        <div class="flex-1 min-h-0 flex gap-4 p-4 pt-0 md:p-4 md:pl-0">
             <div class="h-full w-full rounded-[20px] flex flex-col overflow-hidden [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
 
                 <!-- Toolbar -->
@@ -247,15 +271,21 @@
                 </div>
             </div>
 
-            <div class="mb-5">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Colour</label>
-                <select id="evColor" class="tp-input">
-                    <option value="bg-blue-500">Blue</option>
-                    <option value="bg-emerald-500">Green</option>
-                    <option value="bg-orange-500">Orange</option>
-                    <option value="bg-rose-500">Red</option>
-                    <option value="bg-purple-500">Purple</option>
+            <div class="mb-3">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Category</label>
+                <select id="evCategory" class="tp-input">
+                    <option value="Personal">Personal</option>
+                    <option value="Studies">Studies</option>
+                    <option value="Work">Work</option>
+                    <option value="Social">Social</option>
+                    <option value="Health">Health</option>
+                    <option value="Finance">Finance</option>
                 </select>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Note <span style="color: var(--text-fine);">(optional)</span></label>
+                <textarea id="evNote" placeholder="Add a note…" class="tp-input" rows="2" style="resize: none;"></textarea>
             </div>
 
             <div class="flex justify-end gap-2">
