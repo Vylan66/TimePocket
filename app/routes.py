@@ -17,6 +17,11 @@ def personal():
 def group():
     return render_template('group.html')
 
+@main.route('/friends')
+@login_required
+def friends():
+    return render_template('friends.html')
+
 @main.route('/dashboard')
 @login_required
 def dashboard():

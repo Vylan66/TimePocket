@@ -33,6 +33,9 @@ function openPage(pageRequested) {
     if (pageRequested === "profile") {
         window.location.href = '/profile';
     }
+    if (pageRequested === "friends") {
+        window.location.href = '/friends';
+    }
 }
 
 const navLinks = {
@@ -40,6 +43,7 @@ const navLinks = {
     'personal-timetable-link': 'personal',
     'groups-link': 'group',
     'profile-link': 'profile',
+    'friends-link': 'friends',
 };
 Object.entries(navLinks).forEach(([id, page]) => {
     document.getElementById(id)?.addEventListener('click', () => openPage(page));
@@ -50,6 +54,7 @@ const pathMap = {
     '/dashboard': 'dash-link',
     '/personal':  'personal-timetable-link',
     '/group':     'groups-link',
+    '/friends':   'friends-link',
 };
 document.getElementById(pathMap[window.location.pathname])?.classList.add('active');
 
@@ -75,6 +80,7 @@ const mobilePageMap = {
     '/dashboard': 'dashboard',
     '/personal':  'personal',
     '/group':     'group',
+    '/friends':   'friends',
 };
 const activeMobilePage = mobilePageMap[window.location.pathname];
 document.querySelectorAll('.mobile-nav-item').forEach(btn => {
