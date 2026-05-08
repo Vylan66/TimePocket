@@ -42,7 +42,7 @@ document.getElementById('btn-signup-submit').addEventListener('click', function(
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) { window.location.href = '/index'; }
+        if (data.success) { window.location.href = '/personal'; }
         else { alert(data.message || 'Registration failed.'); }
     });
 });
