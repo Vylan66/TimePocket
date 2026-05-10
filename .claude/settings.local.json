@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from app import create_app; app = create_app\\(\\); rules = [r.rule for r in app.url_map.iter_rules\\(\\) if 'friend' in r.rule]; print\\('\\\\n'.join\\(sorted\\(rules\\)\\)\\)\")"
+    ]
+  }
+}

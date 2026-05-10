@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-create-cancel').addEventListener('click', closeCreateGroupPopup);
     document.getElementById('btn-create-close').addEventListener('click',  closeCreateGroupPopup);
     document.getElementById('btn-create-save').addEventListener('click',   createGroup);
+    document.getElementById('new-member-search').addEventListener('focus', () => searchUsersForCreate(''));
     document.getElementById('new-member-search').addEventListener('input',
         debounce(e => searchUsersForCreate(e.target.value), 280));
 
@@ -51,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-settings-close').addEventListener('click',  closeSettingsPopup);
     document.getElementById('btn-settings-save').addEventListener('click',   saveGroupSettings);
     document.getElementById('btn-settings-delete').addEventListener('click', confirmDeleteGroup);
+    document.getElementById('settings-member-search').addEventListener('focus', () => searchUsersForSettings(''));
     document.getElementById('settings-member-search').addEventListener('input',
         debounce(e => searchUsersForSettings(e.target.value), 280));
 });
@@ -194,20 +196,18 @@ function handleCreateGroupOverlayClick(e) {
 
 async function searchUsersForCreate(q) {
     const results = document.getElementById('new-member-results');
-    if (q.length < 2) { results.innerHTML = ''; return; }
-    const users = await fetchUsers(q);
+    const users = await fetchFriends(q);
     const alreadyPending = new Set(pendingMembers.map(m => m.id));
-    results.innerHTML = users
-        .filter(u => !alreadyPending.has(u.id))
-        .map(u => `
-            <button onclick="addPendingMember(${u.id},'${escHtml(u.username)}')"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm w-full text-left transition-colors"
-                style="color:var(--dark);"
-                onmouseover="this.style.background='var(--bg-tab-pill)'"
-                onmouseout="this.style.background='transparent'">
-                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0" style="background:var(--blue);">${escHtml(u.username.charAt(0).toUpperCase())}</div>
-                ${escHtml(u.username)}
-            </button>`).join('') || `<p class="text-xs px-3 py-1" style="color:var(--text-fine);">No users found</p>`;
+    const filtered = users.filter(u => !alreadyPending.has(u.id));
+    results.innerHTML = filtered.map(u => `
+        <button onclick="addPendingMember(${u.id},'${escHtml(u.username)}')"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm w-full text-left transition-colors"
+            style="color:var(--dark);"
+            onmouseover="this.style.background='var(--bg-tab-pill)'"
+            onmouseout="this.style.background='transparent'">
+            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0" style="background:var(--blue);">${escHtml(u.username.charAt(0).toUpperCase())}</div>
+            ${escHtml(u.username)}
+        </button>`).join('') || (q.length >= 2 ? `<p class="text-xs px-3 py-1" style="color:var(--text-fine);">No friends found</p>` : '');
 }
 
 function addPendingMember(id, username) {
@@ -308,8 +308,7 @@ function renderSettingsMembersList(members, isOwner) {
 
 async function searchUsersForSettings(q) {
     const results = document.getElementById('settings-member-results');
-    if (q.length < 2) { results.innerHTML = ''; return; }
-    const users = await fetchUsers(q);
+    const users = await fetchFriends(q);
     results.innerHTML = users.map(u => `
         <button onclick="addMemberToGroup(${u.id},'${escHtml(u.username)}')"
             class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm w-full text-left transition-colors"
@@ -318,7 +317,7 @@ async function searchUsersForSettings(q) {
             onmouseout="this.style.background='transparent'">
             <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0" style="background:var(--blue);">${escHtml(u.username.charAt(0).toUpperCase())}</div>
             ${escHtml(u.username)}
-        </button>`).join('') || `<p class="text-xs px-3 py-1" style="color:var(--text-fine);">No users found</p>`;
+        </button>`).join('') || (q.length >= 2 ? `<p class="text-xs px-3 py-1" style="color:var(--text-fine);">No friends found</p>` : '');
 }
 
 async function addMemberToGroup(userId, username) {
@@ -392,9 +391,10 @@ async function confirmDeleteGroup() {
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
-async function fetchUsers(q) {
+async function fetchFriends(q) {
     try {
-        const res  = await fetch(`/users/search?q=${encodeURIComponent(q)}`);
+        const url = q ? `/api/friends/search?q=${encodeURIComponent(q)}` : '/api/friends/search';
+        const res  = await fetch(url);
         const data = await res.json();
         return data.users || [];
     } catch { return []; }
