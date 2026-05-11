@@ -2,11 +2,13 @@ import click
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_mail import Mail
 from config import Config
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
+mail = Mail()
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +16,7 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
 
     from app.auth import auth_bp as auth_blueprint
     app.register_blueprint(auth_blueprint)
@@ -39,11 +42,9 @@ def create_app():
         from datetime import datetime, timedelta
 
         today = datetime.now().date()
-        # Sunday of the current week
         this_sunday = today - timedelta(days=(today.weekday() + 1) % 7)
 
         def date_on(week_offset, day_name):
-            """Return YYYY-MM-DD for day_name in the week starting at this_sunday + week_offset*7."""
             offsets = {'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
                        'thursday': 4, 'friday': 5, 'saturday': 6}
             base = this_sunday + timedelta(weeks=week_offset)
@@ -62,88 +63,71 @@ def create_app():
                 db.session.add(u)
         db.session.flush()
 
-        # (week_offset, day, start, end, title, category)
         events_by_user = {
             'alice': [
-                # — this week —
                 (0, 'monday',    '09:00', '11:00', 'Morning Lecture',      'Studies'),
                 (0, 'monday',    '13:00', '15:00', 'Library Study',        'Studies'),
                 (0, 'tuesday',   '10:00', '12:00', 'Yoga Class',           'Health'),
                 (0, 'wednesday', '09:00', '17:00', 'Work From Home',       'Work'),
                 (0, 'thursday',  '14:00', '16:00', 'Project Group',        'Studies'),
                 (0, 'friday',    '10:00', '13:00', 'Part-time Job',        'Work'),
-                # — last week —
                 (-1, 'monday',   '09:00', '11:00', 'Morning Lecture',      'Studies'),
                 (-1, 'wednesday','10:00', '12:00', 'Lab Session',          'Studies'),
                 (-1, 'friday',   '14:00', '16:00', 'Revision Session',     'Studies'),
-                # — next week —
                 (1, 'tuesday',   '09:00', '11:00', 'Exam Prep',            'Studies'),
                 (1, 'wednesday', '09:00', '17:00', 'Work From Home',       'Work'),
                 (1, 'thursday',  '10:00', '12:00', 'Group Project',        'Studies'),
                 (1, 'friday',    '11:00', '14:00', 'Part-time Job',        'Work'),
-                # — week after next —
                 (2, 'monday',    '09:00', '11:00', 'Morning Lecture',      'Studies'),
                 (2, 'thursday',  '14:00', '17:00', 'Assignment Sprint',    'Studies'),
             ],
             'bob': [
-                # — this week —
                 (0, 'monday',    '08:00', '10:00', 'Gym',                  'Health'),
                 (0, 'tuesday',   '09:00', '12:00', 'Coding Tutorial',      'Studies'),
                 (0, 'tuesday',   '14:00', '17:00', 'Internship',           'Work'),
                 (0, 'wednesday', '11:00', '13:00', 'Lunch with Friends',   'Social'),
                 (0, 'thursday',  '09:00', '12:00', 'Morning Classes',      'Studies'),
                 (0, 'friday',    '15:00', '18:00', 'Board Game Night',     'Social'),
-                # — last week —
                 (-1, 'tuesday',  '09:00', '12:00', 'Coding Tutorial',      'Studies'),
                 (-1, 'thursday', '14:00', '17:00', 'Internship',           'Work'),
                 (-1, 'saturday', '12:00', '15:00', 'Hackathon',            'Studies'),
-                # — next week —
                 (1, 'monday',    '08:00', '10:00', 'Gym',                  'Health'),
                 (1, 'wednesday', '09:00', '12:00', 'Code Review',          'Work'),
                 (1, 'friday',    '14:00', '17:00', 'Movie Night',          'Social'),
-                # — week after next —
                 (2, 'tuesday',   '10:00', '13:00', 'Sprint Planning',      'Work'),
                 (2, 'friday',    '15:00', '18:00', 'Board Game Night',     'Social'),
             ],
             'charlie': [
-                # — this week —
                 (0, 'monday',    '10:00', '12:00', 'Design Workshop',      'Studies'),
                 (0, 'tuesday',   '13:00', '15:00', 'Café Study',           'Studies'),
                 (0, 'wednesday', '09:00', '11:00', 'Morning Run',          'Health'),
                 (0, 'wednesday', '14:00', '17:00', 'Part-time Shift',      'Work'),
                 (0, 'thursday',  '10:00', '14:00', 'Research Session',     'Studies'),
                 (0, 'saturday',  '11:00', '14:00', 'BBQ with Friends',     'Social'),
-                # — last week —
                 (-1, 'monday',   '10:00', '12:00', 'Design Workshop',      'Studies'),
                 (-1, 'friday',   '09:00', '12:00', 'Portfolio Review',     'Studies'),
-                # — next week —
                 (1, 'monday',    '09:00', '12:00', 'Client Presentation',  'Work'),
                 (1, 'tuesday',   '13:00', '15:00', 'Café Study',           'Studies'),
                 (1, 'wednesday', '09:00', '11:00', 'Morning Run',          'Health'),
                 (1, 'wednesday', '14:00', '18:00', 'Full-day Shift',       'Work'),
                 (1, 'saturday',  '10:00', '13:00', 'Photography Walk',     'Personal'),
-                # — week after next —
                 (2, 'wednesday', '09:00', '17:00', 'Full-day Shift',       'Work'),
                 (2, 'saturday',  '12:00', '15:00', 'Beach Day',            'Social'),
             ],
             'diana': [
-                # — this week —
                 (0, 'monday',    '09:00', '12:00', 'Team Stand-up',        'Work'),
                 (0, 'tuesday',   '11:00', '13:00', 'Finance Review',       'Finance'),
                 (0, 'wednesday', '10:00', '12:00', 'Study Group',          'Studies'),
                 (0, 'thursday',  '09:00', '11:00', 'Pilates Class',        'Health'),
                 (0, 'thursday',  '15:00', '18:00', 'Client Meeting',       'Work'),
                 (0, 'friday',    '11:00', '14:00', 'Networking Event',     'Social'),
-                # — last week —
                 (-1, 'monday',   '09:00', '12:00', 'Team Stand-up',        'Work'),
                 (-1, 'wednesday','10:00', '12:00', 'Study Group',          'Studies'),
                 (-1, 'friday',   '11:00', '14:00', 'Networking Event',     'Social'),
-                # — next week —
                 (1, 'monday',    '09:00', '11:00', 'Budget Review',        'Finance'),
                 (1, 'tuesday',   '14:00', '16:00', 'Finance Review',       'Finance'),
                 (1, 'thursday',  '09:00', '11:00', 'Pilates Class',        'Health'),
                 (1, 'thursday',  '13:00', '17:00', 'Quarterly Report',     'Work'),
-                # — week after next —
                 (2, 'monday',    '09:00', '12:00', 'Team Stand-up',        'Work'),
                 (2, 'wednesday', '11:00', '14:00', 'Strategy Session',     'Work'),
             ],
@@ -163,7 +147,6 @@ def create_app():
                 ))
                 count += 1
 
-        # Group 1: Study Group Demo — all 4 users (owner: alice)
         alice = User.query.filter_by(username='alice').first()
         if alice and not Group.query.filter_by(name='Study Group Demo').first():
             g1 = Group(name='Study Group Demo', created_by=alice.id)
@@ -177,7 +160,6 @@ def create_app():
                         role='owner' if u.id == alice.id else 'member',
                     ))
 
-        # Group 2: Dev Team — bob + charlie only (owner: bob)
         bob = User.query.filter_by(username='bob').first()
         if bob and not Group.query.filter_by(name='Dev Team').first():
             g2 = Group(name='Dev Team', created_by=bob.id)
