@@ -3,3 +3,5 @@ flask-sqlalchemy
 flask-login
 pytest
 python-dotenv
+flask-mail
+flask-migrate

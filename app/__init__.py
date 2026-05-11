@@ -3,12 +3,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_migrate import Migrate
 from config import Config
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 mail = Mail()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -17,6 +19,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    migrate.init_app(app, db)
 
     from app.auth import auth_bp as auth_blueprint
     app.register_blueprint(auth_blueprint)
@@ -24,16 +27,7 @@ def create_app():
     from app.routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    with app.app_context():
-        db.create_all()
 
-    @app.cli.command('migrate-db')
-    def migrate_db():
-        """Run database migrations."""
-        import os
-        from migrations.add_event_details_001 import migrate
-        db_path = os.path.join(app.instance_path, 'timepocket.db')
-        migrate(db_path)
 
     @app.cli.command('seed-demo')
     def seed_demo():
