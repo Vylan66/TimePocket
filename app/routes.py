@@ -220,7 +220,6 @@ def group_heatmap(group_id):
         Availability.date <= end_str,
     ).all()
 
-    avail = Availability.query.filter(Availability.user_id.in_(member_ids)).all()
     day_map = {
         'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6,
         'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
