@@ -2,6 +2,7 @@ from app import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import secrets
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -13,6 +14,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     avatar = db.Column(db.String(20), default='avatar_1')
+    bio = db.Column(db.String(200), nullable=True)
+    is_verified = db.Column(db.Boolean, default=False)
+    verification_token = db.Column(db.String(100), nullable=True)
     availability = db.relationship('Availability', backref='user', lazy=True)
 
     def set_password(self, password):
@@ -20,6 +24,10 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def generate_verification_token(self):
+        self.verification_token = secrets.token_urlsafe(32)
+        return self.verification_token
 
 class Availability(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
@@ -41,7 +49,7 @@ class Group(db.Model):
 class GroupMember(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id  = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     role = db.Column(db.String(20), default='member')
     user = db.relationship('User', backref=db.backref('group_memberships', lazy=True))
 
