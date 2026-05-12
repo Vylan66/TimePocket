@@ -11,8 +11,8 @@
     --bg-surface:        rgb(239,239,238);
     --bg-input:          rgb(255,255,255);
     --bg-input-autofill: #f8f8f7;
-    --bg-tab-pill:       rgba(26,23,20,0.07);
-    --bg-close-btn:      rgba(255,255,255,0.3);
+    --bg-tab-pill:       rgba(26,23,20,0.10);
+    --bg-close-btn:      rgba(255,255,255);
     --overlay-bg:        rgba(26,23,20,0.5);
     --bg-timetable:      #c4d5f9;
 
