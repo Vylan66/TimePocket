@@ -18,6 +18,9 @@ def register():
 
     if User.query.filter_by(email=email).first():
         return jsonify({'success': False, 'message': 'Email already registered.'})
+    
+    if User.query.filter_by(username=username).first():
+    return jsonify({'success': False, 'message': 'Username already taken.'})
 
     new_user = User(username=username, email=email)
     new_user.set_password(password)
