@@ -63,6 +63,7 @@ def create_app():
             if not User.query.filter_by(username=username).first():
                 u = User(username=username, email=email)
                 u.set_password(password)
+                u.is_verified = True
                 db.session.add(u)
         db.session.flush()
 
