@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
-from app.models import Availability, User, Group, GroupMember
+from app.models import Availability, User, Group, GroupMember, Friendship
 
 main = Blueprint('main', __name__)
 
@@ -255,6 +255,83 @@ def search_users():
         User.id != current_user.id
     ).limit(10).all()
     return jsonify({'users': [{'id': u.id, 'username': u.username} for u in users]})
+
+def _friend_ids():
+    """Return set of user IDs who are accepted friends of current_user."""
+    rows = Friendship.query.filter(
+        db.or_(
+            db.and_(Friendship.requester_id == current_user.id, Friendship.status == 'accepted'),
+            db.and_(Friendship.receiver_id == current_user.id, Friendship.status == 'accepted'),
+        )
+    ).all()
+    return {(f.receiver_id if f.requester_id == current_user.id else f.requester_id): f.id for f in rows}
+
+@main.route('/api/friends', methods=['GET'])
+@login_required
+def get_friends():
+    id_map = _friend_ids()
+    users = User.query.filter(User.id.in_(id_map.keys())).all()
+    return jsonify({'friends': [{'id': u.id, 'username': u.username, 'friendship_id': id_map[u.id]} for u in users]})
+
+@main.route('/api/friends/search', methods=['GET'])
+@login_required
+def search_friends():
+    q = (request.args.get('q') or '').strip()
+    id_map = _friend_ids()
+    if not id_map:
+        return jsonify({'users': []})
+    query = User.query.filter(User.id.in_(id_map.keys()))
+    if q:
+        query = query.filter(User.username.ilike(f'%{q}%'))
+    return jsonify({'users': [{'id': u.id, 'username': u.username} for u in query.limit(10).all()]})
+
+@main.route('/api/friends/requests', methods=['GET'])
+@login_required
+def get_friend_requests():
+    rows = Friendship.query.filter_by(receiver_id=current_user.id, status='pending').all()
+    return jsonify({'requests': [{'id': f.id, 'user_id': f.requester_id, 'username': f.requester.username} for f in rows]})
+
+@main.route('/api/friends/request', methods=['POST'])
+@login_required
+def send_friend_request():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    if not user_id or user_id == current_user.id:
+        return jsonify({'error': 'Invalid user'}), 400
+    if not User.query.get(user_id):
+        return jsonify({'error': 'User not found'}), 404
+    existing = Friendship.query.filter(
+        db.or_(
+            db.and_(Friendship.requester_id == current_user.id, Friendship.receiver_id == user_id),
+            db.and_(Friendship.requester_id == user_id, Friendship.receiver_id == current_user.id),
+        )
+    ).first()
+    if existing:
+        return jsonify({'error': 'Request already exists'}), 409
+    f = Friendship(requester_id=current_user.id, receiver_id=user_id)
+    db.session.add(f)
+    db.session.commit()
+    return jsonify({'message': 'Friend request sent', 'id': f.id}), 201
+
+@main.route('/api/friends/accept/<int:friendship_id>', methods=['POST'])
+@login_required
+def accept_friend_request(friendship_id):
+    f = Friendship.query.get_or_404(friendship_id)
+    if f.receiver_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    f.status = 'accepted'
+    db.session.commit()
+    return jsonify({'message': 'Accepted'})
+
+@main.route('/api/friends/<int:friendship_id>', methods=['DELETE'])
+@login_required
+def remove_friend(friendship_id):
+    f = Friendship.query.get_or_404(friendship_id)
+    if f.requester_id != current_user.id and f.receiver_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    db.session.delete(f)
+    db.session.commit()
+    return jsonify({'message': 'Removed'})
 
 @main.route('/profile')
 @login_required

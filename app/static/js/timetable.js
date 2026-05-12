@@ -96,7 +96,43 @@ function goToWeekContaining(date) {
     buildColumns();
 }
 
-// Day columns — only injects events + now-line; layout is CSS 
+// Overlap layout — assigns each event a horizontal slot so overlapping
+// events sit side-by-side instead of stacking on top of each other.
+function computeLayout(dayEvents) {
+    if (dayEvents.length === 0) return [];
+
+    // Sort by start time so we process events in chronological order
+    const sorted = [...dayEvents]
+        .map((ev, i) => ({ ev, i }))
+        .sort((a, b) => timeToFrac(a.ev.start) - timeToFrac(b.ev.start));
+
+    // Greedily assign each event to the first available slot.
+    // slotEnds[i] = end-time fraction of the last event placed in slot i.
+    const slotEnds = [];
+    const assigned = sorted.map(({ ev, i }) => {
+        const start = timeToFrac(ev.start);
+        const end   = timeToFrac(ev.end);
+        let slot = slotEnds.findIndex(endFrac => endFrac <= start);
+        if (slot === -1) slot = slotEnds.push(0) - 1;
+        slotEnds[slot] = end;
+        return { ev, i, slot };
+    });
+
+    // For each event, find how many slots are active at the same time —
+    // that determines how wide each event should be drawn.
+    return assigned.map(item => {
+        const start = timeToFrac(item.ev.start);
+        const end   = timeToFrac(item.ev.end);
+        const concurrent = assigned.filter(
+            other => timeToFrac(other.ev.start) < end &&
+                     timeToFrac(other.ev.end)   > start
+        );
+        const totalCols = Math.max(...concurrent.map(c => c.slot)) + 1;
+        return { ...item, totalCols };
+    });
+}
+
+// Day columns — only injects events + now-line; layout is CSS
 function buildColumns() {
     const weekStart = getWeekStart();
     const today     = new Date(); today.setHours(0, 0, 0, 0);
@@ -108,17 +144,24 @@ function buildColumns() {
 
         col.innerHTML = '';
 
-        const dateStr = toDateStr(day);
-        events.filter(e => e.date === dateStr).forEach(ev => {
+        const dateStr  = toDateStr(day);
+        const dayEvents = events.filter(e => e.date === dateStr);
+        computeLayout(dayEvents).forEach(({ ev, slot, totalCols }) => {
             const top    = fracToY(timeToFrac(ev.start));
             const height = fracToY(timeToFrac(ev.end)) - top;
             const el     = document.createElement('div');
             el.className             = 'cal-event';
             el.style.top             = `${top}px`;
-            el.style.height          = `${Math.max(height - 4, 20)}px`;
+            el.style.height          = `${Math.max(height-3, 20)}px`;
             el.style.backgroundColor = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
-            el.innerHTML   = `<div class="ev-title">${ev.title}</div><div class="ev-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>`;
-            el.style.cursor = 'pointer';
+            el.innerHTML             = `<div class="ev-title">${ev.title}</div><div class="ev-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>`;
+
+            // Position event within its horizontal slot
+            const pct      = 100 / totalCols;
+            el.style.left  = `calc(${slot * pct}% + 1.5px)`;
+            el.style.right = 'auto';
+            el.style.width = `calc(${pct}% - 2.5px)`;
+
             const capturedIdx = events.indexOf(ev);
             el.addEventListener('click', (e) => { e.stopPropagation(); openEventDetail(capturedIdx); });
             col.appendChild(el);

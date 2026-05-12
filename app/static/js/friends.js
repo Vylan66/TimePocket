@@ -1,20 +1,6 @@
-// JavaScript for local state (frontend-only, resets on page reload) 
+let friends  = []; // {id, username, friendship_id}
+let requests = []; // {id: friendship_id, user_id, username}
 
-// Dummy test users
-let friends  = [
-    { id: 101, username: 'alice' },
-    { id: 102, username: 'bob' },
-    { id: 103, username: 'charlie' },
-    { id: 104, username: 'diana' },
-    { id: 105, username: 'evan' },
-];
-let requests = [
-    { id: 201, username: 'frank',  fid: 901 },
-    { id: 202, username: 'grace',  fid: 902 },
-];
-let nextId = 903;
-
-// Helpers 
 function escHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -24,10 +10,9 @@ function debounce(fn, ms) {
     return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
 }
 
-// Boot
 document.addEventListener('DOMContentLoaded', () => {
-    renderFriends();
-    renderRequests();
+    loadFriends();
+    loadRequests();
 
     document.getElementById('friend-search').addEventListener('input',
         debounce(e => searchUsers(e.target.value), 280));
@@ -47,7 +32,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Search users (uses existing /users/search API) 
+async function loadFriends() {
+    try {
+        const res  = await fetch('/api/friends');
+        const data = await res.json();
+        friends = data.friends || [];
+    } catch {
+        friends = [];
+    }
+    renderFriends();
+}
+
+async function loadRequests() {
+    try {
+        const res  = await fetch('/api/friends/requests');
+        const data = await res.json();
+        requests = data.requests || [];
+    } catch {
+        requests = [];
+    }
+    renderRequests();
+}
+
 async function searchUsers(q) {
     const results = document.getElementById('friend-search-results');
     if (q.length < 2) { results.style.display = 'none'; return; }
@@ -56,7 +62,7 @@ async function searchUsers(q) {
         const res  = await fetch(`/users/search?q=${encodeURIComponent(q)}`);
         const data = await res.json();
         const users = (data.users || []).filter(
-            u => !friends.find(f => f.id === u.id) && !requests.find(r => r.id === u.id)
+            u => !friends.find(f => f.id === u.id) && !requests.find(r => r.user_id === u.id)
         );
 
         if (users.length === 0) {
@@ -80,22 +86,35 @@ async function searchUsers(q) {
     }
 }
 
-// Send friend request (adds to local requests list as demo) 
-function sendRequest(userId, username) {
+async function sendRequest(userId, username) {
     document.getElementById('friend-search-results').style.display = 'none';
     document.getElementById('friend-search').value = '';
 
-    if (friends.find(f => f.id === userId) || requests.find(r => r.id === userId)) {
+    if (friends.find(f => f.id === userId) || requests.find(r => r.user_id === userId)) {
         showToast('Already a friend or request pending', true);
         return;
     }
 
-    requests.push({ id: userId, username, fid: nextId++ });
-    renderRequests();
-    showToast(`Friend request sent to ${username}`);
+    try {
+        const res = await fetch('/api/friends/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId }),
+        });
+        if (res.ok) {
+            const data = await res.json();
+            requests.push({ id: data.id, user_id: userId, username });
+            renderRequests();
+            showToast(`Friend request sent to ${username}`);
+        } else {
+            const data = await res.json();
+            showToast(data.error || 'Failed to send request', true);
+        }
+    } catch {
+        showToast('Failed to send request', true);
+    }
 }
 
-// Render friends list 
 function renderFriends() {
     const list  = document.getElementById('friends-list');
     const empty = document.getElementById('friends-empty');
@@ -157,17 +176,25 @@ function buildFriendRow(f) {
         menu.classList.toggle('hidden');
     });
 
-    row.querySelector('.remove-btn').addEventListener('click', (e) => {
+    row.querySelector('.remove-btn').addEventListener('click', async (e) => {
         e.stopPropagation();
-        friends = friends.filter(x => x.id !== f.id);
-        renderFriends();
-        showToast('Friend removed');
+        try {
+            const res = await fetch(`/api/friends/${f.friendship_id}`, { method: 'DELETE' });
+            if (res.ok) {
+                friends = friends.filter(x => x.id !== f.id);
+                renderFriends();
+                showToast('Friend removed');
+            } else {
+                showToast('Failed to remove friend', true);
+            }
+        } catch {
+            showToast('Failed to remove friend', true);
+        }
     });
 
     return row;
 }
 
-// Render friend requests 
 function renderRequests() {
     const list = document.getElementById('friend-requests-list');
 
@@ -177,7 +204,7 @@ function renderRequests() {
     }
 
     list.innerHTML = requests.map(r => `
-        <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.fid}">
+        <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.id}">
             <div class="flex items-center gap-2 min-w-0 cursor-pointer"
                 onclick="openProfilePopup('${escHtml(r.username)}')">
                 <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
@@ -185,7 +212,7 @@ function renderRequests() {
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
             </div>
             <div class="flex items-center gap-1 shrink-0">
-                <button onclick="acceptRequest(${r.fid})" title="Accept"
+                <button onclick="acceptRequest(${r.id}, ${r.user_id}, '${escHtml(r.username)}')" title="Accept"
                     class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                     style="background:#dcfce7; color:#16a34a;"
                     onmouseover="this.style.background='#bbf7d0'"
@@ -194,7 +221,7 @@ function renderRequests() {
                         <polyline points="20 6 9 17 4 12"/>
                     </svg>
                 </button>
-                <button onclick="rejectRequest(${r.fid})" title="Reject"
+                <button onclick="rejectRequest(${r.id})" title="Reject"
                     class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                     style="background:#fee2e2; color:#dc2626;"
                     onmouseover="this.style.background='#fecaca'"
@@ -207,24 +234,39 @@ function renderRequests() {
         </div>`).join('');
 }
 
-function acceptRequest(fid) {
-    const req = requests.find(r => r.fid === fid);
-    if (!req) return;
-    requests = requests.filter(r => r.fid !== fid);
-    friends.push({ id: req.id, username: req.username });
-    renderRequests();
-    renderFriends();
-    showToast(`${req.username} is now your friend`);
+async function acceptRequest(friendshipId, userId, username) {
+    try {
+        const res = await fetch(`/api/friends/accept/${friendshipId}`, { method: 'POST' });
+        if (res.ok) {
+            requests = requests.filter(r => r.id !== friendshipId);
+            friends.push({ id: userId, username, friendship_id: friendshipId });
+            renderRequests();
+            renderFriends();
+            showToast(`${username} is now your friend`);
+        } else {
+            showToast('Failed to accept request', true);
+        }
+    } catch {
+        showToast('Failed to accept request', true);
+    }
 }
 
-function rejectRequest(fid) {
-    requests = requests.filter(r => r.fid !== fid);
-    renderRequests();
-    showToast('Request rejected');
+async function rejectRequest(friendshipId) {
+    try {
+        const res = await fetch(`/api/friends/${friendshipId}`, { method: 'DELETE' });
+        if (res.ok) {
+            requests = requests.filter(r => r.id !== friendshipId);
+            renderRequests();
+            showToast('Request rejected');
+        } else {
+            showToast('Failed to reject request', true);
+        }
+    } catch {
+        showToast('Failed to reject request', true);
+    }
 }
 
-
-// Dummy test profile popups
+// Mock profile popup (kept as demo UI)
 const MOCK_BIOS = [
     'Loves hiking and photography on weekends.',
     'Coffee enthusiast and part-time coder.',
@@ -303,7 +345,6 @@ function closeProfilePopup() {
     document.getElementById('friend-profile-overlay').classList.remove('open');
 }
 
-// Toast
 function showToast(msg, isError = false) {
     let toast = document.getElementById('friends-toast');
     if (!toast) {

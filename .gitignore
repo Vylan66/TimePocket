@@ -17,3 +17,6 @@ __pycache__/
 # virtual environment
 .venv
 node_modules/
+
+# Claude Code
+.claude/

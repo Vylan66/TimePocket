@@ -28,6 +28,15 @@ def create_app():
     app.register_blueprint(main_blueprint)
 
 
+    @app.cli.command('migrate-db')
+    def migrate_db():
+        """Run database migrations."""
+        import os
+        from migrations.add_event_details_001 import migrate as migrate_001
+        from migrations.add_friendships_002 import migrate as migrate_002
+        db_path = os.path.join(app.instance_path, 'timepocket.db')
+        migrate_001(db_path)
+        migrate_002(db_path)
 
     @app.cli.command('seed-demo')
     def seed_demo():
@@ -167,8 +176,24 @@ def create_app():
                         role='owner' if u.id == bob.id else 'member',
                     ))
 
+        # Friendships: alice↔bob, alice↔charlie, alice↔diana, bob↔charlie
+        from app.models import Friendship
+        friend_pairs = [('alice', 'bob'), ('alice', 'charlie'), ('alice', 'diana'), ('bob', 'charlie')]
+        for uname_a, uname_b in friend_pairs:
+            ua = User.query.filter_by(username=uname_a).first()
+            ub = User.query.filter_by(username=uname_b).first()
+            if ua and ub:
+                existing = Friendship.query.filter(
+                    db.or_(
+                        db.and_(Friendship.requester_id == ua.id, Friendship.receiver_id == ub.id),
+                        db.and_(Friendship.requester_id == ub.id, Friendship.receiver_id == ua.id),
+                    )
+                ).first()
+                if not existing:
+                    db.session.add(Friendship(requester_id=ua.id, receiver_id=ub.id, status='accepted'))
+
         db.session.commit()
-        click.echo(f'Demo data seeded: 4 users, {count} events, 2 groups.')
+        click.echo(f'Demo data seeded: 4 users, {count} events, 2 groups, friendships seeded.')
         click.echo('Login: alice / bob / charlie / diana  —  password: password123')
 
     @app.cli.command('seed-availability')
