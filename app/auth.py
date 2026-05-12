@@ -61,6 +61,9 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({'success': False, 'message': 'Invalid credentials.'})
 
+    if not user.is_verified:
+        return jsonify({'success': False, 'message': 'Please verify your email before logging in.'})
+
     login_user(user)
     return jsonify({'success': True})
 
