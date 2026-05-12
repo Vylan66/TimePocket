@@ -24,8 +24,7 @@ async function fetchHeatmap(groupId) {
     } catch { /* ignore */ }
 }
 
-// ─── Init ────────────────────────────────────────────────────────────────────
-
+// Init 
 document.addEventListener('DOMContentLoaded', () => {
     loadGroups();
 
@@ -57,8 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         debounce(e => searchUsersForSettings(e.target.value), 280));
 });
 
-// ─── Groups list ─────────────────────────────────────────────────────────────
-
+// Groups list 
 async function loadGroups() {
     try {
         const res  = await fetch('/groups');
@@ -94,8 +92,7 @@ function renderGroupsList(groups, filter = '') {
         </button>`).join('');
 }
 
-// ─── Select / deselect group ─────────────────────────────────────────────────
-
+// Select / deselect group 
 async function selectGroup(id, name, role) {
     selectedGroupId   = id;
     selectedGroupRole = role;
@@ -128,8 +125,7 @@ function backToGroups() {
     renderGroupsList(cachedGroups);
 }
 
-// ─── Members list ─────────────────────────────────────────────────────────────
-
+// Members list 
 function renderMembersList(members) {
     const list = document.getElementById('members-list');
     if (!members || members.length === 0) {
@@ -148,8 +144,7 @@ function renderMembersList(members) {
         </div>`).join('');
 }
 
-// ─── Heatmap ─────────────────────────────────────────────────────────────────
-
+// Heatmap 
 function renderHeatmap({ heatmap, total }) {
     clearHeatmap();
     if (!total || !heatmap) return;
@@ -166,7 +161,7 @@ function renderHeatmap({ heatmap, total }) {
             const ratio = count / total;
             const cell  = document.createElement('div');
             cell.className    = 'heatmap-cell';
-            cell.style.cssText = `position:absolute;top:${(hour - START_HOUR) * HOUR_HEIGHT}px;height:${HOUR_HEIGHT}px;left:0;right:0;background:rgba(34,197,94,${(ratio * 0.5).toFixed(3)});pointer-events:none;z-index:0;`;
+            cell.style.cssText = `position:absolute;top:${(hour - START_HOUR) * HOUR_HEIGHT}px;height:${HOUR_HEIGHT}px;left:0;right:0;background:rgba(240,90,90,${(ratio).toFixed(3)});z-index:0;`;
             col.appendChild(cell);
         }
     }
@@ -176,8 +171,7 @@ function clearHeatmap() {
     document.querySelectorAll('.heatmap-cell').forEach(el => el.remove());
 }
 
-// ─── Create Group popup ───────────────────────────────────────────────────────
-
+// Create Group popup 
 function openCreateGroupPopup() {
     pendingMembers = [];
     document.getElementById('new-group-name').value    = '';
@@ -252,8 +246,7 @@ async function createGroup() {
     }
 }
 
-// ─── Group Settings popup ─────────────────────────────────────────────────────
-
+// Group Settings popup 
 async function openSettingsPopup() {
     if (!selectedGroupId) return;
 
@@ -389,8 +382,7 @@ async function confirmDeleteGroup() {
     }
 }
 
-// ─── Shared helpers ───────────────────────────────────────────────────────────
-
+// Shared helpers 
 async function fetchFriends(q) {
     try {
         const url = q ? `/api/friends/search?q=${encodeURIComponent(q)}` : '/api/friends/search';
