@@ -97,6 +97,9 @@ async function selectGroup(id, name, role) {
     selectedGroupId   = id;
     selectedGroupRole = role;
 
+    document.getElementById('time-body').classList.remove('timetable-blur');
+    document.getElementById('timetable-overlay').classList.remove('visible');
+
     document.getElementById('group-name-label').textContent = name;
     document.getElementById('groups-panel').style.display  = 'none';
     document.getElementById('members-panel').style.display = 'flex';
@@ -120,6 +123,8 @@ function backToGroups() {
     selectedGroupRole  = null;
     currentHeatmapData = null;
     clearHeatmap();
+    document.getElementById('time-body').classList.add('timetable-blur');
+    document.getElementById('timetable-overlay').classList.add('visible');
     document.getElementById('members-panel').style.display = 'none';
     document.getElementById('groups-panel').style.display  = 'flex';
     renderGroupsList(cachedGroups);
