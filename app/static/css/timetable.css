@@ -4,6 +4,23 @@
 }
 .btn-today:hover { background: var(--bg-tab-pill) !important; }
 
+/* Group page — blur timetable when no group is selected */
+.timetable-blur {
+    filter: blur(3px);
+    pointer-events: none;
+    user-select: none;
+}
+.timetable-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+}
+.timetable-overlay.visible { display: flex; }
+
 /* Timetable layout constants 
    --hour-h   : height of one hour row — JS reads this so it's the
                 single source of truth for pixel calculations.

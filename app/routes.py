@@ -220,28 +220,36 @@ def group_heatmap(group_id):
         Availability.date <= end_str,
     ).all()
 
-    avail = Availability.query.filter(Availability.user_id.in_(member_ids)).all()
-    day_map = {
-        'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6,
-        'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
-        'thursday': 4, 'friday': 5, 'saturday': 6
-    }
-    heatmap = {str(i): {} for i in range(7)}
+    # Group raw intervals by (user_id, day_index) so overlapping events from the same user can be merged into one before counting.
+    from collections import defaultdict
+    user_day_intervals = defaultdict(list)
     for slot in avail:
         try:
-            dt = datetime.strptime(slot.date, '%Y-%m-%d')
-            # Python weekday(): Mon=0…Sun=6 → JS getDay(): Sun=0, Mon=1…Sat=6
-            day_idx = (dt.weekday() + 1) % 7
-        except (ValueError, AttributeError):
-            continue
-        try:
+            dt      = datetime.strptime(slot.date, '%Y-%m-%d')
+            day_idx = (dt.weekday() + 1) % 7  # Mon=0…Sun=6 → Sun=0, Mon=1…Sat=6
             start_h = int(slot.start_time.split(':')[0])
             end_h   = int(slot.end_time.split(':')[0])
         except (ValueError, AttributeError):
             continue
+        user_day_intervals[(slot.user_id, day_idx)].append((start_h, end_h))
+
+    # For each (user, day), merge overlapping intervals so one user can 
+    # contribute at most 1 to the count per hour regardless of how many
+    # events they have covering that slot.
+    heatmap = {str(i): {} for i in range(7)}
+    for (_, day_idx), intervals in user_day_intervals.items():
+        intervals.sort()
+        merged = []
+        for start, end in intervals:
+            if merged and start <= merged[-1][1]:
+                merged[-1][1] = max(merged[-1][1], end)
+            else:
+                merged.append([start, end])
         day_key = str(day_idx)
-        for h in range(start_h, end_h):
-            heatmap[day_key][str(h)] = heatmap[day_key].get(str(h), 0) + 1
+        for start, end in merged:
+            for h in range(start, end):
+                heatmap[day_key][str(h)] = heatmap[day_key].get(str(h), 0) + 1
+
     return jsonify({'heatmap': heatmap, 'total': total})
 
 @main.route('/users/search', methods=['GET'])
