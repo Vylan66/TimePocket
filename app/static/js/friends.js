@@ -22,6 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === document.getElementById('friend-profile-overlay')) closeProfilePopup();
     });
 
+    document.getElementById('friend-req-profile-close').addEventListener('click', closeFriendReqPopup);
+    document.getElementById('friend-req-profile-overlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('friend-req-profile-overlay')) closeFriendReqPopup();
+    });
+
     document.addEventListener('click', (e) => {
         const input   = document.getElementById('friend-search');
         const results = document.getElementById('friend-search-results');
@@ -69,7 +74,7 @@ async function searchUsers(q) {
             results.innerHTML = `<div class="px-3 py-2 text-xs" style="color:var(--text-fine);">No users found</div>`;
         } else {
             results.innerHTML = users.map(u => `
-                <button onclick="sendRequest(${u.id}, '${escHtml(u.username)}')"
+                <button onclick="friendReqPopup(${u.id}, '${escHtml(u.username)}')"
                     class="flex items-center gap-2 px-3 py-2 text-xs text-left w-full transition-colors"
                     style="color:var(--dark);"
                     onmouseover="this.style.background='var(--bg-tab-pill)'"
@@ -309,6 +314,41 @@ function getMockProfile(username) {
         mutualGroups: MOCK_GROUPS[i],
         nextFree:     MOCK_TIMES[i],
     };
+}
+
+function friendReqPopup(userId, username) {
+    const p = getMockProfile(username);
+
+    document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
+    document.getElementById('frq-username').textContent = username;
+    document.getElementById('frq-bio').textContent      = p.bio;
+
+    document.getElementById('frq-hobbies').innerHTML = p.hobbies.map(h =>
+        `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
+            style="background:var(--bg-tab-pill);color:var(--dark);">${escHtml(h)}</span>`
+    ).join('');
+
+    document.getElementById('frq-mutual-friends').innerHTML = p.mutualFriends.length
+        ? p.mutualFriends.map(u =>
+            `<div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    style="background:var(--blue);">${escHtml(u[0].toUpperCase())}</span>
+                <span class="text-xs">${escHtml(u)}</span>
+            </div>`).join('')
+        : `<span class="text-xs" style="color:var(--text-fine);">None</span>`;
+
+    document.getElementById('send-friend-req-btn').onclick = () => {
+        closeFriendReqPopup();
+        document.getElementById('friend-search-results').style.display = 'none';
+        document.getElementById('friend-search').value = '';
+        sendRequest(userId, username);
+    };
+
+    document.getElementById('friend-req-profile-overlay').classList.add('open');
+}
+
+function closeFriendReqPopup() {
+    document.getElementById('friend-req-profile-overlay').classList.remove('open');
 }
 
 function openProfilePopup(username) {
