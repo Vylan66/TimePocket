@@ -96,18 +96,14 @@ function goToWeekContaining(date) {
     buildColumns();
 }
 
-// Overlap layout — assigns each event a horizontal slot so overlapping
-// events sit side-by-side instead of stacking on top of each other.
+// Overlap layout
 function computeLayout(dayEvents) {
     if (dayEvents.length === 0) return [];
 
-    // Sort by start time so we process events in chronological order
     const sorted = [...dayEvents]
         .map((ev, i) => ({ ev, i }))
         .sort((a, b) => timeToFrac(a.ev.start) - timeToFrac(b.ev.start));
 
-    // Greedily assign each event to the first available slot.
-    // slotEnds[i] = end-time fraction of the last event placed in slot i.
     const slotEnds = [];
     const assigned = sorted.map(({ ev, i }) => {
         const start = timeToFrac(ev.start);
@@ -118,8 +114,6 @@ function computeLayout(dayEvents) {
         return { ev, i, slot };
     });
 
-    // For each event, find how many slots are active at the same time —
-    // that determines how wide each event should be drawn.
     return assigned.map(item => {
         const start = timeToFrac(item.ev.start);
         const end   = timeToFrac(item.ev.end);
@@ -132,7 +126,7 @@ function computeLayout(dayEvents) {
     });
 }
 
-// Day columns — only injects events + now-line; layout is CSS
+// Day columns
 function buildColumns() {
     const weekStart = getWeekStart();
     const today     = new Date(); today.setHours(0, 0, 0, 0);
@@ -156,7 +150,6 @@ function buildColumns() {
             el.style.backgroundColor = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
             el.innerHTML             = `<div class="ev-title">${ev.title}</div><div class="ev-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>`;
 
-            // Position event within its horizontal slot
             const pct      = 100 / totalCols;
             el.style.left  = `calc(${slot * pct}% + 1.5px)`;
             el.style.right = 'auto';
@@ -179,7 +172,6 @@ function buildColumns() {
         }
     }
 
-    // Populate popup day select (only present on personal page)
     const evDay = document.getElementById('evDay');
     if (evDay) {
         evDay.innerHTML = '';
@@ -195,7 +187,7 @@ function buildColumns() {
     if (typeof window.onAfterBuildColumns === 'function') window.onAfterBuildColumns();
 }
 
-// New Event Pop-up (only on personal page)
+// New Event Pop-up
 const popupOverlay = document.getElementById('popupOverlay');
 
 function closepopup() {
@@ -211,7 +203,6 @@ if (document.getElementById('addEventBtn')) {
         popupOverlay.style.display    = 'flex';
         popupOverlay.style.background = 'var(--overlay-bg)';
 
-        // Default day: mini cal selection if it falls in current week, else today
         const weekStart = getWeekStart();
         const target    = (typeof calSelected !== 'undefined' && calSelected)
                             ? new Date(calSelected)
@@ -319,9 +310,21 @@ function editEvent(idx) {
     popupOverlay.style.background = 'var(--overlay-bg)';
 }
 
-function deleteEvent(idx) {
-    // Frontend-only placeholder — no action yet
+async function deleteEvent(idx) {
+    const ev = events[idx];
+    if (!ev) return;
+    if (!confirm('Are you sure you want to delete this event?')) return;
+    if (ev.dbId) {
+        try {
+            await fetch(`/availability/${ev.dbId}`, { method: 'DELETE' });
+        } catch (err) {
+            console.error('Failed to delete event:', err);
+            return;
+        }
+    }
+    events.splice(idx, 1);
     closeEventDetail();
+    buildColumns();
 }
 
 if (document.getElementById('btn-detail-close')) {
