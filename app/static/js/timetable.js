@@ -241,8 +241,10 @@ if (document.getElementById('saveBtn')) {
             events.push({ title, date, start, end, category, note });
             if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note });
         }
+        const wasEditing = editingIdx !== null;
         closepopup();
         buildColumns();
+        showToast(wasEditing ? 'Event updated' : 'Event saved');
         document.getElementById('evTitle').value = '';
         document.getElementById('evNote').value  = '';
     });
@@ -322,6 +324,7 @@ async function deleteEvent(idx) {
     events.splice(idx, 1);
     closeEventDetail();
     buildColumns();
+    showToast('Event deleted');
 }
 
 if (document.getElementById('btn-detail-close')) {

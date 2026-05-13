@@ -75,6 +75,25 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Toast notifications
+function showToast(msg, isError = false) {
+    let toast = document.getElementById('tp-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'tp-toast';
+        toast.style.cssText = `position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+            padding: 0.5rem 1.25rem; border-radius: 9999px; font-size: 0.8rem;
+            z-index: 100; pointer-events: none; transition: opacity 0.3s;`;
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.background = isError ? '#fee2e2' : 'var(--dark)';
+    toast.style.color       = isError ? '#dc2626' : 'var(--bg-page)';
+    toast.style.opacity = '1';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+}
+
 // Mobile nav item clicks + active state
 const mobilePageMap = {
     '/dashboard': 'dashboard',
