@@ -108,7 +108,7 @@ async function sendRequest(userId, username) {
         });
         if (res.ok) {
             const data = await res.json();
-            requests.push({ id: data.id, user_id: userId, username });
+            requests.push({ id: data.id, user_id: userId, username, direction: 'outgoing' });
             renderRequests();
             showToast(`Friend request sent to ${username}`);
         } else {
@@ -217,24 +217,27 @@ function renderRequests() {
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
             </div>
             <div class="flex items-center gap-1 shrink-0">
-                <button onclick="acceptRequest(${r.id}, ${r.user_id}, '${escHtml(r.username)}')" title="Accept"
-                    class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                    style="background:#dcfce7; color:#16a34a;"
-                    onmouseover="this.style.background='#bbf7d0'"
-                    onmouseout="this.style.background='#dcfce7'">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                </button>
-                <button onclick="rejectRequest(${r.id})" title="Reject"
-                    class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                    style="background:#fee2e2; color:#dc2626;"
-                    onmouseover="this.style.background='#fecaca'"
-                    onmouseout="this.style.background='#fee2e2'">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
+                ${r.direction === 'outgoing'
+                    ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--bg-tab-pill);color:var(--text-label);">Sent</span>`
+                    : `<button onclick="acceptRequest(${r.id}, ${r.user_id}, '${escHtml(r.username)}')" title="Accept"
+                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                        style="background:#dcfce7; color:#16a34a;"
+                        onmouseover="this.style.background='#bbf7d0'"
+                        onmouseout="this.style.background='#dcfce7'">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </button>
+                    <button onclick="rejectRequest(${r.id})" title="Reject"
+                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                        style="background:#fee2e2; color:#dc2626;"
+                        onmouseover="this.style.background='#fecaca'"
+                        onmouseout="this.style.background='#fee2e2'">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>`
+                }
             </div>
         </div>`).join('');
 }
