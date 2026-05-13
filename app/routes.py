@@ -43,13 +43,7 @@ def get_my_availability():
         'notes':      s.notes or '',
     } for s in slots])
 
-@main.route('/test/dashboard')
-def dashboardTest():
-    return render_template('dashboard.html')
 
-@main.route('/test/profile')
-def profileTest():
-    return render_template('profile.html')
 
 @main.route('/availability', methods=['POST'])
 @login_required
