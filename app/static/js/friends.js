@@ -211,7 +211,7 @@ function renderRequests() {
     list.innerHTML = requests.map(r => `
         <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.id}">
             <div class="flex items-center gap-2 min-w-0 cursor-pointer"
-                onclick="openProfilePopup('${escHtml(r.username)}')">
+                onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false)">
                 <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
                     style="background:var(--blue);">${escHtml(r.username[0].toUpperCase())}</span>
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
@@ -316,7 +316,7 @@ function getMockProfile(username) {
     };
 }
 
-function friendReqPopup(userId, username) {
+function friendReqPopup(userId, username, showButton = true) {
     const p = getMockProfile(username);
 
     document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
@@ -337,12 +337,14 @@ function friendReqPopup(userId, username) {
             </div>`).join('')
         : `<span class="text-xs" style="color:var(--text-fine);">None</span>`;
 
-    document.getElementById('send-friend-req-btn').onclick = () => {
+    const btn = document.getElementById('send-friend-req-btn');
+    btn.style.display = showButton ? '' : 'none';
+    btn.onclick = showButton ? () => {
         closeFriendReqPopup();
         document.getElementById('friend-search-results').style.display = 'none';
         document.getElementById('friend-search').value = '';
         sendRequest(userId, username);
-    };
+    } : null;
 
     document.getElementById('friend-req-profile-overlay').classList.add('open');
 }
