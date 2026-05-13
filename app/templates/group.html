@@ -193,8 +193,8 @@
     </main>
 
     <!-- Group popup -->
-    <div id="createGroupOverlay" style="display:none; position:fixed; inset:0; z-index:60; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); background:var(--overlay-bg);" onclick="handleCreateGroupOverlayClick(event)">
-        <div class="popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
+    <div id="createGroupOverlay" class="popup-overlay" style="z-index:60;" onclick="handleCreateGroupOverlayClick(event)">
+        <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
             <h2 class="text-lg font-semibold mb-4" style="color: var(--dark);">New Group</h2>
 
             <div class="mb-3">
@@ -223,8 +223,8 @@
     </div>
 
     <!-- Group settings -->
-    <div id="settingsOverlay" style="display:none; position:fixed; inset:0; z-index:60; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); background:var(--overlay-bg);" onclick="handleSettingsOverlayClick(event)">
-        <div class="popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
+    <div id="settingsOverlay" class="popup-overlay" style="z-index:60;" onclick="handleSettingsOverlayClick(event)">
+        <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
             <h2 class="text-lg font-semibold mb-4" style="color: var(--dark);">Group Settings</h2>
 
             <div class="mb-3">

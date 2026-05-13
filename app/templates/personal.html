@@ -172,8 +172,8 @@
     </main>
 
     <!-- Add Event Pop-up -->
-    <div id="popupOverlay" style="display:none; position:fixed; inset:0; z-index:50; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);" onclick="handleOverlayClick(event)">
-        <div class="popup-box popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
+    <div id="popupOverlay" class="popup-overlay" onclick="handleOverlayClick(event)">
+        <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
             <h2 id="popup-title" class="text-lg font-semibold mb-4" style="color: var(--dark);">New Event</h2>
 
             <div class="mb-3">
@@ -224,8 +224,8 @@
     </div>
 
     <!-- Event Detail Pop-up -->
-    <div id="evDetailOverlay" style="display:none; position:fixed; inset:0; z-index:50; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);" onclick="handleDetailOverlayClick(event)">
-        <div class="popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
+    <div id="evDetailOverlay" class="popup-overlay" onclick="handleDetailOverlayClick(event)">
+        <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
 
             <!-- Title + category colour -->
             <div class="flex items-start gap-3 mb-4">

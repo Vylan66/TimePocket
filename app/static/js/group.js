@@ -397,14 +397,8 @@ async function fetchFriends(q) {
     } catch { return []; }
 }
 
-function showOverlay(id) {
-    const el = document.getElementById(id);
-    el.style.display = 'flex';
-}
-
-function hideOverlay(id) {
-    document.getElementById(id).style.display = 'none';
-}
+function showOverlay(id) { document.getElementById(id).classList.add('open'); }
+function hideOverlay(id) { document.getElementById(id).classList.remove('open'); }
 
 function escHtml(str) {
     return String(str)
