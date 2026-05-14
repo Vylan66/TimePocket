@@ -139,6 +139,19 @@
         </div>
 
         <div class="mb-3">
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Repeat</label>
+            <select id="evRecurring" class="tp-input">
+                <option value="none">Does not repeat</option>
+                <option value="weekly">Weekly</option>
+            </select>
+        </div>
+
+        <div class="mb-3" id="recurringEndWrapper" style="display:none;">
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Repeat until</label>
+            <input type="date" id="evRecurrenceEnd" class="tp-input">
+        </div>
+
+        <div class="mb-3">
             <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Category</label>
             <select id="evCategory" class="tp-input">
                 <option value="Personal">Personal</option>
