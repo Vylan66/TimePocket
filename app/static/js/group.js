@@ -405,19 +405,3 @@ async function fetchFriends(q) {
 function showOverlay(id) { document.getElementById(id).classList.add('open'); }
 function hideOverlay(id) { document.getElementById(id).classList.remove('open'); }
 
-function escHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-function debounce(fn, ms) {
-    let timer;
-    return function (...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn.apply(this, args), ms);
-    };
-}

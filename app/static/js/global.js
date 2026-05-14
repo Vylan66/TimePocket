@@ -75,6 +75,24 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Shared utilities
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function debounce(fn, ms) {
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), ms);
+    };
+}
+
 // Toast notifications
 function showToast(msg, isError = false) {
     let toast = document.getElementById('tp-toast');

@@ -1,14 +1,6 @@
 let friends  = []; // {id, username, friendship_id}
 let requests = []; // {id: friendship_id, user_id, username}
 
-function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function debounce(fn, ms) {
-    let t;
-    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFriends();
