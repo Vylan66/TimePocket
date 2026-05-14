@@ -171,15 +171,8 @@ function buildColumns() {
     }
 
     const evDay = document.getElementById('evDay');
-    if (evDay) {
-        evDay.innerHTML = '';
-        for (let i = 0; i < 7; i++) {
-            const d   = new Date(weekStart); d.setDate(d.getDate() + i);
-            const opt = document.createElement('option');
-            opt.value       = toDateStr(d);
-            opt.textContent = `${DAY_NAMES[d.getDay()]} ${d.getDate()}`;
-            evDay.appendChild(opt);
-        }
+    if (evDay && !evDay.min) {
+        evDay.min = toDateStr(new Date());
     }
 
     if (typeof window.onAfterBuildColumns === 'function') window.onAfterBuildColumns();
