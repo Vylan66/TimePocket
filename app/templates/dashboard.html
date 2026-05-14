@@ -1,78 +1,14 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TimePocket - Dashboard</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    </head>
-
-    <body class="font-mono flex flex-col justify-between h-screen" style="background: var(--blue-light); color: var(--dark); transition: background 0.3s, color 0.3s">
-        <!-- NAV BAR-->
-         <div class="flex justify-between flex-row p-4 items-center" style="background-color: var(--bg-page);">
-            <div id="logo" class="flex flex-row justify-center items-center gap-2">
-                <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
-                <span class="text-ui font-semibold">TimePocket</span>
-            </div>
-
-            <div id="nav-bar" class="flex flex-row justify-evenly gap-16 items-center">
-                <div id="dash-link">
-                    Dashboard
-                </div>
-                <div id="personal-timetable-link">
-                    My Timetable
-                </div>
-                <div id="groups-link">
-                    Groups
-                </div>
-            </div>
-
-            <div id="profile-container" class="flex flex-row justify-end gap-4 items-center">
-                <div id="dark-toggle">
-                    <div class="w-9 h-9 rounded-full border-2 border-ui"></div>
-                </div>
-                <div id="profile-link" class="btn-blue">
-                    Profile
-                </div>
-            </div>
-         </div>
-
-        <!-- DASHBOARD INFO -->
-         <div class="grid grid-cols-4 grid-rows-2 gap-8 m-8 grow">
-            <div id="current-day-events" class="rounded-3xl row-span-2" style="background-color: var(--bg-page);">
-            </div>
-            <div id="upcoming-events" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
-            </div>
-                
-            <div id="upcoming-plans" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
-            </div>
-         </div>
-    </body>
-
-    <script>
-        const root = document.documentElement;
-
-        function openPage(pageRequested) {
-            if (pageRequested === "dashboard") {
-                console.log("dashboard");
-            }
-            if (pageRequested === "personal") {
-                console.log("personal");
-            }
-            if (pageRequested === "groups") {
-                console.log("groups");
-            }
-            if (pageRequested === "profile") {
-                console.log("profile");
-            }
-        }
-
-        document.getElementById("dash-link").addEventListener("click", function() {openPage("dashboard")});
-        document.getElementById("personal-timetable-link").addEventListener("click", function() {openPage("personal")});
-        document.getElementById("groups-link").addEventListener("click", function() {openPage("groups")});
-        document.getElementById("profile-link").addEventListener("click", function() {openPage("profile")});
-
-    </script>
-</html>
+{% block content %}
+<!-- DASHBOARD INFO -->
+<div class="grid grid-cols-4 grid-rows-2 gap-8 m-8 grow">
+<div id="current-day-events" class="rounded-3xl row-span-2" style="background-color: var(--bg-page);">
+</div>
+<div id="upcoming-events" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
+</div>
+    
+<div id="upcoming-plans" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
+</div>
+</div>
+{% endblock %}
