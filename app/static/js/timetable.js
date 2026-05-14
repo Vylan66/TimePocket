@@ -1,6 +1,4 @@
 // Hour range 
-// HOUR_HEIGHT is read from --hour-h so CSS is the single source of truth.
-// --num-hours is written to CSS so calc() in the stylesheet stays in sync.
 const START_HOUR  = 4;
 const END_HOUR    = 23;
 const NUM_HOURS   = END_HOUR - START_HOUR + 1;
@@ -60,7 +58,7 @@ function toDateStr(d) {
     return `${yyyy}-${mm}-${dd}`;
 }
 
-// Week headers — updates existing static DOM elements 
+// Week headers
 function renderWeekHeaders() {
     const weekStart = getWeekStart();
     const today     = new Date();
@@ -222,7 +220,7 @@ if (document.getElementById('cancelBtn'))   document.getElementById('cancelBtn')
 if (document.getElementById('btn-popup-close')) document.getElementById('btn-popup-close').addEventListener('click', closepopup);
 
 if (document.getElementById('saveBtn')) {
-    document.getElementById('saveBtn').addEventListener('click', () => {
+    document.getElementById('saveBtn').addEventListener('click', async () => {
         const title    = document.getElementById('evTitle').value.trim();
         const date     = document.getElementById('evDay').value;
         const start    = document.getElementById('evStart').value;
@@ -238,6 +236,24 @@ if (document.getElementById('saveBtn')) {
         if (editingIdx !== null) {
             const old = events[editingIdx];
             events.splice(editingIdx, 1, { title, date, start, end, category, note, dbId: old.dbId });
+            if (old.dbId) {
+                try {
+                    await fetch(`/availability/${old.dbId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            date,
+                            start_time: start,
+                            end_time: end,
+                            title,
+                            category,
+                            notes: note,
+                        }),
+                    });
+                } catch (err) {
+                    console.error('Failed to update event:', err);
+                }
+            }
         } else {
             events.push({ title, date, start, end, category, note });
             if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note });
