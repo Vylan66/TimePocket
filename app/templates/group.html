@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mini_cal.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/timetable.css') }}">
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/mini_cal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/timetable.js') }}"></script>
+<script src="{{ url_for('static', filename='js/group.js') }}"></script>
+{% endblock %}
+
 {% block main %}
 <!-- Left Column: Mini Calendar + Groups/Members Panel -->
 <div class="w-full md:w-68 shrink-0 flex flex-row md:flex-col gap-4 p-4 overflow-y-auto">
@@ -194,9 +205,4 @@
         <button id="btn-settings-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
     </div>
 </div>
-
-<!-- JavaScript -->
-<script src="{{ url_for('static', filename='js/mini_cal.js') }}"></script>
-<script src="{{ url_for('static', filename='js/timetable.js') }}"></script>
-<script src="{{ url_for('static', filename='js/group.js') }}"></script>
 {% endblock %}
