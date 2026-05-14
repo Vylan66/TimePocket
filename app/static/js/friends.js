@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === document.getElementById('friend-profile-overlay')) closeProfilePopup();
     });
 
+    document.getElementById('friend-req-profile-close').addEventListener('click', closeFriendReqPopup);
+    document.getElementById('friend-req-profile-overlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('friend-req-profile-overlay')) closeFriendReqPopup();
+    });
+
     document.addEventListener('click', (e) => {
         const input   = document.getElementById('friend-search');
         const results = document.getElementById('friend-search-results');
@@ -61,7 +66,7 @@ async function searchUsers(q) {
             results.innerHTML = `<div class="px-3 py-2 text-xs" style="color:var(--text-fine);">No users found</div>`;
         } else {
             results.innerHTML = users.map(u => `
-                <button onclick="sendRequest(${u.id}, '${escHtml(u.username)}')"
+                <button onclick="friendReqPopup(${u.id}, '${escHtml(u.username)}')"
                     class="flex items-center gap-2 px-3 py-2 text-xs text-left w-full transition-colors"
                     style="color:var(--dark);"
                     onmouseover="this.style.background='var(--bg-tab-pill)'"
@@ -95,7 +100,7 @@ async function sendRequest(userId, username) {
         });
         if (res.ok) {
             const data = await res.json();
-            requests.push({ id: data.id, user_id: userId, username });
+            requests.push({ id: data.id, user_id: userId, username, direction: 'outgoing' });
             renderRequests();
             showToast(`Friend request sent to ${username}`);
         } else {
@@ -198,30 +203,33 @@ function renderRequests() {
     list.innerHTML = requests.map(r => `
         <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.id}">
             <div class="flex items-center gap-2 min-w-0 cursor-pointer"
-                onclick="openProfilePopup('${escHtml(r.username)}')">
+                onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false)">
                 <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
                     style="background:var(--blue);">${escHtml(r.username[0].toUpperCase())}</span>
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
             </div>
             <div class="flex items-center gap-1 shrink-0">
-                <button onclick="acceptRequest(${r.id}, ${r.user_id}, '${escHtml(r.username)}')" title="Accept"
-                    class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                    style="background:#dcfce7; color:#16a34a;"
-                    onmouseover="this.style.background='#bbf7d0'"
-                    onmouseout="this.style.background='#dcfce7'">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                </button>
-                <button onclick="rejectRequest(${r.id})" title="Reject"
-                    class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                    style="background:#fee2e2; color:#dc2626;"
-                    onmouseover="this.style.background='#fecaca'"
-                    onmouseout="this.style.background='#fee2e2'">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
+                ${r.direction === 'outgoing'
+                    ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--bg-tab-pill);color:var(--text-label);">Sent</span>`
+                    : `<button onclick="acceptRequest(${r.id}, ${r.user_id}, '${escHtml(r.username)}')" title="Accept"
+                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                        style="background:#dcfce7; color:#16a34a;"
+                        onmouseover="this.style.background='#bbf7d0'"
+                        onmouseout="this.style.background='#dcfce7'">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </button>
+                    <button onclick="rejectRequest(${r.id})" title="Reject"
+                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                        style="background:#fee2e2; color:#dc2626;"
+                        onmouseover="this.style.background='#fecaca'"
+                        onmouseout="this.style.background='#fee2e2'">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>`
+                }
             </div>
         </div>`).join('');
 }
@@ -301,6 +309,43 @@ function getMockProfile(username) {
         mutualGroups: MOCK_GROUPS[i],
         nextFree:     MOCK_TIMES[i],
     };
+}
+
+function friendReqPopup(userId, username, showButton = true) {
+    const p = getMockProfile(username);
+
+    document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
+    document.getElementById('frq-username').textContent = username;
+    document.getElementById('frq-bio').textContent      = p.bio;
+
+    document.getElementById('frq-hobbies').innerHTML = p.hobbies.map(h =>
+        `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
+            style="background:var(--bg-tab-pill);color:var(--dark);">${escHtml(h)}</span>`
+    ).join('');
+
+    document.getElementById('frq-mutual-friends').innerHTML = p.mutualFriends.length
+        ? p.mutualFriends.map(u =>
+            `<div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    style="background:var(--blue);">${escHtml(u[0].toUpperCase())}</span>
+                <span class="text-xs">${escHtml(u)}</span>
+            </div>`).join('')
+        : `<span class="text-xs" style="color:var(--text-fine);">None</span>`;
+
+    const btn = document.getElementById('send-friend-req-btn');
+    btn.style.display = showButton ? '' : 'none';
+    btn.onclick = showButton ? () => {
+        closeFriendReqPopup();
+        document.getElementById('friend-search-results').style.display = 'none';
+        document.getElementById('friend-search').value = '';
+        sendRequest(userId, username);
+    } : null;
+
+    document.getElementById('friend-req-profile-overlay').classList.add('open');
+}
+
+function closeFriendReqPopup() {
+    document.getElementById('friend-req-profile-overlay').classList.remove('open');
 }
 
 function openProfilePopup(username) {

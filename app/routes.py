@@ -296,8 +296,12 @@ def search_friends():
 @main.route('/api/friends/requests', methods=['GET'])
 @login_required
 def get_friend_requests():
-    rows = Friendship.query.filter_by(receiver_id=current_user.id, status='pending').all()
-    return jsonify({'requests': [{'id': f.id, 'user_id': f.requester_id, 'username': f.requester.username} for f in rows]})
+    incoming = Friendship.query.filter_by(receiver_id=current_user.id, status='pending').all()
+    outgoing = Friendship.query.filter_by(requester_id=current_user.id, status='pending').all()
+    return jsonify({'requests':
+        [{'id': f.id, 'user_id': f.requester_id, 'username': f.requester.username, 'direction': 'incoming'} for f in incoming] +
+        [{'id': f.id, 'user_id': f.receiver_id,  'username': f.receiver.username,  'direction': 'outgoing'} for f in outgoing]
+    })
 
 @main.route('/api/friends/request', methods=['POST'])
 @login_required
