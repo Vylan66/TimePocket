@@ -105,8 +105,8 @@ function showToast(msg, isError = false) {
         document.body.appendChild(toast);
     }
     toast.textContent = msg;
-    toast.style.background = isError ? '#fee2e2' : 'var(--dark)';
-    toast.style.color       = isError ? '#dc2626' : 'var(--bg-page)';
+    toast.style.background = isError ? '#fee2e2' : 'var(--primary-text-colour)';
+    toast.style.color       = isError ? '#dc2626' : 'var(--bg-page-surface)';
     toast.style.opacity = '1';
     clearTimeout(toast._t);
     toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);

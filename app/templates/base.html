@@ -9,10 +9,10 @@
     {% block css %} {% endblock %}
 </head>
 
-    <body class="min-h-screen md:h-screen flex flex-col md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
+    <body class="min-h-screen md:h-screen flex flex-col md:overflow-hidden font-mono" style="background: var(--bg-page-surface); color: var(--primary-text-colour); transition: background 0.3s, color 0.3s;">
         <nav class="flex items-center justify-between px-10 h-16 shrink-0 relative">
             <div class="flex items-center gap-2 shrink-0">
-                <div class="w-9 h-9 rounded-full border-2 [border-color:var(--border-ui)]"></div>
+                <div class="w-9 h-9 rounded-full border-2 [border-color:var(--text-ui)]"></div>
                 <span class="font-semibold [color:var(--text-ui)]">Logo</span>
             </div>
             <div id="nav-bar" class="hidden md:flex flex-row gap-1 self-end">
@@ -55,7 +55,7 @@
                 <button class="mobile-nav-item" data-page="friends">Friends</button>
             </div>
         </nav>
-        <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden" style="background-color: var(--bg-timetable);">
+        <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden" style="background-color: var(--bg-accent);">
         {% block main %} {% endblock %}
         </main>
         {% block content %} {% endblock %}

@@ -36,8 +36,8 @@
         <div class="cal-grid" id="calGrid"></div>
     </div>
     
-    <div class="flex-1 md:h-full rounded-[20px] p-6 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
-        <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-label)]">Categories</p>
+    <div class="flex-1 md:h-full rounded-[20px] p-6 flex flex-col gap-2 [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+        <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-secondary)]">Categories</p>
         {% set categories = [
             ('Work',     '#f68383'),
             ('Health',   '#f2a061'),
@@ -49,7 +49,7 @@
         {% for label, colour in categories %}
         <div class="flex items-center gap-2 px-1 py-1">
             <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:{{ colour }};"></span>
-            <span class="text-xs [color:var(--text-label)]">{{ label }}</span>
+            <span class="text-xs [color:var(--text-secondary)]">{{ label }}</span>
         </div>
         {% endfor %}
     </div>
@@ -57,26 +57,26 @@
 
 <!-- Right Column: Timetable -->
 <div class="flex-1 min-h-0 flex gap-4 p-4 pt-0 md:p-4 md:pl-0">
-    <div class="h-full w-full rounded-[20px] flex flex-col overflow-hidden [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+    <div class="h-full w-full rounded-[20px] flex flex-col overflow-hidden [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
 
         <!-- Toolbar -->
         <div class="flex shrink-0 items-center justify-between px-4 py-2">
-            <span id="weekLabel" class="text-xs" style="color: var(--text-fine);"></span>
+            <span id="weekLabel" class="text-xs" style="color: var(--text-muted);"></span>
             <div class="flex items-center gap-1.5">
                 <button onclick="changeWeek(-1)" class="btn-icon text-base leading-none">&#8249;</button>
-                <button id="todayBtn" class="btn-today text-xs px-3 py-1 rounded-full border" style="border-color: var(--border-card); color: var(--text-label); background: transparent;">Today</button>
+                <button id="todayBtn" class="btn-today text-xs px-3 py-1 rounded-full border" style="border-color: var(--border-darker); color: var(--text-secondary); background: transparent;">Today</button>
                 <button onclick="changeWeek(1)" class="btn-icon text-base leading-none">&#8250;</button>
                 <button id="addEventBtn" class="btn-blue px-3 py-1 text-xs">+ New event</button>
             </div>
         </div>
 
         <!-- Day headers -->
-        <div class="flex shrink-0 border-b" style="border-color: var(--grid-line);" id="day-headers">
+        <div class="flex shrink-0 border-b" style="border-color: var(--border-darker);" id="day-headers">
             <div class="w-14 shrink-0"></div>
             <div class="grid grid-cols-7 flex-1" id="day-header-cells">
                 {% for i in range(7) %}
                 <div class="flex flex-col items-center justify-center py-2">
-                    <span class="text-xs" id="hdr-name-{{ i }}" style="color:var(--text-fine);"></span>
+                    <span class="text-xs" id="hdr-name-{{ i }}" style="color:var(--text-muted);"></span>
                     <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-{{ i }}"></span>
                 </div>
                 {% endfor %}
@@ -86,15 +86,15 @@
         <!-- Scrollable time body -->
         <div class="flex min-h-0 flex-1 overflow-y-scroll styled-scroll" id="time-body">
             <!-- Time gutter -->
-            <div class="w-14 shrink-0 border-r flex flex-col" style="border-color: var(--grid-line);" id="time-gutter">
+            <div class="w-14 shrink-0 border-r flex flex-col" style="border-color: var(--border-darker);" id="time-gutter">
                 <div class="hour-slot"></div> <!-- No label for 4 AM -->
                 {% for hour in range(5,24) %}
                     {% if hour < 12 %}{% set label = hour|string ~ ' AM' %}
                     {% elif hour == 12 %}{% set label = '12 PM' %}
                     {% else %}{% set label = (hour - 12)|string ~ ' PM' %}{% endif %}
                     <div class="hour-slot">
-                        <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">{{ label }}</span>
-                        <span class="absolute" style="right:0;top:0;width:8px;height:0.8px;background:var(--grid-line);"></span>
+                        <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-muted);">{{ label }}</span>
+                        <span class="absolute" style="right:0;top:0;width:8px;height:0.8px;background:var(--border-darker);"></span>
                     </div>
                 {% endfor %}
             </div>
@@ -102,7 +102,7 @@
             <!-- Day columns: height + grid lines handled entirely by CSS -->
             <div class="grid grid-cols-7 flex-1 relative" id="day-columns">
                 {% for i in range(6) %}
-                <div class="border-r" style="border-color: var(--grid-line);" id="col-{{ i }}"></div>
+                <div class="border-r" style="border-color: var(--border-darker);" id="col-{{ i }}"></div>
                 {% endfor %}
                 <div id="col-6"></div>
             </div>
@@ -115,31 +115,31 @@
 <!-- Add Event Pop-up -->
 <div id="popupOverlay" class="popup-overlay" onclick="handleOverlayClick(event)">
     <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
-        <h2 id="popup-title" class="text-lg font-semibold mb-4" style="color: var(--dark);">New Event</h2>
+        <h2 id="popup-title" class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);">New Event</h2>
 
         <div class="mb-3">
-            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Title</label>
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Title</label>
             <input id="evTitle" type="text" placeholder="e.g. Team standup" class="tp-input" />
         </div>
 
         <div class="mb-3">
-            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Day</label>
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Day</label>
             <input type="date" id="evDay" class="tp-input">
         </div>
 
         <div class="flex gap-3 mb-3">
             <div class="flex-1">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Start</label>
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Start</label>
                 <input id="evStart" type="time" value="09:00" class="tp-input" />
             </div>
             <div class="flex-1">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">End</label>
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">End</label>
                 <input id="evEnd" type="time" value="10:00" class="tp-input" />
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Repeat</label>
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Repeat</label>
             <select id="evRecurring" class="tp-input">
                 <option value="none">Does not repeat</option>
                 <option value="weekly">Weekly</option>
@@ -147,12 +147,12 @@
         </div>
 
         <div class="mb-3" id="recurringEndWrapper" style="display:none;">
-            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Repeat until</label>
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Repeat until</label>
             <input type="date" id="evRecurrenceEnd" class="tp-input">
         </div>
 
         <div class="mb-3">
-            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Category</label>
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Category</label>
             <select id="evCategory" class="tp-input">
                 <option value="Personal">Personal</option>
                 <option value="Studies">Studies</option>
@@ -164,16 +164,16 @@
         </div>
 
         <div class="mb-5">
-            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Note <span style="color: var(--text-fine);">(optional)</span></label>
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Note <span style="color: var(--text-muted);">(optional)</span></label>
             <textarea id="evNote" placeholder="Add a note…" class="tp-input" rows="2" style="resize: none;"></textarea>
         </div>
 
         <div class="flex justify-end gap-2">
-            <button id="cancelBtn" class="px-4 py-2 text-sm rounded-full border" style="border-color: var(--border-card); color: var(--text-label); background: transparent;">Cancel</button>
+            <button id="cancelBtn" class="px-4 py-2 text-sm rounded-full border" style="border-color: var(--border-darker); color: var(--text-secondary); background: transparent;">Cancel</button>
             <button id="saveBtn" class="btn-blue px-4 py-2 text-sm">Save</button>
         </div>
 
-        <button id="btn-popup-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
+        <button id="btn-popup-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
     </div>
 </div>
 
@@ -185,8 +185,8 @@
         <div class="flex items-start gap-3 mb-4">
             <span id="det-color-bar" class="mt-1.5 w-3 h-3 rounded-full shrink-0"></span>
             <div class="flex-1 min-w-0">
-                <h2 id="det-title" class="text-lg font-semibold break-words" style="color: var(--dark);"></h2>
-                <p id="det-category" class="text-xs mt-0.5" style="color: var(--text-subtitle);"></p>
+                <h2 id="det-title" class="text-lg font-semibold break-words" style="color: var(--primary-text-colour);"></h2>
+                <p id="det-category" class="text-xs mt-0.5" style="color: var(--text-secondary);"></p>
             </div>
         </div>
 
@@ -196,20 +196,20 @@
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="shrink-0" style="color:var(--text-ui);">
                     <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                 </svg>
-                <span id="det-date" class="text-sm" style="color: var(--dark);"></span>
+                <span id="det-date" class="text-sm" style="color: var(--primary-text-colour);"></span>
             </div>
             <div class="flex items-center gap-2">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="shrink-0" style="color:var(--text-ui);">
                     <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                 </svg>
-                <span id="det-time" class="text-sm" style="color: var(--dark);"></span>
+                <span id="det-time" class="text-sm" style="color: var(--primary-text-colour);"></span>
             </div>
         </div>
 
         <!-- Notes (hidden when empty) -->
         <div id="det-note-row" class="mb-5">
-            <p class="text-xs tracking-widest mb-1" style="color: var(--text-label);">Note:</p>
-            <p id="det-note" class="text-sm" style="color: var(--text-subtitle);"></p>
+            <p class="text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Note:</p>
+            <p id="det-note" class="text-sm" style="color: var(--text-secondary);"></p>
         </div>
 
         <!-- Actions -->
@@ -218,7 +218,7 @@
             <button id="det-edit-btn" class="btn-blue px-4 py-2 text-sm">Edit</button>
         </div>
 
-        <button id="btn-detail-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
+        <button id="btn-detail-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
     </div>
 </div>
 {% endblock %}

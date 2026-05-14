@@ -79,7 +79,7 @@ function renderWeekHeaders() {
         const dateEl = document.getElementById(`hdr-date-${i}`);
         dateEl.textContent      = d.getDate();
         dateEl.style.background = isTod ? 'var(--blue)' : '';
-        dateEl.style.color      = isTod ? '#fff' : 'var(--dark)';
+        dateEl.style.color      = isTod ? '#fff' : 'var(--primary-text-colour)';
     }
 }
 

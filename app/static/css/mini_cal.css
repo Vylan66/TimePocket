@@ -1,8 +1,8 @@
 /* ── Mini Calendar Widget ── */
 .cal-widget {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-card);
-    color: var(--dark);
+    background: var(--bg-page-surface);
+    border: 1px solid var(--border-darker);
+    color: var(--primary-text-colour);
     padding: 18px;
     width: 100%;
     box-shadow: 0 4px 16px rgba(0,0,0,0.08);
@@ -27,7 +27,7 @@
     user-select: none;
     letter-spacing: 0.01em;
 }
-.cal-widget .cal-title:hover { background: var(--bg-tab-pill); }
+.cal-widget .cal-title:hover { background: var(--bg-hover); }
 .cal-widget .cal-title.open .cal-arrow { transform: rotate(180deg); }
 .cal-widget .cal-arrow {
     font-size: 0.5rem;
@@ -43,8 +43,8 @@
     top: 56px;
     left: 18px;
     right: 18px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-card);
+    background: var(--bg-page-surface);
+    border: 1px solid var(--border-darker);
     border-radius: 16px;
     padding: 14px;
     z-index: 10;
@@ -65,7 +65,7 @@
 }
 .cal-widget .picker-label {
     font-size: 0.58rem;
-    color: var(--text-label);
+    color: var(--text-secondary);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     width: 38px;
@@ -74,8 +74,8 @@
 .cal-widget .picker-select {
     flex: 1;
     background: var(--bg-input);
-    color: var(--dark);
-    border: 1px solid var(--border-card);
+    color: var(--primary-text-colour);
+    border: 1px solid var(--border-darker);
     border-radius: 8px;
     padding: 5px 22px 5px 8px;
     font-family: inherit;
@@ -88,8 +88,8 @@
     background-position: right 7px center;
 }
 html.dark .cal-widget .picker-select option {
-    background: #27231f;
-    color: #ece9e6;
+    background: var(--bg-page-surface);
+    color: var(--primary-text-colour);
 }
 .cal-widget .picker-select:focus {
     outline: none;
@@ -122,7 +122,7 @@ html.dark .cal-widget .picker-select option {
 .cal-widget .cal-day-label {
     text-align: center;
     font-size: 0.58rem;
-    color: var(--text-label);
+    color: var(--text-secondary);
     padding: 3px 0 6px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -137,7 +137,7 @@ html.dark .cal-widget .picker-select option {
     cursor: pointer;
     transition: background 0.12s;
 }
-.cal-widget .cal-day:hover       { background: var(--bg-tab-pill); }
-.cal-widget .cal-day.other-month { color: var(--text-fine); }
+.cal-widget .cal-day:hover       { background: var(--bg-hover); }
+.cal-widget .cal-day.other-month { color: var(--text-muted); }
 .cal-widget .cal-day.today       { background: var(--blue); color: #fff; font-weight: 500; }
 .cal-widget .cal-day.selected    { background: var(--blue-ring); color: var(--blue); font-weight: 500; }
