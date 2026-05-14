@@ -40,6 +40,7 @@ class Availability(db.Model):
     notes      = db.Column(db.Text,        nullable=True)
     is_recurring   = db.Column(db.Boolean, default=False)
     recurrence_end = db.Column(db.String(10), nullable=True)
+    recurrence_group_id = db.Column(db.String(36), nullable=True)
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
