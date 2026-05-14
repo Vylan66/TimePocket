@@ -137,7 +137,7 @@
                 <div class="flex min-h-0 flex-1 overflow-y-scroll styled-scroll" id="time-body">
                     <!-- Time gutter -->
                     <div class="w-14 shrink-0 border-r flex flex-col" style="border-color: var(--grid-line);" id="time-gutter">
-                        <div class="hour-slot"></div> <!-- No label for 4 AM -->
+                        <div class="hour-slot"></div>
                         {% for hour in range(5,24) %}
                             {% if hour < 12 %}{% set label = hour|string ~ ' AM' %}
                             {% elif hour == 12 %}{% set label = '12 PM' %}
@@ -149,7 +149,7 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Day columns: height + grid lines handled entirely by CSS -->
+                    <!-- Day columns -->
                     <div class="grid grid-cols-7 flex-1 relative" id="day-columns">
                         {% for i in range(6) %}
                         <div class="border-r" style="border-color: var(--grid-line);" id="col-{{ i }}"></div>
@@ -199,9 +199,22 @@
                 </select>
             </div>
 
-            <div class="mb-5">
+            <div class="mb-3">
                 <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Note <span style="color: var(--text-fine);">(optional)</span></label>
                 <textarea id="evNote" placeholder="Add a note…" class="tp-input" rows="2" style="resize: none;"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Repeat</label>
+                <select id="evRecurring" class="tp-input">
+                    <option value="none">Does not repeat</option>
+                    <option value="weekly">Weekly</option>
+                </select>
+            </div>
+
+            <div class="mb-3" id="recurringEndWrapper" style="display:none;">
+                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Repeat until</label>
+                <input type="date" id="evRecurrenceEnd" class="tp-input">
             </div>
 
             <div class="flex justify-end gap-2">

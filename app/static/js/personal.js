@@ -1,18 +1,19 @@
 events = [];
 buildColumns();
-
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const res  = await fetch('/availability');
         const data = await res.json();
         events = data.map(s => ({
-            title:    s.title || availTitle(s.start_time, s.end_time),
-            date:     s.date,
-            start:    s.start_time,
-            end:      s.end_time,
-            category: s.category || 'Personal',
-            note:     s.notes || '',
-            dbId:     s.id,
+            title:         s.title || availTitle(s.start_time, s.end_time),
+            date:          s.date,
+            start:         s.start_time,
+            end:           s.end_time,
+            category:      s.category || 'Personal',
+            note:          s.notes || '',
+            dbId:          s.id,
+            isRecurring:   s.is_recurring || false,
+            recurrenceEnd: s.recurrence_end || null,
         }));
         buildColumns();
     } catch (e) {
@@ -20,22 +21,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-window.onEventSave = async function ({ title, date, start, end, category, note }) {
+window.onEventSave = async function ({ title, date, start, end, category, note, is_recurring, recurrence_end }) {
     try {
-        const res  = await fetch('/availability', {
+        const res = await fetch('/availability', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify({
                 date,
-                start_time: start,
-                end_time:   end,
+                start_time:     start,
+                end_time:       end,
                 title,
                 category,
-                notes: note,
+                notes:          note,
+                is_recurring:   is_recurring || false,
+                recurrence_end: recurrence_end || null,
             }),
         });
         const data = await res.json();
-        // Backfill the db id onto the event we just pushed
         const ev = events[events.length - 1];
         if (ev && data.id) ev.dbId = data.id;
     } catch (e) {

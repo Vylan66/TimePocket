@@ -186,8 +186,22 @@ function closepopup() {
     editingIdx = null;
     const pt = document.getElementById('popup-title');
     if (pt) pt.textContent = 'New Event';
+    const rc = document.getElementById('evRecurring');
+    if (rc) rc.value = 'none';
+    const rw = document.getElementById('recurringEndWrapper');
+    if (rw) rw.style.display = 'none';
 }
+
 function handleOverlayClick(e) { if (e.target === popupOverlay) closepopup(); }
+
+// Recurring dropdown toggle
+const evRecurring = document.getElementById('evRecurring');
+if (evRecurring) {
+    evRecurring.addEventListener('change', () => {
+        document.getElementById('recurringEndWrapper').style.display =
+            evRecurring.value === 'weekly' ? '' : 'none';
+    });
+}
 
 if (document.getElementById('addEventBtn')) {
     document.getElementById('addEventBtn').addEventListener('click', () => {
@@ -213,21 +227,29 @@ if (document.getElementById('btn-popup-close')) document.getElementById('btn-pop
 
 if (document.getElementById('saveBtn')) {
     document.getElementById('saveBtn').addEventListener('click', async () => {
-        const title    = document.getElementById('evTitle').value.trim();
-        const date     = document.getElementById('evDay').value;
-        const start    = document.getElementById('evStart').value;
-        const end      = document.getElementById('evEnd').value;
-        const category = document.getElementById('evCategory').value;
-        const note     = document.getElementById('evNote').value.trim();
+        const title         = document.getElementById('evTitle').value.trim();
+        const date          = document.getElementById('evDay').value;
+        const start         = document.getElementById('evStart').value;
+        const end           = document.getElementById('evEnd').value;
+        const category      = document.getElementById('evCategory').value;
+        const note          = document.getElementById('evNote').value.trim();
+        const recurringVal  = document.getElementById('evRecurring')?.value || 'none';
+        const isRecurring   = recurringVal === 'weekly';
+        const recurrenceEnd = document.getElementById('evRecurrenceEnd')?.value || null;
 
         if (!title || !date || !start || !end || start >= end) {
             alert('Please fill in all fields and ensure start time is before end time.');
             return;
         }
 
+        if (isRecurring && !recurrenceEnd) {
+            alert('Please set a repeat until date.');
+            return;
+        }
+
         if (editingIdx !== null) {
             const old = events[editingIdx];
-            events.splice(editingIdx, 1, { title, date, start, end, category, note, dbId: old.dbId });
+            events.splice(editingIdx, 1, { title, date, start, end, category, note, dbId: old.dbId, isRecurring, recurrenceEnd });
             if (old.dbId) {
                 try {
                     await fetch(`/availability/${old.dbId}`, {
@@ -247,8 +269,8 @@ if (document.getElementById('saveBtn')) {
                 }
             }
         } else {
-            events.push({ title, date, start, end, category, note });
-            if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note });
+            events.push({ title, date, start, end, category, note, isRecurring, recurrenceEnd });
+            if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note, is_recurring: isRecurring, recurrence_end: recurrenceEnd });
         }
         const wasEditing = editingIdx !== null;
         closepopup();
@@ -311,6 +333,14 @@ function editEvent(idx) {
     document.getElementById('evEnd').value      = ev.end;
     document.getElementById('evCategory').value = ev.category;
     document.getElementById('evNote').value     = ev.note || '';
+
+    // Pre-fill recurring dropdown
+    const rc = document.getElementById('evRecurring');
+    const rw = document.getElementById('recurringEndWrapper');
+    const re = document.getElementById('evRecurrenceEnd');
+    if (rc) rc.value = ev.isRecurring ? 'weekly' : 'none';
+    if (rw) rw.style.display = ev.isRecurring ? '' : 'none';
+    if (re && ev.recurrenceEnd) re.value = ev.recurrenceEnd;
 
     const pt = document.getElementById('popup-title');
     if (pt) pt.textContent = 'Edit Event';
