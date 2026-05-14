@@ -7,8 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     {% block css %} {% endblock %}
-    <script src="{{ url_for('static', filename='js/global.js') }}"></script>
-    {% block script %} {% endblock %}
 </head>
 
     <body class="min-h-screen md:h-screen flex flex-col md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
@@ -61,5 +59,7 @@
         {% block main %} {% endblock %}
         </main>
         {% block content %} {% endblock %}
+        <script src="{{ url_for('static', filename='js/global.js') }}"></script>
+        {% block script %} {% endblock %}
     </body>
 </html>
