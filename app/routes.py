@@ -58,18 +58,20 @@ def profileTest():
 @main.route('/availability', methods=['POST'])
 @login_required
 def add_availability():
-    data = request.get_json()
-    is_recurring   = data.get('is_recurring', False)
-    recurrence_end = data.get('recurrence_end')
+    data       = request.get_json()
+    recurrence = data.get('recurrence', 'none')
+    end_str    = data.get('recurrence_end')
 
-    if is_recurring and recurrence_end:
+    if recurrence != 'none' and end_str:
         start_date = datetime.strptime(data['date'], '%Y-%m-%d')
-        end_date   = datetime.strptime(recurrence_end, '%Y-%m-%d')
+        end_date   = datetime.strptime(end_str, '%Y-%m-%d')
         if end_date <= start_date:
-            return jsonify({'error': 'Repeat until date must be after event date'}), 400
+            return jsonify({'error': 'End date must be after event date'}), 400
+
         group_id = str(uuid.uuid4())
-        slots = []
-        current = start_date
+        slots    = []
+        current  = start_date
+
         while current <= end_date:
             slot = Availability(
                 user_id             = current_user.id,
@@ -80,14 +82,27 @@ def add_availability():
                 category            = data.get('category'),
                 notes               = data.get('notes'),
                 is_recurring        = True,
-                recurrence_end      = recurrence_end,
+                recurrence_end      = end_str,
                 recurrence_group_id = group_id,
             )
             db.session.add(slot)
             slots.append(slot)
-            current += timedelta(weeks=1)
+
+            if recurrence == 'weekly':
+                current += timedelta(weeks=1)
+            elif recurrence == 'biweekly':
+                current += timedelta(weeks=2)
+            elif recurrence == 'monthly':
+                month = current.month + 1
+                year  = current.year + (month - 1) // 12
+                month = (month - 1) % 12 + 1
+                days_in_month = [31, 29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28,
+                                 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                day     = min(current.day, days_in_month[month - 1])
+                current = current.replace(year=year, month=month, day=day)
+
         db.session.commit()
-        return jsonify({'message': 'Recurring availability added!', 'count': len(slots)})
+        return jsonify({'message': f'{recurrence} availability added!', 'count': len(slots)})
 
     slot = Availability(
         user_id             = current_user.id,
@@ -138,6 +153,37 @@ def delete_recurring_group(group_id):
         db.session.delete(slot)
     db.session.commit()
     return jsonify({'message': f'Deleted {len(slots)} recurring events'})
+
+@main.route('/availability/recurring/<string:group_id>/from/<string:from_date>', methods=['DELETE'])
+@login_required
+def delete_recurring_from_date(group_id, from_date):
+    slots = Availability.query.filter(
+        Availability.recurrence_group_id == group_id,
+        Availability.user_id == current_user.id,
+        Availability.date >= from_date
+    ).all()
+    for slot in slots:
+        db.session.delete(slot)
+    db.session.commit()
+    return jsonify({'message': f'Deleted {len(slots)} recurring events from {from_date}'})
+
+@main.route('/availability/recurring/<string:group_id>/from/<string:from_date>', methods=['PUT'])
+@login_required
+def update_recurring_from_date(group_id, from_date):
+    data  = request.get_json()
+    slots = Availability.query.filter(
+        Availability.recurrence_group_id == group_id,
+        Availability.user_id == current_user.id,
+        Availability.date >= from_date
+    ).all()
+    for slot in slots:
+        if 'title'      in data: slot.title      = data['title']
+        if 'start_time' in data: slot.start_time = data['start_time']
+        if 'end_time'   in data: slot.end_time   = data['end_time']
+        if 'category'   in data: slot.category   = data['category']
+        if 'notes'      in data: slot.notes      = data['notes']
+    db.session.commit()
+    return jsonify({'message': f'Updated {len(slots)} events'})
 
 @main.route('/availability/all', methods=['GET'])
 @login_required
