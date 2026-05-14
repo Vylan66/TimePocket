@@ -182,7 +182,7 @@ function buildColumns() {
 const popupOverlay = document.getElementById('popupOverlay');
 
 function closepopup() {
-    if (popupOverlay) popupOverlay.style.display = 'none';
+    if (popupOverlay) popupOverlay.classList.remove('open');
     editingIdx = null;
     const pt = document.getElementById('popup-title');
     if (pt) pt.textContent = 'New Event';
@@ -191,8 +191,7 @@ function handleOverlayClick(e) { if (e.target === popupOverlay) closepopup(); }
 
 if (document.getElementById('addEventBtn')) {
     document.getElementById('addEventBtn').addEventListener('click', () => {
-        popupOverlay.style.display    = 'flex';
-        popupOverlay.style.background = 'var(--overlay-bg)';
+        popupOverlay.classList.add('open');
 
         const weekStart = getWeekStart();
         const target    = (typeof calSelected !== 'undefined' && calSelected)
@@ -251,8 +250,10 @@ if (document.getElementById('saveBtn')) {
             events.push({ title, date, start, end, category, note });
             if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note });
         }
+        const wasEditing = editingIdx !== null;
         closepopup();
         buildColumns();
+        showToast(wasEditing ? 'Event updated' : 'Event saved');
         document.getElementById('evTitle').value = '';
         document.getElementById('evNote').value  = '';
     });
@@ -269,7 +270,7 @@ document.getElementById('todayBtn').addEventListener('click', () => {
 const evDetailOverlay = document.getElementById('evDetailOverlay');
 
 function closeEventDetail() {
-    if (evDetailOverlay) evDetailOverlay.style.display = 'none';
+    if (evDetailOverlay) evDetailOverlay.classList.remove('open');
 }
 
 function handleDetailOverlayClick(e) {
@@ -295,8 +296,7 @@ function openEventDetail(idx) {
     document.getElementById('det-edit-btn').onclick   = () => editEvent(idx);
     document.getElementById('det-delete-btn').onclick = () => deleteEvent(idx);
 
-    evDetailOverlay.style.display    = 'flex';
-    evDetailOverlay.style.background = 'var(--overlay-bg)';
+    evDetailOverlay.classList.add('open');
 }
 
 function editEvent(idx) {
@@ -315,8 +315,7 @@ function editEvent(idx) {
     const pt = document.getElementById('popup-title');
     if (pt) pt.textContent = 'Edit Event';
 
-    popupOverlay.style.display    = 'flex';
-    popupOverlay.style.background = 'var(--overlay-bg)';
+    popupOverlay.classList.add('open');
 }
 
 async function deleteEvent(idx) {
@@ -334,6 +333,7 @@ async function deleteEvent(idx) {
     events.splice(idx, 1);
     closeEventDetail();
     buildColumns();
+    showToast('Event deleted');
 }
 
 if (document.getElementById('btn-detail-close')) {

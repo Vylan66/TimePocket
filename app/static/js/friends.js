@@ -1,14 +1,6 @@
 let friends  = []; // {id, username, friendship_id}
 let requests = []; // {id: friendship_id, user_id, username}
 
-function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function debounce(fn, ms) {
-    let t;
-    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFriends();
@@ -345,21 +337,3 @@ function closeProfilePopup() {
     document.getElementById('friend-profile-overlay').classList.remove('open');
 }
 
-function showToast(msg, isError = false) {
-    let toast = document.getElementById('friends-toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'friends-toast';
-        toast.style.cssText = `
-            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-            padding: 0.5rem 1.25rem; border-radius: 9999px; font-size: 0.8rem;
-            z-index: 100; pointer-events: none; transition: opacity 0.3s;`;
-        document.body.appendChild(toast);
-    }
-    toast.textContent = msg;
-    toast.style.background = isError ? '#fee2e2' : 'var(--dark)';
-    toast.style.color       = isError ? '#dc2626' : 'var(--bg-page)';
-    toast.style.opacity = '1';
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
-}

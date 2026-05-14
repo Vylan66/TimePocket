@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head lang="en">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimePocket - Group Calendar</title>
@@ -92,7 +92,7 @@
             <!-- Groups / Members Panel -->
             <div class="flex-1 md:h-full rounded-[20px] p-4 flex flex-col [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); min-height: 0;">
 
-                <!-- GROUPS VIEW -->
+                <!-- Groups view -->
                 <div id="groups-panel" class="flex flex-col h-full gap-2">
                     <div class="flex items-center gap-2 shrink-0">
                         <input id="group-search" type="text" placeholder="Search groups…"
@@ -107,7 +107,7 @@
                     <div id="groups-list" class="flex flex-col gap-1 overflow-y-auto flex-1 styled-scroll pr-0.5"></div>
                 </div>
 
-                <!-- MEMBERS VIEW (hidden until group selected) -->
+                <!-- Members view (hidden until group selected) -->
                 <div id="members-panel" class="flex flex-col h-full gap-2" style="display:none;">
                     <div class="flex items-center gap-1 shrink-0">
                         <button id="btn-back" class="btn-icon shrink-0" title="Back to groups"
@@ -148,34 +148,12 @@
                 <div class="flex shrink-0 border-b" style="border-color: var(--grid-line);" id="day-headers">
                     <div class="w-14 shrink-0"></div>
                     <div class="grid grid-cols-7 flex-1" id="day-header-cells">
+                        {% for i in range(7) %}
                         <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-0" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-0"></span>
+                            <span class="text-xs" id="hdr-name-{{ i }}" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-{{ i }}"></span>
                         </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-1" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-1"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-2" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-2"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-3" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-3"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-4" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-4"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-5" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-5"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-6" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-6"></span>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
 
@@ -188,48 +166,35 @@
 
                         <!-- Time gutter -->
                         <div class="w-14 shrink-0 border-r flex flex-col" style="border-color: var(--grid-line);" id="time-gutter">
-                            <div class="hour-slot"></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">5 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">6 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">7 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">8 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">9 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">10 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">11 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">12 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">1 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">2 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">3 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">4 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">5 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">6 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">7 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">8 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">9 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">10 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">11 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
+                            <div class="hour-slot"></div> <!-- No label for 4 AM -->
+                            {% for hour in range(5,24) %}
+                                {% if hour < 12 %}{% set label = hour|string ~ ' AM' %}
+                                {% elif hour == 12 %}{% set label = '12 PM' %}
+                                {% else %}{% set label = (hour - 12)|string ~ ' PM' %}{% endif %}
+                                <div class="hour-slot">
+                                    <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">{{ label }}</span>
+                                    <span class="absolute" style="right:0;top:0;width:8px;height:0.8px;background:var(--grid-line);"></span>
+                                </div>
+                            {% endfor %}
                         </div>
 
                         <!-- Day columns -->
                         <div class="grid grid-cols-7 flex-1 relative" id="day-columns">
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-0"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-1"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-2"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-3"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-4"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-5"></div>
+                            {% for i in range(6) %}
+                            <div class="border-r" style="border-color: var(--grid-line);" id="col-{{ i }}"></div>
+                            {% endfor %}
                             <div id="col-6"></div>
                         </div>
                     </div>
-                </div><!-- end time-body wrapper -->
+                </div>
 
             </div>
         </div>
     </main>
 
-    <!-- CREATE GROUP POPUP -->
-    <div id="createGroupOverlay" style="display:none; position:fixed; inset:0; z-index:60; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); background:var(--overlay-bg);" onclick="handleCreateGroupOverlayClick(event)">
-        <div class="w-full max-w-sm mx-4 relative border" style="background: var(--bg-surface); border-color: var(--border-glass); box-shadow: 0 30px 80px rgba(0,0,0,0.16); border-radius: 1.5rem; padding: 2.25rem; backdrop-filter: blur(28px) saturate(1.8);">
+    <!-- Group popup -->
+    <div id="createGroupOverlay" class="popup-overlay" style="z-index:60;" onclick="handleCreateGroupOverlayClick(event)">
+        <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
             <h2 class="text-lg font-semibold mb-4" style="color: var(--dark);">New Group</h2>
 
             <div class="mb-3">
@@ -257,9 +222,9 @@
         </div>
     </div>
 
-    <!-- GROUP SETTINGS POPUP -->
-    <div id="settingsOverlay" style="display:none; position:fixed; inset:0; z-index:60; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); background:var(--overlay-bg);" onclick="handleSettingsOverlayClick(event)">
-        <div class="w-full max-w-sm mx-4 relative border" style="background: var(--bg-surface); border-color: var(--border-glass); box-shadow: 0 30px 80px rgba(0,0,0,0.16); border-radius: 1.5rem; padding: 2.25rem; backdrop-filter: blur(28px) saturate(1.8);">
+    <!-- Group settings -->
+    <div id="settingsOverlay" class="popup-overlay" style="z-index:60;" onclick="handleSettingsOverlayClick(event)">
+        <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
             <h2 class="text-lg font-semibold mb-4" style="color: var(--dark);">Group Settings</h2>
 
             <div class="mb-3">

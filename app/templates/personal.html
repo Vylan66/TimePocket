@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head lang="en">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimePocket - Personal Calendar</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Reference style.css stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mini_cal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/timetable.css') }}">
@@ -90,30 +88,20 @@
             
             <div class="flex-1 md:h-full rounded-[20px] p-6 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
                 <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-label)]">Categories</p>
+                {% set categories = [
+                    ('Work',     '#f68383'),
+                    ('Health',   '#f2a061'),
+                    ('Personal', '#d6bf6c'),
+                    ('Finance',  '#5bbb81'),
+                    ('Studies',  '#5e99f0'),
+                    ('Social',   '#a729d0'),
+                ] %}
+                {% for label, colour in categories %}
                 <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#f68383;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Work</span>
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:{{ colour }};"></span>
+                    <span class="text-xs [color:var(--text-label)]">{{ label }}</span>
                 </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#f2a061;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Health</span>
-                </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#d6bf6c;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Personal</span>
-                </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#5bbb81;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Finance</span>
-                </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#5e99f0;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Studies</span>
-                </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#a729d0;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Social</span>
-                </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -132,133 +120,40 @@
                     </div>
                 </div>
 
-                <!-- Day headers: 7 static shells, JS updates text + today highlight -->
+                <!-- Day headers -->
                 <div class="flex shrink-0 border-b" style="border-color: var(--grid-line);" id="day-headers">
                     <div class="w-14 shrink-0"></div>
                     <div class="grid grid-cols-7 flex-1" id="day-header-cells">
+                        {% for i in range(7) %}
                         <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-0" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-0"></span>
+                            <span class="text-xs" id="hdr-name-{{ i }}" style="color:var(--text-fine);"></span>
+                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-{{ i }}"></span>
                         </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-1" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-1"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-2" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-2"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-3" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-3"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-4" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-4"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-5" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-5"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-6" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-6"></span>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
 
                 <!-- Scrollable time body -->
                 <div class="flex min-h-0 flex-1 overflow-y-scroll styled-scroll" id="time-body">
-
-                    <!-- Time gutter: pure HTML+CSS, no JS required -->
+                    <!-- Time gutter -->
                     <div class="w-14 shrink-0 border-r flex flex-col" style="border-color: var(--grid-line);" id="time-gutter">
-                        <div class="hour-slot"></div><!-- 4 AM — no label, aligns with first grid row -->
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">5 AM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">6 AM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">7 AM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">8 AM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">9 AM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">10 AM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">11 AM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">12 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">1 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">2 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">3 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">4 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">5 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">6 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">7 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">8 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">9 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">10 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
-                        <div class="hour-slot">
-                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">11 PM</span>
-                            <span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span>
-                        </div>
+                        <div class="hour-slot"></div> <!-- No label for 4 AM -->
+                        {% for hour in range(5,24) %}
+                            {% if hour < 12 %}{% set label = hour|string ~ ' AM' %}
+                            {% elif hour == 12 %}{% set label = '12 PM' %}
+                            {% else %}{% set label = (hour - 12)|string ~ ' PM' %}{% endif %}
+                            <div class="hour-slot">
+                                <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">{{ label }}</span>
+                                <span class="absolute" style="right:0;top:0;width:8px;height:0.8px;background:var(--grid-line);"></span>
+                            </div>
+                        {% endfor %}
                     </div>
 
                     <!-- Day columns: height + grid lines handled entirely by CSS -->
                     <div class="grid grid-cols-7 flex-1 relative" id="day-columns">
-                        <div class="border-r" style="border-color: var(--grid-line);" id="col-0"></div>
-                        <div class="border-r" style="border-color: var(--grid-line);" id="col-1"></div>
-                        <div class="border-r" style="border-color: var(--grid-line);" id="col-2"></div>
-                        <div class="border-r" style="border-color: var(--grid-line);" id="col-3"></div>
-                        <div class="border-r" style="border-color: var(--grid-line);" id="col-4"></div>
-                        <div class="border-r" style="border-color: var(--grid-line);" id="col-5"></div>
+                        {% for i in range(6) %}
+                        <div class="border-r" style="border-color: var(--grid-line);" id="col-{{ i }}"></div>
+                        {% endfor %}
                         <div id="col-6"></div>
                     </div>
                 </div>
@@ -267,8 +162,8 @@
     </main>
 
     <!-- Add Event Pop-up -->
-    <div id="popupOverlay" style="display:none; position:fixed; inset:0; z-index:50; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);" onclick="handleOverlayClick(event)">
-        <div class="popup-box w-full max-w-sm mx-4 relative border" style="background: var(--bg-surface); border-color: var(--border-glass); box-shadow: 0 30px 80px rgba(0,0,0,0.16); border-radius: 1.5rem; padding: 2.25rem; backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8);">
+    <div id="popupOverlay" class="popup-overlay" onclick="handleOverlayClick(event)">
+        <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
             <h2 id="popup-title" class="text-lg font-semibold mb-4" style="color: var(--dark);">New Event</h2>
 
             <div class="mb-3">
@@ -319,8 +214,8 @@
     </div>
 
     <!-- Event Detail Pop-up -->
-    <div id="evDetailOverlay" style="display:none; position:fixed; inset:0; z-index:50; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);" onclick="handleDetailOverlayClick(event)">
-        <div class="w-full max-w-sm mx-4 relative border" style="background: var(--bg-surface); border-color: var(--border-glass); box-shadow: 0 30px 80px rgba(0,0,0,0.16); border-radius: 1.5rem; padding: 2.25rem; backdrop-filter: blur(28px) saturate(1.8); -webkit-backdrop-filter: blur(28px) saturate(1.8);">
+    <div id="evDetailOverlay" class="popup-overlay" onclick="handleDetailOverlayClick(event)">
+        <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
 
             <!-- Title + category colour -->
             <div class="flex items-start gap-3 mb-4">

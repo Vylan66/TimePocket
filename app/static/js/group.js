@@ -245,6 +245,7 @@ async function createGroup() {
     if (res.ok) {
         closeCreateGroupPopup();
         await loadGroups();
+        showToast(`Group "${name}" created`);
     } else {
         const data = await res.json();
         alert(data.error || 'Failed to create group');
@@ -334,6 +335,7 @@ async function addMemberToGroup(userId, username) {
         const g = cachedGroups.find(x => x.id === selectedGroupId);
         if (g) g.member_count = data.members.length;
         renderGroupsList(cachedGroups);
+        showToast(`${username} added`);
     } else {
         const data = await res.json();
         alert(data.error || 'Failed to add member');
@@ -351,6 +353,7 @@ async function removeMember(userId) {
         const g = cachedGroups.find(x => x.id === selectedGroupId);
         if (g) g.member_count = data.members.length;
         renderGroupsList(cachedGroups);
+        showToast('Member removed');
     }
 }
 
@@ -370,6 +373,7 @@ async function saveGroupSettings() {
         const g = cachedGroups.find(x => x.id === selectedGroupId);
         if (g) g.name = data.name;
         closeSettingsPopup();
+        showToast('Settings saved');
     } else {
         alert('Failed to save settings');
     }
@@ -382,6 +386,7 @@ async function confirmDeleteGroup() {
         closeSettingsPopup();
         backToGroups();
         await loadGroups();
+        showToast('Group deleted');
     } else {
         alert('Failed to delete group');
     }
@@ -397,28 +402,6 @@ async function fetchFriends(q) {
     } catch { return []; }
 }
 
-function showOverlay(id) {
-    const el = document.getElementById(id);
-    el.style.display = 'flex';
-}
+function showOverlay(id) { document.getElementById(id).classList.add('open'); }
+function hideOverlay(id) { document.getElementById(id).classList.remove('open'); }
 
-function hideOverlay(id) {
-    document.getElementById(id).style.display = 'none';
-}
-
-function escHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-function debounce(fn, ms) {
-    let timer;
-    return function (...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn.apply(this, args), ms);
-    };
-}
