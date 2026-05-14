@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
-<!-- MAIN -->
-<main class="flex flex-col md:flex-row flex-1 md:overflow-hidden" style="background-color: var(--bg-timetable);">
-
+{% block main %}
     <!-- Left Column -->
     <div class="w-full md:w-80 shrink-0 flex flex-col gap-4 p-4 overflow-y-auto">
 
@@ -43,98 +40,97 @@
             </div>
         </div>
     </div>
+{% endblock %}
 
-</main>
-
+{% block content %}
 <!-- Friend Request Profile Popup -->
 <div id="friend-req-profile-overlay" class="auth-overlay">
-<div class="auth-box" style="max-width: 460px; padding: 1.75rem; position: relative;">
-    <button id="friend-req-profile-close" class="btn-icon" style="position:absolute;top:1rem;right:1rem;background:var(--bg-close-btn);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-    </button>
+    <div class="auth-box" style="max-width: 460px; padding: 1.75rem; position: relative;">
+        <button id="friend-req-profile-close" class="btn-icon" style="position:absolute;top:1rem;right:1rem;background:var(--bg-close-btn);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
 
-    <!-- Avatar + name + bio -->
-    <div class="flex items-center gap-4 mb-5">
-        <span id="frq-avatar" class="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
-            style="background: var(--blue);"></span>
-        <div>
-            <p id="frq-username" class="text-base font-bold"></p>
-            <p id="frq-bio" class="text-xs mt-0.5" style="color: var(--text-subtitle);"></p>
+        <!-- Avatar + name + bio -->
+        <div class="flex items-center gap-4 mb-5">
+            <span id="frq-avatar" class="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
+                style="background: var(--blue);"></span>
+            <div>
+                <p id="frq-username" class="text-base font-bold"></p>
+                <p id="frq-bio" class="text-xs mt-0.5" style="color: var(--text-subtitle);"></p>
+            </div>
         </div>
-    </div>
 
-    <!-- Interests -->
-    <div class="mb-4">
-        <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Interests</p>
-        <div id="frq-hobbies" class="flex flex-wrap gap-1.5"></div>
-    </div>
-
-    <!-- Mutual friends -->
-    <div class="mb-3">
-        <div class="rounded-xl p-3 border [border-color:var(--border-card)]">
-            <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Mutual friends</p>
-            <div id="frq-mutual-friends" class="flex flex-col gap-1"></div>
+        <!-- Interests -->
+        <div class="mb-4">
+            <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Interests</p>
+            <div id="frq-hobbies" class="flex flex-wrap gap-1.5"></div>
         </div>
-    </div>
 
-    <!-- Send friend request button -->
-    <button id="send-friend-req-btn" class="btn-blue w-full py-2 text-sm">
-        Send Friend Request
-    </button>
-</div>
+        <!-- Mutual friends -->
+        <div class="mb-3">
+            <div class="rounded-xl p-3 border [border-color:var(--border-card)]">
+                <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Mutual friends</p>
+                <div id="frq-mutual-friends" class="flex flex-col gap-1"></div>
+            </div>
+        </div>
+
+        <!-- Send friend request button -->
+        <button id="send-friend-req-btn" class="btn-blue w-full py-2 text-sm">
+            Send Friend Request
+        </button>
+    </div>
 </div>
 
 <!-- Generic Friend Profile Popup -->
 <div id="friend-profile-overlay" class="auth-overlay">
-<div class="auth-box" style="max-width: 460px; padding: 1.75rem; position: relative;">
-    <button id="friend-profile-close" class="btn-icon" style="position:absolute;top:1rem;right:1rem;background:var(--bg-close-btn);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-    </button>
+    <div class="auth-box" style="max-width: 460px; padding: 1.75rem; position: relative;">
+        <button id="friend-profile-close" class="btn-icon" style="position:absolute;top:1rem;right:1rem;background:var(--bg-close-btn);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
 
-    <!-- Avatar + name + bio -->
-    <div class="flex items-center gap-4 mb-5">
-        <span id="fp-avatar" class="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
-            style="background: var(--blue);"></span>
-        <div>
-            <p id="fp-username" class="text-base font-bold"></p>
-            <p id="fp-bio" class="text-xs mt-0.5" style="color: var(--text-subtitle);"></p>
+        <!-- Avatar + name + bio -->
+        <div class="flex items-center gap-4 mb-5">
+            <span id="fp-avatar" class="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
+                style="background: var(--blue);"></span>
+            <div>
+                <p id="fp-username" class="text-base font-bold"></p>
+                <p id="fp-bio" class="text-xs mt-0.5" style="color: var(--text-subtitle);"></p>
+            </div>
         </div>
-    </div>
 
-    <!-- Interests -->
-    <div class="mb-4">
-        <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Interests</p>
-        <div id="fp-hobbies" class="flex flex-wrap gap-1.5"></div>
-    </div>
-
-    <!-- Mutual friends + groups -->
-    <div class="grid grid-cols-2 gap-3 mb-3">
-        <div class="rounded-xl p-3 border [border-color:var(--border-card)]">
-            <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Mutual friends</p>
-            <div id="fp-mutual-friends" class="flex flex-col gap-1"></div>
+        <!-- Interests -->
+        <div class="mb-4">
+            <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Interests</p>
+            <div id="fp-hobbies" class="flex flex-wrap gap-1.5"></div>
         </div>
-        <div class="rounded-xl p-3 border [border-color:var(--border-card)]">
-            <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Mutual groups</p>
-            <div id="fp-mutual-groups" class="flex flex-col gap-1"></div>
-        </div>
-    </div>
 
-    <!-- Next free timeslot -->
-    <div class="rounded-xl p-3 flex items-center gap-3" style="background: var(--bg-timetable);">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="shrink-0" style="color: var(--blue);">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        <div>
-            <p class="text-xs font-semibold tracking-widest" style="color: var(--text-label);">Next free together:</p>
-            <p id="fp-next-free" class="text-sm font-medium mt-0.5"></p>
+        <!-- Mutual friends + groups -->
+        <div class="grid grid-cols-2 gap-3 mb-3">
+            <div class="rounded-xl p-3 border [border-color:var(--border-card)]">
+                <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Mutual friends</p>
+                <div id="fp-mutual-friends" class="flex flex-col gap-1"></div>
+            </div>
+            <div class="rounded-xl p-3 border [border-color:var(--border-card)]">
+                <p class="text-xs font-semibold tracking-widest mb-2" style="color: var(--text-label);">Mutual groups</p>
+                <div id="fp-mutual-groups" class="flex flex-col gap-1"></div>
+            </div>
+        </div>
+
+        <!-- Next free timeslot -->
+        <div class="rounded-xl p-3 flex items-center gap-3" style="background: var(--bg-timetable);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="shrink-0" style="color: var(--blue);">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <div>
+                <p class="text-xs font-semibold tracking-widest" style="color: var(--text-label);">Next free together:</p>
+                <p id="fp-next-free" class="text-sm font-medium mt-0.5"></p>
+            </div>
         </div>
     </div>
 </div>
-</div>
-
 <script src="{{ url_for('static', filename='js/friends.js') }}"></script>
 {% endblock %}

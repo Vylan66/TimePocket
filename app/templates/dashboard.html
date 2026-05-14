@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block main %}
 <!-- DASHBOARD INFO -->
 <div class="grid grid-cols-4 grid-rows-2 gap-8 m-8 grow">
-<div id="current-day-events" class="rounded-3xl row-span-2" style="background-color: var(--bg-page);">
+    <div id="current-day-events" class="rounded-3xl row-span-2" style="background-color: var(--bg-page);">
+    </div>
+    <div id="upcoming-events" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
+    </div>
+        
+    <div id="upcoming-plans" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
+    </div>
 </div>
-<div id="upcoming-events" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
-</div>
-    
-<div id="upcoming-plans" class="rounded-3xl col-span-3" style="background-color: var(--bg-page);">
-</div>
-</div>
+{% endblock %}
+
+{% block content %}
+
 {% endblock %}

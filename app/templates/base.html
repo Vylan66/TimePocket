@@ -56,6 +56,9 @@
                 <button class="mobile-nav-item" data-page="friends">Friends</button>
             </div>
         </nav>
+        <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden" style="background-color: var(--bg-timetable);">
+        {% block main %} {% endblock %}
+        </main>
         {% block content %} {% endblock %}
         <script src="{{ url_for('static', filename='js/global.js') }}"></script>
     </body>
