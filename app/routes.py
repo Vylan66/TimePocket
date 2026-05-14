@@ -10,24 +10,29 @@ main = Blueprint('main', __name__)
 @main.route('/personal')
 @login_required
 def personal():
-    return render_template('personal.html')
+    return render_template('personal.html', pageName="Personal Calendar")
 
 @main.route('/group')
 @login_required
 def group():
-    return render_template('group.html')
+    return render_template('group.html', pageName="Groups")
 
 @main.route('/friends')
 @login_required
 def friends():
-    return render_template('friends.html')
+    return render_template('friends.html', pageName="Friends")
 
 @main.route('/dashboard')
 @login_required
 def dashboard():
     all_users = User.query.all()
     my_availability = Availability.query.filter_by(user_id=current_user.id).all()
-    return render_template('dashboard.html', users=all_users, my_availability=my_availability)
+    return render_template('dashboard.html', users=all_users, my_availability=my_availability, pageName="Dashboard")
+
+@main.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', pageName="Profile")
 
 @main.route('/availability', methods=['GET'])
 @login_required
@@ -42,14 +47,6 @@ def get_my_availability():
         'category':   s.category or 'Personal',
         'notes':      s.notes or '',
     } for s in slots])
-
-@main.route('/test/dashboard')
-def dashboardTest():
-    return render_template('dashboard.html')
-
-@main.route('/test/profile')
-def profileTest():
-    return render_template('profile.html')
 
 @main.route('/availability', methods=['POST'])
 @login_required
@@ -344,11 +341,6 @@ def remove_friend(friendship_id):
     db.session.delete(f)
     db.session.commit()
     return jsonify({'message': 'Removed'})
-
-@main.route('/profile')
-@login_required
-def profile():
-    return render_template('profile.html')
 
 # Profile API routes
 
