@@ -88,30 +88,20 @@
             
             <div class="flex-1 md:h-full rounded-[20px] p-6 flex flex-col gap-2 [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
                 <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-label)]">Categories</p>
+                {% set categories = [
+                    ('Work',     '#f68383'),
+                    ('Health',   '#f2a061'),
+                    ('Personal', '#d6bf6c'),
+                    ('Finance',  '#5bbb81'),
+                    ('Studies',  '#5e99f0'),
+                    ('Social',   '#a729d0'),
+                ] %}
+                {% for label, colour in categories %}
                 <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#f68383;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Work</span>
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:{{ colour }};"></span>
+                    <span class="text-xs [color:var(--text-label)]">{{ label }}</span>
                 </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#f2a061;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Health</span>
-                </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#d6bf6c;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Personal</span>
-                </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#5bbb81;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Finance</span>
-                </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#5e99f0;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Studies</span>
-                </div>
-                <div class="flex items-center gap-2 px-1 py-1">
-                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#a729d0;"></span>
-                    <span class="text-xs [color:var(--text-label)]">Social</span>
-                </div>
+                {% endfor %}
             </div>
         </div>
 
