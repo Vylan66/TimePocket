@@ -41,6 +41,7 @@ class Availability(db.Model):
     is_recurring   = db.Column(db.Boolean, default=False)
     recurrence_end = db.Column(db.String(10), nullable=True)
     recurrence_group_id = db.Column(db.String(36), nullable=True)
+    recurrence          = db.Column(db.String(20), nullable=True)
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)

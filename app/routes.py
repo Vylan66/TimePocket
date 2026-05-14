@@ -43,7 +43,7 @@ def get_my_availability():
         'category':            s.category or 'Personal',
         'notes':               s.notes or '',
         'is_recurring':        s.is_recurring,
-        'recurrence_end':      s.recurrence_end,
+        'recurrence':          s.recurrence or 'none',
         'recurrence_group_id': s.recurrence_group_id,
     } for s in slots])
 
@@ -60,17 +60,13 @@ def profileTest():
 def add_availability():
     data       = request.get_json()
     recurrence = data.get('recurrence', 'none')
-    end_str    = data.get('recurrence_end')
 
-    if recurrence != 'none' and end_str:
+    if recurrence != 'none':
         start_date = datetime.strptime(data['date'], '%Y-%m-%d')
-        end_date   = datetime.strptime(end_str, '%Y-%m-%d')
-        if end_date <= start_date:
-            return jsonify({'error': 'End date must be after event date'}), 400
-
-        group_id = str(uuid.uuid4())
-        slots    = []
-        current  = start_date
+        end_date   = start_date.replace(year=start_date.year + 1)
+        group_id   = str(uuid.uuid4())
+        slots      = []
+        current    = start_date
 
         while current <= end_date:
             slot = Availability(
@@ -82,7 +78,8 @@ def add_availability():
                 category            = data.get('category'),
                 notes               = data.get('notes'),
                 is_recurring        = True,
-                recurrence_end      = end_str,
+                recurrence          = recurrence,
+                recurrence_end      = end_date.strftime('%Y-%m-%d'),
                 recurrence_group_id = group_id,
             )
             db.session.add(slot)
@@ -93,16 +90,15 @@ def add_availability():
             elif recurrence == 'biweekly':
                 current += timedelta(weeks=2)
             elif recurrence == 'monthly':
-                month = current.month + 1
-                year  = current.year + (month - 1) // 12
-                month = (month - 1) % 12 + 1
-                days_in_month = [31, 29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28,
-                                 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-                day     = min(current.day, days_in_month[month - 1])
-                current = current.replace(year=year, month=month, day=day)
+                month   = current.month + 1
+                year    = current.year + (month - 1) // 12
+                month   = (month - 1) % 12 + 1
+                days    = [31, 29 if year%4==0 and (year%100!=0 or year%400==0) else 28,
+                           31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                current = current.replace(year=year, month=month, day=min(current.day, days[month-1]))
 
         db.session.commit()
-        return jsonify({'message': f'{recurrence} availability added!', 'count': len(slots)})
+        return jsonify({'message': f'{recurrence} events added!', 'count': len(slots)})
 
     slot = Availability(
         user_id             = current_user.id,
@@ -113,6 +109,7 @@ def add_availability():
         category            = data.get('category'),
         notes               = data.get('notes'),
         is_recurring        = False,
+        recurrence          = None,
         recurrence_end      = None,
         recurrence_group_id = None,
     )
@@ -142,18 +139,6 @@ def delete_availability(slot_id):
     db.session.commit()
     return jsonify({'message': 'Deleted!'})
 
-@main.route('/availability/recurring/<string:group_id>', methods=['DELETE'])
-@login_required
-def delete_recurring_group(group_id):
-    slots = Availability.query.filter_by(
-        recurrence_group_id=group_id,
-        user_id=current_user.id
-    ).all()
-    for slot in slots:
-        db.session.delete(slot)
-    db.session.commit()
-    return jsonify({'message': f'Deleted {len(slots)} recurring events'})
-
 @main.route('/availability/recurring/<string:group_id>/from/<string:from_date>', methods=['DELETE'])
 @login_required
 def delete_recurring_from_date(group_id, from_date):
@@ -165,7 +150,7 @@ def delete_recurring_from_date(group_id, from_date):
     for slot in slots:
         db.session.delete(slot)
     db.session.commit()
-    return jsonify({'message': f'Deleted {len(slots)} recurring events from {from_date}'})
+    return jsonify({'message': f'Deleted {len(slots)} events from {from_date}'})
 
 @main.route('/availability/recurring/<string:group_id>/from/<string:from_date>', methods=['PUT'])
 @login_required
