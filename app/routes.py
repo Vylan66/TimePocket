@@ -55,14 +55,42 @@ def profileTest():
 @login_required
 def add_availability():
     data = request.get_json()
+    is_recurring   = data.get('is_recurring', False)
+    recurrence_end = data.get('recurrence_end')
+
+    if is_recurring and recurrence_end:
+        start_date = datetime.strptime(data['date'], '%Y-%m-%d')
+        end_date   = datetime.strptime(recurrence_end, '%Y-%m-%d')
+        slots = []
+        current = start_date
+        while current <= end_date:
+            slot = Availability(
+                user_id        = current_user.id,
+                date           = current.strftime('%Y-%m-%d'),
+                start_time     = data['start_time'],
+                end_time       = data['end_time'],
+                title          = data.get('title', ''),
+                category       = data.get('category'),
+                notes          = data.get('notes'),
+                is_recurring   = True,
+                recurrence_end = recurrence_end,
+            )
+            db.session.add(slot)
+            slots.append(slot)
+            current += timedelta(weeks=1)
+        db.session.commit()
+        return jsonify({'message': 'Recurring availability added!', 'count': len(slots)})
+
     slot = Availability(
-        user_id    = current_user.id,
-        date       = data['date'],
-        start_time = data['start_time'],
-        end_time   = data['end_time'],
-        title      = data.get('title', ''),
-        category   = data.get('category'),
-        notes      = data.get('notes'),
+        user_id        = current_user.id,
+        date           = data['date'],
+        start_time     = data['start_time'],
+        end_time       = data['end_time'],
+        title          = data.get('title', ''),
+        category       = data.get('category'),
+        notes          = data.get('notes'),
+        is_recurring   = False,
+        recurrence_end = None,
     )
     db.session.add(slot)
     db.session.commit()
@@ -220,22 +248,18 @@ def group_heatmap(group_id):
         Availability.date <= end_str,
     ).all()
 
-    # Group raw intervals by (user_id, day_index) so overlapping events from the same user can be merged into one before counting.
     from collections import defaultdict
     user_day_intervals = defaultdict(list)
     for slot in avail:
         try:
             dt      = datetime.strptime(slot.date, '%Y-%m-%d')
-            day_idx = (dt.weekday() + 1) % 7  # Mon=0…Sun=6 → Sun=0, Mon=1…Sat=6
+            day_idx = (dt.weekday() + 1) % 7
             start_h = int(slot.start_time.split(':')[0])
             end_h   = int(slot.end_time.split(':')[0])
         except (ValueError, AttributeError):
             continue
         user_day_intervals[(slot.user_id, day_idx)].append((start_h, end_h))
 
-    # For each (user, day), merge overlapping intervals so one user can 
-    # contribute at most 1 to the count per hour regardless of how many
-    # events they have covering that slot.
     heatmap = {str(i): {} for i in range(7)}
     for (_, day_idx), intervals in user_day_intervals.items():
         intervals.sort()
@@ -265,7 +289,6 @@ def search_users():
     return jsonify({'users': [{'id': u.id, 'username': u.username} for u in users]})
 
 def _friend_ids():
-    """Return set of user IDs who are accepted friends of current_user."""
     rows = Friendship.query.filter(
         db.or_(
             db.and_(Friendship.requester_id == current_user.id, Friendship.status == 'accepted'),
