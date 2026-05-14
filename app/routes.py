@@ -34,13 +34,15 @@ def dashboard():
 def get_my_availability():
     slots = Availability.query.filter_by(user_id=current_user.id).all()
     return jsonify([{
-        'id':         s.id,
-        'date':       s.date,
-        'start_time': s.start_time,
-        'end_time':   s.end_time,
-        'title':      s.title or '',
-        'category':   s.category or 'Personal',
-        'notes':      s.notes or '',
+        'id':             s.id,
+        'date':           s.date,
+        'start_time':     s.start_time,
+        'end_time':       s.end_time,
+        'title':          s.title or '',
+        'category':       s.category or 'Personal',
+        'notes':          s.notes or '',
+        'is_recurring':   s.is_recurring,
+        'recurrence_end': s.recurrence_end,
     } for s in slots])
 
 @main.route('/test/dashboard')
