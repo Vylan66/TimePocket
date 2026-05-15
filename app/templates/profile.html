@@ -2,7 +2,9 @@
 
 {% block css %} {% endblock %}
 
-{% block script %} {% endblock %}
+{% block script %} 
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}
 
 {% block main %}
 <!-- SETTINGS WINDOW -->
