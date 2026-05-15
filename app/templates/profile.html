@@ -46,16 +46,60 @@
             </div>
         </div>
         <div id="account-modifications" class="flex gap-2 flex-wrap justify-center md:justify-start">
-            <button class="text-sm p-2 shrink-0 rounded-full border change-btn"> Update bio </button>
-            <button class="text-sm p-2 shrink-0 rounded-full border change-btn"> Choose Interests </button>
-            <button class="text-sm p-2 shrink-0 rounded-full border change-btn"> Change password </button>
-            <button class="text-sm p-2 shrink-0 rounded-full border change-btn"> Change email </button>
+            <button class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change username </button>
+            <button class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change email </button>
+            <button class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Update bio </button>
+            <button class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Choose Interests </button>
+            <button class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change password </button>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
+<!-- CHANGE AVATAR DIALOG -->
+ <div id="avatar-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="avatar-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Change Your Avatar </p>
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> Click the avatar that you would like to use. </p>
+        
+        <div id="avatar-list" class="flex flex-wrap justify-evenly gap-6 my-2">
+            <div id="av-1" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_1</div>
+            <div id="av-2" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_2</div>
+            <div id="av-3" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_3</div>
+            <div id="av-4" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_4</div>
+            <div id="av-5" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_5</div>
+            <div id="av-6" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_6</div>
+        </div>
+
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="avatar-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="avatar-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+    </div>
+ </div>
+
+<!-- UPDATE BIO DIALOG -->
+ <div id="bio-dialog">
+
+ </div>
+
+<!-- CHANGE EMAIL DIALOG -->
+ <div id="email-dialog">
+
+ </div>
+
+<!-- CHANGE PASSWORD DIALOG -->
+ <div id="password-dialog">
+
+ </div>
+
+<!-- UPDATE INTERESTS DIALOG -->
+ <div id="interests-dialog">
+
+ </div>
+
 <style>
     .interest {
         padding: 0.5rem;
@@ -72,6 +116,14 @@
 
     .change-btn:hover {
         background-color: var(--bg-hover);
+    }
+
+    .avatar-option:hover {
+        border-color: var(--border-darker) !important;
+    }
+
+    .avatar-option.chosen {
+        border-color: var(--blue) !important;
     }
 </style>
 {% endblock %}
