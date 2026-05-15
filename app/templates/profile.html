@@ -11,27 +11,32 @@
 <div id="settings-window" class="grow m-4 p-4 rounded-3xl flex md:flex-row flex-col content-center" style="background: var(--bg-page-surface); color: var(--primary-text-colour);">
     <div id="profile-picture-container" class="flex flex-col justify-center items-center shrink-0 p-4">
         <div id="profile-picture" class="rounded-full md:size-64 size-48 border-4" style="border-color: var(--border-light);">
-
         </div>
         <button id="btn-change-avatar" class="btn-blue m-2">Change Avatar</button>
     </div>
     <div id="user-info" class="grow flex flex-col gap-2 md:justify-center p-4">
-        <div id="username">
+        <div name="username">
             <p class="text-xl"> Username:</p>
             <div class="border-2 rounded-[20px] flex items-center p-3" style="border-color: var(--border-darker);">
-                <p> example </p>
+                <span id="username-display">
+                    <p class="italic" style="color: var(--text-secondary)"> username </p>
+                </span>
             </div>
         </div>
-        <div id="email">
+        <div name="email">
             <p class="text-xl"> Email: </p>
             <div class="border-2 rounded-[20px] flex items-center p-3" style="border-color: var(--border-darker);"> 
-                <p> example@example.com </p>
+                <span id="user-email">
+                    <p class="italic" style="color: var(--text-secondary)"> email </p>
+                </span>
             </div>
         </div>
-        <div id="user-bio">
+        <div name="bio">
             <p class="text-xl"> Bio: </p>
             <div class="border-2 rounded-[20px] flex items-center p-3" style="border-color: var(--border-darker);"> 
-                <p> This is an example! </p>
+                <span id="user-bio">
+                    <p class="italic" style="color: var(--text-secondary)"> No bio... Create one with the button below! </p>
+                </span>
             </div>
         </div>
         <div id="user-interests">
