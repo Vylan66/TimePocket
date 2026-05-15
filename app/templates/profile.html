@@ -138,7 +138,23 @@
 
 <!-- CHANGE PASSWORD DIALOG -->
  <div id="password-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="password-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Change Your Password </p>
+        
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> Old password: </p>
+        <p id="password-old-error" class="text-xs italic text-red-500"></p>
+        <input type="password" id="password-old-input-field" class="tp-input mb-2" placeholder="Old Password">
 
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> New password: </p>
+        <p id="password-new-error" class="text-xs italic text-red-500"></p>
+        <input type="password" id="password-new-input-field" class="tp-input mb-2" placeholder="New Password">
+
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="password-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="password-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+    </div>
  </div>
 
 <!-- UPDATE INTERESTS DIALOG -->
