@@ -63,13 +63,13 @@ async function searchUsers(q) {
         );
 
         if (users.length === 0) {
-            results.innerHTML = `<div class="px-3 py-2 text-xs" style="color:var(--text-fine);">No users found</div>`;
+            results.innerHTML = `<div class="px-3 py-2 text-xs" style="color:var(--text-muted);">No users found</div>`;
         } else {
             results.innerHTML = users.map(u => `
                 <button onclick="friendReqPopup(${u.id}, '${escHtml(u.username)}')"
                     class="flex items-center gap-2 px-3 py-2 text-xs text-left w-full transition-colors"
-                    style="color:var(--dark);"
-                    onmouseover="this.style.background='var(--bg-tab-pill)'"
+                    style="color:var(--primary-text-colour);"
+                    onmouseover="this.style.background='var(--bg-hover)'"
                     onmouseout="this.style.background='transparent'">
                     <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
                         style="background:var(--blue);">${escHtml(u.username[0].toUpperCase())}</span>
@@ -132,8 +132,8 @@ function renderFriends() {
 function buildFriendRow(f) {
     const row = document.createElement('div');
     row.className = 'friend-row flex items-center justify-between px-4 py-2.5 rounded-xl transition-colors';
-    row.style.cssText = 'border: 1px solid var(--border-card);';
-    row.onmouseover = () => row.style.background = 'var(--bg-tab-pill)';
+    row.style.cssText = 'border: 1px solid var(--border-darker);';
+    row.onmouseover = () => row.style.background = 'var(--bg-hover)';
     row.onmouseout  = () => row.style.background = 'transparent';
 
     row.innerHTML = `
@@ -149,10 +149,10 @@ function buildFriendRow(f) {
                 </svg>
             </button>
             <div class="friend-menu hidden absolute right-0 top-full mt-1 rounded-xl shadow-lg z-20 py-1 min-w-[130px]"
-                style="background:var(--bg-surface); border:1px solid var(--border-card);">
+                style="background:var(--bg-page-surface); border:1px solid var(--border-darker);">
                 <button class="remove-btn flex items-center gap-2 px-3 py-2 text-xs w-full text-left transition-colors"
                     style="color:#ef4444;"
-                    onmouseover="this.style.background='var(--bg-tab-pill)'"
+                    onmouseover="this.style.background='var(--bg-hover)'"
                     onmouseout="this.style.background='transparent'">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -196,7 +196,7 @@ function renderRequests() {
     const list = document.getElementById('friend-requests-list');
 
     if (requests.length === 0) {
-        list.innerHTML = `<p class="text-xs" style="color:var(--text-fine);">No pending requests</p>`;
+        list.innerHTML = `<p class="text-xs" style="color:var(--text-muted);">No pending requests</p>`;
         return;
     }
 
@@ -210,7 +210,7 @@ function renderRequests() {
             </div>
             <div class="flex items-center gap-1 shrink-0">
                 ${r.direction === 'outgoing'
-                    ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--bg-tab-pill);color:var(--text-label);">Sent</span>`
+                    ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--bg-hover);color:var(--text-secondary);">Sent</span>`
                     : `<button onclick="acceptRequest(${r.id}, ${r.user_id}, '${escHtml(r.username)}')" title="Accept"
                         class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                         style="background:#dcfce7; color:#16a34a;"
@@ -320,7 +320,7 @@ function friendReqPopup(userId, username, showButton = true) {
 
     document.getElementById('frq-hobbies').innerHTML = p.hobbies.map(h =>
         `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-            style="background:var(--bg-tab-pill);color:var(--dark);">${escHtml(h)}</span>`
+            style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
     ).join('');
 
     document.getElementById('frq-mutual-friends').innerHTML = p.mutualFriends.length
@@ -330,7 +330,7 @@ function friendReqPopup(userId, username, showButton = true) {
                     style="background:var(--blue);">${escHtml(u[0].toUpperCase())}</span>
                 <span class="text-xs">${escHtml(u)}</span>
             </div>`).join('')
-        : `<span class="text-xs" style="color:var(--text-fine);">None</span>`;
+        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
 
     const btn = document.getElementById('send-friend-req-btn');
     btn.style.display = showButton ? '' : 'none';
@@ -358,7 +358,7 @@ function openProfilePopup(username) {
 
     document.getElementById('fp-hobbies').innerHTML = p.hobbies.map(h =>
         `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-            style="background:var(--bg-tab-pill);color:var(--dark);">${escHtml(h)}</span>`
+            style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
     ).join('');
 
     document.getElementById('fp-mutual-friends').innerHTML = p.mutualFriends.length
@@ -368,12 +368,12 @@ function openProfilePopup(username) {
                     style="background:var(--blue);">${escHtml(u[0].toUpperCase())}</span>
                 <span class="text-xs">${escHtml(u)}</span>
             </div>`).join('')
-        : `<span class="text-xs" style="color:var(--text-fine);">None</span>`;
+        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
 
     document.getElementById('fp-mutual-groups').innerHTML = p.mutualGroups.length
         ? p.mutualGroups.map(g =>
             `<span class="text-xs">${escHtml(g)}</span>`).join('')
-        : `<span class="text-xs" style="color:var(--text-fine);">None</span>`;
+        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
 
     document.getElementById('friend-profile-overlay').classList.add('open');
 }

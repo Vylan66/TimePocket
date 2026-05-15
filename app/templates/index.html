@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
 </head>
 
-<body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
+<body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page-surface); color: var(--primary-text-colour); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 rounded-full border-2 [border-color:var(--border-ui)]"></div>
+            <div class="w-9 h-9 rounded-full border-2 [border-color:var(--text-ui)]"></div>
             <span class="font-semibold [color:var(--text-ui)]">Logo</span>
         </div>
         <div class="flex items-center gap-3">
@@ -43,7 +43,7 @@
             <div class="w-full max-w-sm h-[480px] md:h-full md:max-h-[520px] flex flex-col justify-center p-8">
                 <p class="font-mono font-normal text-5xl leading-tight">Welcome to</p>
                 <h1 class="font-mono font-bold text-5xl leading-tight mb-4" style="color: var(--blue);">TimePocket</h1>
-                <p class="text-sm leading-relaxed mb-6" style="color: var(--text-subtitle);">Find the perfect time to hang out, together.</p>
+                <p class="text-sm leading-relaxed mb-6" style="color: var(--text-secondary);">Find the perfect time to hang out, together.</p>
                 <button id="btn-jump-signup" class="btn-blue text-sm self-start">Get started</button>
             </div>
         </div>
@@ -52,7 +52,7 @@
             <div class="px-10 py-3 w-full max-w-lg md:max-w-2xl text-center">
                 <h2>How it works:</h2>
             </div>
-            <div class="w-full max-w-lg md:max-w-2xl h-[320px] md:flex-1 md:max-h-[340px] rounded-3xl border-2 [border-color:var(--border-card)] flex items-center justify-center">
+            <div class="w-full max-w-lg md:max-w-2xl h-[320px] md:flex-1 md:max-h-[340px] rounded-3xl border-2 [border-color:var(--border-darker)] flex items-center justify-center">
                 <p class="text-sm [color:var(--text-ui)]">slideshow</p>
             </div>
         </div>
@@ -61,7 +61,7 @@
     <!-- AUTH OVERLAY -->
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-box">
-            <div class="flex gap-1 p-1 rounded-full mb-6" style="background: var(--bg-tab-pill);">
+            <div class="flex gap-1 p-1 rounded-full mb-6" style="background: var(--bg-hover);">
                 <button id="tab-login" class="auth-tab active">Log in</button>
                 <button id="tab-signup" class="auth-tab">Sign up</button>
             </div>
@@ -69,19 +69,19 @@
             <!-- Login panel -->
             <div id="panel-login">
                 <h2 class="text-2xl font-semibold mb-1">Welcome back!</h2>
-                <p class="text-sm mb-5" style="color: var(--text-subtitle);">Sign in to your TimePocket account</p>
+                <p class="text-sm mb-5" style="color: var(--text-secondary);">Sign in to your TimePocket account</p>
                 <div class="flex flex-col gap-3">
                     <input class="tp-input" type="email" placeholder="Email address" id="login-email" />
                     <input class="tp-input" type="password" placeholder="Password" id="login-password" />
                 </div>
                 <div class="flex items-center justify-between mt-3 mb-5">
-                    <label class="flex items-center gap-2 text-xs cursor-pointer select-none" style="color: var(--text-label);">
+                    <label class="flex items-center gap-2 text-xs cursor-pointer select-none" style="color: var(--text-secondary);">
                         <input type="checkbox" style="accent-color: var(--blue);" /> Remember me
                     </label>
                     <a href="#" class="text-xs hover:underline" style="color: var(--blue);">Forgot password?</a>
                 </div>
                 <button id="btn-login-submit" class="btn-blue w-full py-3 text-sm">Log in</button>
-                <p class="text-xs text-center mt-5" style="color: var(--text-fine);">
+                <p class="text-xs text-center mt-5" style="color: var(--text-muted);">
                     No account? <button id="btn-to-signup" class="hover:underline font-medium cursor-pointer" style="color: var(--blue);">Sign up</button>
                 </p>
             </div>
@@ -89,7 +89,7 @@
             <!-- Signup panel -->
             <div id="panel-signup" class="hidden">
                 <h2 class="text-2xl font-semibold mb-1">Create account</h2>
-                <p class="text-sm mb-5" style="color: var(--text-subtitle);">Join TimePocket!</p>
+                <p class="text-sm mb-5" style="color: var(--text-secondary);">Join TimePocket!</p>
                 <div class="flex flex-col gap-3">
                     <div class="flex gap-2.5">
                         <input class="tp-input" type="text" placeholder="First name" id="signup-firstname" />
@@ -101,12 +101,12 @@
                     <input class="tp-input" type="password" placeholder="Confirm password" id="signup-confirm" />
                 </div>
                 <button id="btn-signup-submit" class="btn-blue w-full py-3 text-sm mt-5">Create my account</button>
-                <p class="text-xs text-center mt-5" style="color: var(--text-fine);">
+                <p class="text-xs text-center mt-5" style="color: var(--text-muted);">
                     Already have an account? <button id="btn-to-login" class="hover:underline font-medium cursor-pointer" style="color: var(--blue);">Log in</button>
                 </p>
             </div>
 
-            <button id="btn-auth-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer transition-colors" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
+            <button id="btn-auth-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer transition-colors" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
         </div>
     </div>
 

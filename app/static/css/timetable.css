@@ -2,7 +2,7 @@
 .btn-today {
     transition: background 0.15s;
 }
-.btn-today:hover { background: var(--bg-tab-pill) !important; }
+.btn-today:hover { background: var(--bg-hover) !important; }
 
 /* Group page — blur timetable when no group is selected */
 .timetable-blur {
@@ -45,7 +45,7 @@
 #day-columns {
     background-image: repeating-linear-gradient(
         to bottom,
-        var(--grid-line) 0px, var(--grid-line) 1px,
+        var(--border-darker) 0px, var(--border-darker) 1px,
         transparent 1px, transparent var(--hour-h)
     );
     background-position-y: var(--hour-h);
@@ -60,8 +60,8 @@
 /* Scrollbar */
 .styled-scroll::-webkit-scrollbar { width: 4px; }
 .styled-scroll::-webkit-scrollbar-track { background: transparent; }
-.styled-scroll::-webkit-scrollbar-thumb { background: var(--border-card); border-radius: 99px; }
-.styled-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-ui); }
+.styled-scroll::-webkit-scrollbar-thumb { background: var(--border-darker); border-radius: 99px; }
+.styled-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-ui); }
 
 /* Event blocks */
 .cal-event {
