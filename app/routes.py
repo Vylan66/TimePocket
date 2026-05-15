@@ -463,3 +463,16 @@ def update_avatar():
     current_user.avatar = avatar
     db.session.commit()
     return jsonify({'success': True, 'message': 'Avatar updated!'})
+
+@main.route('/api/user/bio', methods=['PUT'])
+@login_required
+def update_bio():
+    data = request.get_json()
+    bio = data.get('bio')
+    if not bio:
+        return jsonify({'success': False, 'message': 'Bio required.'}), 400
+    if len(bio) > 200:
+        return jsonify({'success': False, 'message': 'Bio must be 200 characters or less.'})
+    current_user.bio = bio
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Bio updated!'})
