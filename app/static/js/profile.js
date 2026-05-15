@@ -58,6 +58,49 @@ const setupEvents = () => {
     document.getElementById("btn-change-avatar").onclick = () => showAvatarDialog();
     document.getElementById("update-bio").onclick = () => showBioDialog();
     document.getElementById("change-email").onclick = () => showEmailDialog();
+    document.getElementById("change-username").onclick = () => showUsernameDialog();
+}
+
+// Activates dialog for changing username
+const showUsernameDialog = () => {
+    const usernameDialog = document.getElementById("username-dialog");
+    usernameDialog.classList.add('open');
+
+    const usernameInput = document.getElementById("username-input-field");
+
+    document.getElementById("username-save").onclick = () => saveUsernameChanges(usernameInput);
+
+    document.getElementById("username-close").onclick = () => hideUsernameDialog();
+    document.getElementById("username-exit").onclick = () => hideUsernameDialog();
+}
+
+// Saves changes to username
+const saveUsernameChanges = async (usernameInput) => {
+    const usernameError = document.getElementById("username-error");
+
+    if (usernameInput === "") {
+        usernameError.innerHTML = `Please enter a username.`
+    }
+    else {
+        await fetch(`/api/user`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: usernameInput.value })
+        });
+        user["username"] = usernameInput.value;
+        hideUsernameDialog();
+        fillUsername(user);
+    }
+}
+
+// Closes username dialog
+const hideUsernameDialog = () => {
+    const usernameDialog = document.getElementById("username-dialog");
+    const usernameInput = document.getElementById("username-input-field");
+    const usernameError = document.getElementById("username-error");
+    usernameError.innerHTML = ``;
+    usernameInput.value = "";
+    usernameDialog.classList.remove('open');
 }
 
 // Activates dialog for changing email

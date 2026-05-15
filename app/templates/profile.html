@@ -52,7 +52,7 @@
             <button id="change-email" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Email </button>
             <button id="update-bio" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Update Bio </button>
             <button id="update-interests" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Choose Interests </button>
-            <button id="change-password" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Rassword </button>
+            <button id="change-password" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Password </button>
         </div>
     </div>
 </div>
@@ -120,7 +120,20 @@
 
 <!-- CHANGE USERNAME DIALOG -->
  <div id="username-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="username-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Change Your Username </p>
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> New username: </p>
+        
+        <p id="username-error" class="text-xs italic text-red-500"></p>
+        <input id="username-input-field" class="tp-input mb-2" placeholder="Username">
 
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="username-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="username-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+
+    </div>
  </div>
 
 <!-- CHANGE PASSWORD DIALOG -->
