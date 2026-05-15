@@ -6,13 +6,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res  = await fetch('/availability');
         const data = await res.json();
         events = data.map(s => ({
-            title:    s.title || availTitle(s.start_time, s.end_time),
-            date:     s.date,
-            start:    s.start_time,
-            end:      s.end_time,
-            category: s.category || 'Personal',
-            note:     s.notes || '',
-            dbId:     s.id,
+            title:             s.title || availTitle(s.start_time, s.end_time),
+            date:              s.date,
+            start:             s.start_time,
+            end:               s.end_time,
+            category:          s.category || 'Personal',
+            note:              s.notes || '',
+            dbId:              s.id,
+            isRecurring:       s.is_recurring || false,
+            recurrence:        s.recurrence || 'none',
+            recurrenceGroupId: s.recurrence_group_id || null,
         }));
         buildColumns();
     } catch (e) {
@@ -20,9 +23,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-window.onEventSave = async function ({ title, date, start, end, category, note }) {
+async function reloadEvents() {
     try {
-        const res  = await fetch('/availability', {
+        const res  = await fetch('/availability');
+        const data = await res.json();
+        events = data.map(s => ({
+            title:             s.title || availTitle(s.start_time, s.end_time),
+            date:              s.date,
+            start:             s.start_time,
+            end:               s.end_time,
+            category:          s.category || 'Personal',
+            note:              s.notes || '',
+            dbId:              s.id,
+            isRecurring:       s.is_recurring || false,
+            recurrence:        s.recurrence || 'none',
+            recurrenceGroupId: s.recurrence_group_id || null,
+        }));
+        buildColumns();
+    } catch (e) {
+        console.error('Failed to reload availability:', e);
+    }
+}
+
+window.onEventSave = async function ({ title, date, start, end, category, note, recurrence }) {
+    try {
+        const res = await fetch('/availability', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify({
@@ -31,15 +56,41 @@ window.onEventSave = async function ({ title, date, start, end, category, note }
                 end_time:   end,
                 title,
                 category,
-                notes: note,
+                notes:      note,
+                recurrence: recurrence || 'none',
             }),
         });
         const data = await res.json();
-        // Backfill the db id onto the event we just pushed
-        const ev = events[events.length - 1];
-        if (ev && data.id) ev.dbId = data.id;
+        if (recurrence && recurrence !== 'none') {
+            await reloadEvents();
+        } else {
+            const ev = events[events.length - 1];
+            if (ev && data.id) ev.dbId = data.id;
+        }
     } catch (e) {
         console.error('Failed to save availability:', e);
+    }
+};
+
+window.onDeleteRecurringFrom = async function (groupId, fromDate) {
+    try {
+        await fetch(`/availability/recurring/${groupId}/from/${fromDate}`, { method: 'DELETE' });
+        await reloadEvents();
+    } catch (e) {
+        console.error('Failed to delete recurring events:', e);
+    }
+};
+
+window.onUpdateRecurringFrom = async function (groupId, fromDate, updateData) {
+    try {
+        await fetch(`/availability/recurring/${groupId}/from/${fromDate}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(updateData),
+        });
+        await reloadEvents();
+    } catch (e) {
+        console.error('Failed to update recurring events:', e);
     }
 };
 

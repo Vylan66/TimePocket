@@ -1,299 +1,208 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TimePocket - Group Calendar</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/mini_cal.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/timetable.css') }}">
-</head>
+{% extends "base.html" %}
 
-<body class="min-h-screen md:h-screen flex flex-col md:overflow-hidden font-mono" style="background: var(--bg-page); color: var(--dark); transition: background 0.3s, color 0.3s;">
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mini_cal.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/timetable.css') }}">
+{% endblock %}
 
-    <!-- NAVBAR -->
-    <nav class="flex items-center justify-between px-10 h-16 shrink-0 relative">
-        <div class="flex items-center gap-2 shrink-0">
-           <div class="w-9 h-9 rounded-full border-2 [border-color:var(--border-ui)]"></div>
-           <span class="font-semibold [color:var(--text-ui)]">Logo</span>
-        </div>
-        <div id="nav-bar" class="hidden md:flex flex-row self-end">
-            <button class="text-sm nav-tab" id="dash-link">Dashboard</button>
-            <button class="text-sm nav-tab" id="personal-timetable-link">My Timetable</button>
-            <button class="text-sm nav-tab" id="groups-link">Groups</button>
-            <button class="text-sm nav-tab" id="friends-link">Friends</button>
-        </div>
-        <div class="flex items-center gap-3 shrink-0">
-            <button id="hamburger-btn" class="btn-icon md:hidden" title="Menu">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <line x1="3" y1="12" x2="21" y2="12"/>
-                    <line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
-            </button>
-            <button id="theme-toggle" class="btn-icon" title="Toggle dark mode">
-                <svg id="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
-                <svg id="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-                    <circle cx="12" cy="12" r="5"/>
-                    <line x1="12" y1="1" x2="12" y2="3"/>
-                    <line x1="12" y1="21" x2="12" y2="23"/>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                    <line x1="1" y1="12" x2="3" y2="12"/>
-                    <line x1="21" y1="12" x2="23" y2="12"/>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                </svg>
-            </button>
-            <button id="profile-link" class="btn-blue px-5 py-2 text-sm">Profile</button>
-        </div>
-        <!-- Mobile dropdown -->
-        <div id="mobile-nav" class="mobile-nav md:hidden">
-            <button class="mobile-nav-item" data-page="dashboard">Dashboard</button>
-            <button class="mobile-nav-item" data-page="personal">My Timetable</button>
-            <button class="mobile-nav-item" data-page="group">Groups</button>
-            <button class="mobile-nav-item" data-page="friends">Friends</button>
-        </div>
-    </nav>
+{% block script %}
+<script src="{{ url_for('static', filename='js/mini_cal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/timetable.js') }}"></script>
+<script src="{{ url_for('static', filename='js/group.js') }}"></script>
+{% endblock %}
 
-    <!-- MAIN -->
-    <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden" style="background-color: var(--bg-timetable);">
+{% block main %}
+<!-- Left Column: Mini Calendar + Groups/Members Panel -->
+<div class="w-full md:w-68 shrink-0 flex flex-row md:flex-col gap-4 p-4 overflow-y-auto">
 
-        <!-- Left Column: Mini Calendar + Groups/Members Panel -->
-        <div class="w-full md:w-68 shrink-0 flex flex-row md:flex-col gap-4 p-4 overflow-y-auto">
-
-            <!-- Mini Calendar -->
-            <div class="cal-widget rounded-[20px] flex-1 md:flex-none">
-                <div class="cal-header">
-                    <button class="btn-icon text-base leading-none" id="prevBtn">&#8249;</button>
-                    <div class="cal-title" id="calTitle">
-                        <span id="calTitleText"></span>
-                        <span class="cal-arrow">&#9660;</span>
-                    </div>
-                    <button class="btn-icon text-base leading-none" id="nextBtn">&#8250;</button>
-                </div>
-                <div class="cal-picker" id="calPicker">
-                    <div class="picker-row">
-                        <span class="picker-label">Month</span>
-                        <select class="picker-select" id="pickMonth"></select>
-                    </div>
-                    <div class="picker-row">
-                        <span class="picker-label">Year</span>
-                        <select class="picker-select" id="pickYear"></select>
-                    </div>
-                    <button class="picker-go" id="pickerGo">Save</button>
-                </div>
-                <div class="cal-grid" id="calGrid"></div>
+    <!-- Mini Calendar -->
+    <div class="cal-widget rounded-[20px] flex-1 md:flex-none">
+        <div class="cal-header">
+            <button class="btn-icon text-base leading-none" id="prevBtn">&#8249;</button>
+            <div class="cal-title" id="calTitle">
+                <span id="calTitleText"></span>
+                <span class="cal-arrow">&#9660;</span>
             </div>
-
-            <!-- Groups / Members Panel -->
-            <div class="flex-1 md:h-full rounded-[20px] p-4 flex flex-col [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); min-height: 0;">
-
-                <!-- GROUPS VIEW -->
-                <div id="groups-panel" class="flex flex-col h-full gap-2">
-                    <div class="flex items-center gap-2 shrink-0">
-                        <input id="group-search" type="text" placeholder="Search groups…"
-                            class="tp-input flex-1 text-xs" style="padding: 0.35rem 0.7rem;" />
-                        <button id="btn-add-group" class="btn-icon shrink-0" title="New group"
-                            style="width:1.9rem;height:1.9rem;border:1px solid var(--border-card);">
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                                <line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="groups-list" class="flex flex-col gap-1 overflow-y-auto flex-1 styled-scroll pr-0.5"></div>
-                </div>
-
-                <!-- MEMBERS VIEW (hidden until group selected) -->
-                <div id="members-panel" class="flex flex-col h-full gap-2" style="display:none;">
-                    <div class="flex items-center gap-1 shrink-0">
-                        <button id="btn-back" class="btn-icon shrink-0" title="Back to groups"
-                            style="width:1.9rem;height:1.9rem;">
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="8 1 3 6 8 11"/>
-                            </svg>
-                        </button>
-                        <span id="group-name-label" class="flex-1 text-sm font-semibold truncate text-center" style="color:var(--dark);"></span>
-                        <button id="btn-group-settings" class="btn-icon shrink-0" title="Group settings"
-                            style="width:1.9rem;height:1.9rem;">
-                            <svg width="14" height="3" viewBox="0 0 18 4" fill="currentColor">
-                                <circle cx="2" cy="2" r="2"/><circle cx="9" cy="2" r="2"/><circle cx="16" cy="2" r="2"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="members-list" class="flex flex-col gap-1 overflow-y-auto flex-1 styled-scroll pr-0.5"></div>
-                </div>
-
-            </div>
+            <button class="btn-icon text-base leading-none" id="nextBtn">&#8250;</button>
         </div>
-
-        <!-- Right Column: Timetable -->
-        <div class="flex-1 min-h-0 flex gap-4 p-4 pt-0 md:p-4 md:pl-0">
-            <div class="h-full w-full rounded-[20px] flex flex-col overflow-hidden [background:var(--bg-surface)] border [border-color:var(--border-card)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
-
-                <!-- Toolbar -->
-                <div class="flex shrink-0 items-center justify-between px-4 py-2">
-                    <span id="weekLabel" class="text-xs" style="color: var(--text-fine);"></span>
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="changeWeek(-1)" class="btn-icon text-base leading-none">&#8249;</button>
-                        <button id="todayBtn" class="btn-today text-xs px-3 py-1 rounded-full border" style="border-color: var(--border-card); color: var(--text-label); background: transparent;">Today</button>
-                        <button onclick="changeWeek(1)" class="btn-icon text-base leading-none">&#8250;</button>
-                    </div>
-                </div>
-
-                <!-- Day headers -->
-                <div class="flex shrink-0 border-b" style="border-color: var(--grid-line);" id="day-headers">
-                    <div class="w-14 shrink-0"></div>
-                    <div class="grid grid-cols-7 flex-1" id="day-header-cells">
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-0" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-0"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-1" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-1"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-2" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-2"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-3" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-3"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-4" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-4"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-5" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-5"></span>
-                        </div>
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <span class="text-xs" id="hdr-name-6" style="color:var(--text-fine);"></span>
-                            <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-6"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scrollable time body -->
-                <div class="relative flex-1 min-h-0">
-                    <div id="timetable-overlay" class="timetable-overlay visible">
-                        <p class="text-xs font-medium tracking-wide" style="color: var(--text-fine);">Select a group to view availability</p>
-                    </div>
-                    <div class="flex h-full overflow-y-scroll styled-scroll timetable-blur" id="time-body">
-
-                        <!-- Time gutter -->
-                        <div class="w-14 shrink-0 border-r flex flex-col" style="border-color: var(--grid-line);" id="time-gutter">
-                            <div class="hour-slot"></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">5 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">6 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">7 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">8 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">9 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">10 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">11 AM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">12 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">1 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">2 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">3 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">4 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">5 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">6 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">7 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">8 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">9 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">10 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                            <div class="hour-slot"><span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-fine);">11 PM</span><span class="absolute" style="right:0;top:0;width:8px;height:1px;background:var(--grid-line);"></span></div>
-                        </div>
-
-                        <!-- Day columns -->
-                        <div class="grid grid-cols-7 flex-1 relative" id="day-columns">
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-0"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-1"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-2"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-3"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-4"></div>
-                            <div class="border-r" style="border-color: var(--grid-line);" id="col-5"></div>
-                            <div id="col-6"></div>
-                        </div>
-                    </div>
-                </div><!-- end time-body wrapper -->
-
+        <div class="cal-picker" id="calPicker">
+            <div class="picker-row">
+                <span class="picker-label">Month</span>
+                <select class="picker-select" id="pickMonth"></select>
             </div>
+            <div class="picker-row">
+                <span class="picker-label">Year</span>
+                <select class="picker-select" id="pickYear"></select>
+            </div>
+            <button class="picker-go" id="pickerGo">Save</button>
         </div>
-    </main>
-
-    <!-- CREATE GROUP POPUP -->
-    <div id="createGroupOverlay" style="display:none; position:fixed; inset:0; z-index:60; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); background:var(--overlay-bg);" onclick="handleCreateGroupOverlayClick(event)">
-        <div class="w-full max-w-sm mx-4 relative border" style="background: var(--bg-surface); border-color: var(--border-glass); box-shadow: 0 30px 80px rgba(0,0,0,0.16); border-radius: 1.5rem; padding: 2.25rem; backdrop-filter: blur(28px) saturate(1.8);">
-            <h2 class="text-lg font-semibold mb-4" style="color: var(--dark);">New Group</h2>
-
-            <div class="mb-3">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Group Name</label>
-                <input id="new-group-name" type="text" placeholder="e.g. Study Group" class="tp-input" />
-            </div>
-
-            <div class="mb-3">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Add Members</label>
-                <input id="new-member-search" type="text" placeholder="Search by username…" class="tp-input" />
-                <div id="new-member-results" class="mt-1.5 flex flex-col gap-1 max-h-28 overflow-y-auto styled-scroll"></div>
-            </div>
-
-            <div class="mb-5">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Members to Add</label>
-                <div id="new-member-pending" class="flex flex-wrap gap-1.5 min-h-7"></div>
-            </div>
-
-            <div class="flex justify-end gap-2">
-                <button id="btn-create-cancel" class="px-4 py-2 text-sm rounded-full border" style="border-color: var(--border-card); color: var(--text-label); background: transparent;">Cancel</button>
-                <button id="btn-create-save" class="btn-blue px-4 py-2 text-sm">Create</button>
-            </div>
-
-            <button id="btn-create-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
-        </div>
+        <div class="cal-grid" id="calGrid"></div>
     </div>
 
-    <!-- GROUP SETTINGS POPUP -->
-    <div id="settingsOverlay" style="display:none; position:fixed; inset:0; z-index:60; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); background:var(--overlay-bg);" onclick="handleSettingsOverlayClick(event)">
-        <div class="w-full max-w-sm mx-4 relative border" style="background: var(--bg-surface); border-color: var(--border-glass); box-shadow: 0 30px 80px rgba(0,0,0,0.16); border-radius: 1.5rem; padding: 2.25rem; backdrop-filter: blur(28px) saturate(1.8);">
-            <h2 class="text-lg font-semibold mb-4" style="color: var(--dark);">Group Settings</h2>
+    <!-- Groups / Members Panel -->
+    <div class="flex-1 md:h-full rounded-[20px] p-4 flex flex-col [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); min-height: 0;">
 
-            <div class="mb-3">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Group Name</label>
-                <input id="settings-group-name" type="text" class="tp-input" />
+        <!-- Groups view -->
+        <div id="groups-panel" class="flex flex-col h-full gap-2">
+            <div class="flex items-center gap-2 shrink-0">
+                <input id="group-search" type="text" placeholder="Search groups…"
+                    class="tp-input flex-1 text-xs" style="padding: 0.35rem 0.7rem;" />
+                <button id="btn-add-group" class="btn-icon shrink-0" title="New group"
+                    style="width:1.9rem;height:1.9rem;border:1px solid var(--border-darker);">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/>
+                    </svg>
+                </button>
             </div>
+            <div id="groups-list" class="flex flex-col gap-1 overflow-y-auto flex-1 styled-scroll pr-0.5"></div>
+        </div>
 
-            <div class="mb-3" id="settings-add-member-section">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Add Member</label>
-                <input id="settings-member-search" type="text" placeholder="Search by username…" class="tp-input" />
-                <div id="settings-member-results" class="mt-1.5 flex flex-col gap-1 max-h-24 overflow-y-auto styled-scroll"></div>
+        <!-- Members view (hidden until group selected) -->
+        <div id="members-panel" class="flex flex-col h-full gap-2" style="display:none;">
+            <div class="flex items-center gap-1 shrink-0">
+                <button id="btn-back" class="btn-icon shrink-0" title="Back to groups"
+                    style="width:1.9rem;height:1.9rem;">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="8 1 3 6 8 11"/>
+                    </svg>
+                </button>
+                <span id="group-name-label" class="flex-1 text-sm font-semibold truncate text-center" style="color:var(--primary-text-colour);"></span>
+                <button id="btn-group-settings" class="btn-icon shrink-0" title="Group settings"
+                    style="width:1.9rem;height:1.9rem;">
+                    <svg width="14" height="3" viewBox="0 0 18 4" fill="currentColor">
+                        <circle cx="2" cy="2" r="2"/><circle cx="9" cy="2" r="2"/><circle cx="16" cy="2" r="2"/>
+                    </svg>
+                </button>
             </div>
+            <div id="members-list" class="flex flex-col gap-1 overflow-y-auto flex-1 styled-scroll pr-0.5"></div>
+        </div>
 
-            <div class="mb-5">
-                <label class="block text-xs tracking-widest mb-1" style="color: var(--text-label);">Members</label>
-                <div id="settings-members-list" class="flex flex-col gap-1 max-h-36 overflow-y-auto styled-scroll"></div>
+    </div>
+</div>
+
+<!-- Right Column: Timetable -->
+<div class="flex-1 min-h-0 flex gap-4 p-4 pt-0 md:p-4 md:pl-0">
+    <div class="h-full w-full rounded-[20px] flex flex-col overflow-hidden [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+
+        <!-- Toolbar -->
+        <div class="flex shrink-0 items-center justify-between px-4 py-2">
+            <span id="weekLabel" class="text-xs" style="color: var(--text-muted);"></span>
+            <div class="flex items-center gap-1.5">
+                <button onclick="changeWeek(-1)" class="btn-icon text-base leading-none">&#8249;</button>
+                <button id="todayBtn" class="btn-today text-xs px-3 py-1 rounded-full border" style="border-color: var(--border-darker); color: var(--text-secondary); background: transparent;">Today</button>
+                <button onclick="changeWeek(1)" class="btn-icon text-base leading-none">&#8250;</button>
             </div>
+        </div>
 
-            <div class="flex items-center justify-between gap-2">
-                <button id="btn-settings-delete" class="px-3 py-2 text-xs rounded-full border" style="border-color: #ef4444; color: #ef4444; background: transparent; display:none;">Delete Group</button>
-                <div class="flex gap-2 ml-auto">
-                    <button id="btn-settings-cancel" class="px-4 py-2 text-sm rounded-full border" style="border-color: var(--border-card); color: var(--text-label); background: transparent;">Cancel</button>
-                    <button id="btn-settings-save" class="btn-blue px-4 py-2 text-sm">Save</button>
+        <!-- Day headers -->
+        <div class="flex shrink-0 border-b" style="border-color: var(--border-darker);" id="day-headers">
+            <div class="w-14 shrink-0"></div>
+            <div class="grid grid-cols-7 flex-1" id="day-header-cells">
+                {% for i in range(7) %}
+                <div class="flex flex-col items-center justify-center py-2">
+                    <span class="text-xs" id="hdr-name-{{ i }}" style="color:var(--text-muted);"></span>
+                    <span class="text-sm font-semibold mt-0.5 w-7 h-7 flex items-center justify-center rounded-full" id="hdr-date-{{ i }}"></span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Scrollable time body -->
+        <div class="relative flex-1 min-h-0">
+            <div id="timetable-overlay" class="timetable-overlay visible">
+                <p class="text-xs font-medium tracking-wide" style="color: var(--text-muted);">Select a group to view availability</p>
+            </div>
+            <div class="flex h-full overflow-y-scroll styled-scroll timetable-blur" id="time-body">
+
+                <!-- Time gutter -->
+                <div class="w-14 shrink-0 border-r flex flex-col" style="border-color: var(--border-darker);" id="time-gutter">
+                    <div class="hour-slot"></div> <!-- No label for 4 AM -->
+                    {% for hour in range(5,24) %}
+                        {% if hour < 12 %}{% set label = hour|string ~ ' AM' %}
+                        {% elif hour == 12 %}{% set label = '12 PM' %}
+                        {% else %}{% set label = (hour - 12)|string ~ ' PM' %}{% endif %}
+                        <div class="hour-slot">
+                            <span class="absolute text-[10px] leading-none whitespace-nowrap" style="right:14px;top:0;transform:translateY(-50%);color:var(--text-muted);">{{ label }}</span>
+                            <span class="absolute" style="right:0;top:0;width:8px;height:0.8px;background:var(--border-darker);"></span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Day columns -->
+                <div class="grid grid-cols-7 flex-1 relative" id="day-columns">
+                    {% for i in range(6) %}
+                    <div class="border-r" style="border-color: var(--border-darker);" id="col-{{ i }}"></div>
+                    {% endfor %}
+                    <div id="col-6"></div>
                 </div>
             </div>
-
-            <button id="btn-settings-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none" style="background: var(--bg-close-btn); color: var(--text-label);">&times;</button>
         </div>
-    </div>
 
-    <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='js/global.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/mini_cal.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/timetable.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/group.js') }}"></script>
-</body>
-</html>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Group popup -->
+<div id="createGroupOverlay" class="popup-overlay" style="z-index:60;" onclick="handleCreateGroupOverlayClick(event)">
+    <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);">New Group</h2>
+
+        <div class="mb-3">
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Group Name</label>
+            <input id="new-group-name" type="text" placeholder="e.g. Study Group" class="tp-input" />
+        </div>
+
+        <div class="mb-3">
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Add Members</label>
+            <input id="new-member-search" type="text" placeholder="Search by username…" class="tp-input" />
+            <div id="new-member-results" class="mt-1.5 flex flex-col gap-1 max-h-28 overflow-y-auto styled-scroll"></div>
+        </div>
+
+        <div class="mb-5">
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Members to Add</label>
+            <div id="new-member-pending" class="flex flex-wrap gap-1.5 min-h-7"></div>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <button id="btn-create-cancel" class="px-4 py-2 text-sm rounded-full border" style="border-color: var(--border-darker); color: var(--text-secondary); background: transparent;">Cancel</button>
+            <button id="btn-create-save" class="btn-blue px-4 py-2 text-sm">Create</button>
+        </div>
+
+        <button id="btn-create-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+    </div>
+</div>
+
+<!-- Group settings -->
+<div id="settingsOverlay" class="popup-overlay" style="z-index:60;" onclick="handleSettingsOverlayClick(event)">
+    <div class="popup-anim popup-inner w-full max-w-sm mx-4 relative border rounded-3xl p-9">
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);">Group Settings</h2>
+
+        <div class="mb-3">
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Group Name</label>
+            <input id="settings-group-name" type="text" class="tp-input" />
+        </div>
+
+        <div class="mb-3" id="settings-add-member-section">
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Add Member</label>
+            <input id="settings-member-search" type="text" placeholder="Search by username…" class="tp-input" />
+            <div id="settings-member-results" class="mt-1.5 flex flex-col gap-1 max-h-24 overflow-y-auto styled-scroll"></div>
+        </div>
+
+        <div class="mb-5">
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">Members</label>
+            <div id="settings-members-list" class="flex flex-col gap-1 max-h-36 overflow-y-auto styled-scroll"></div>
+        </div>
+
+        <div class="flex items-center justify-between gap-2">
+            <button id="btn-settings-delete" class="px-3 py-2 text-xs rounded-full border" style="border-color: #ef4444; color: #ef4444; background: transparent; display:none;">Delete Group</button>
+            <div class="flex gap-2 ml-auto">
+                <button id="btn-settings-cancel" class="px-4 py-2 text-sm rounded-full border" style="border-color: var(--border-darker); color: var(--text-secondary); background: transparent;">Cancel</button>
+                <button id="btn-settings-save" class="btn-blue px-4 py-2 text-sm">Save</button>
+            </div>
+        </div>
+
+        <button id="btn-settings-close" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+    </div>
+</div>
+{% endblock %}

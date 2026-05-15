@@ -1,14 +1,6 @@
 let friends  = []; // {id, username, friendship_id}
 let requests = []; // {id: friendship_id, user_id, username}
 
-function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function debounce(fn, ms) {
-    let t;
-    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFriends();
@@ -20,6 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('friend-profile-close').addEventListener('click', closeProfilePopup);
     document.getElementById('friend-profile-overlay').addEventListener('click', (e) => {
         if (e.target === document.getElementById('friend-profile-overlay')) closeProfilePopup();
+    });
+
+    document.getElementById('friend-req-profile-close').addEventListener('click', closeFriendReqPopup);
+    document.getElementById('friend-req-profile-overlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('friend-req-profile-overlay')) closeFriendReqPopup();
     });
 
     document.addEventListener('click', (e) => {
@@ -66,13 +63,13 @@ async function searchUsers(q) {
         );
 
         if (users.length === 0) {
-            results.innerHTML = `<div class="px-3 py-2 text-xs" style="color:var(--text-fine);">No users found</div>`;
+            results.innerHTML = `<div class="px-3 py-2 text-xs" style="color:var(--text-muted);">No users found</div>`;
         } else {
             results.innerHTML = users.map(u => `
-                <button onclick="sendRequest(${u.id}, '${escHtml(u.username)}')"
+                <button onclick="friendReqPopup(${u.id}, '${escHtml(u.username)}')"
                     class="flex items-center gap-2 px-3 py-2 text-xs text-left w-full transition-colors"
-                    style="color:var(--dark);"
-                    onmouseover="this.style.background='var(--bg-tab-pill)'"
+                    style="color:var(--primary-text-colour);"
+                    onmouseover="this.style.background='var(--bg-hover)'"
                     onmouseout="this.style.background='transparent'">
                     <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
                         style="background:var(--blue);">${escHtml(u.username[0].toUpperCase())}</span>
@@ -103,7 +100,7 @@ async function sendRequest(userId, username) {
         });
         if (res.ok) {
             const data = await res.json();
-            requests.push({ id: data.id, user_id: userId, username });
+            requests.push({ id: data.id, user_id: userId, username, direction: 'outgoing' });
             renderRequests();
             showToast(`Friend request sent to ${username}`);
         } else {
@@ -135,8 +132,8 @@ function renderFriends() {
 function buildFriendRow(f) {
     const row = document.createElement('div');
     row.className = 'friend-row flex items-center justify-between px-4 py-2.5 rounded-xl transition-colors';
-    row.style.cssText = 'border: 1px solid var(--border-card);';
-    row.onmouseover = () => row.style.background = 'var(--bg-tab-pill)';
+    row.style.cssText = 'border: 1px solid var(--border-darker);';
+    row.onmouseover = () => row.style.background = 'var(--bg-hover)';
     row.onmouseout  = () => row.style.background = 'transparent';
 
     row.innerHTML = `
@@ -152,10 +149,10 @@ function buildFriendRow(f) {
                 </svg>
             </button>
             <div class="friend-menu hidden absolute right-0 top-full mt-1 rounded-xl shadow-lg z-20 py-1 min-w-[130px]"
-                style="background:var(--bg-surface); border:1px solid var(--border-card);">
+                style="background:var(--bg-page-surface); border:1px solid var(--border-darker);">
                 <button class="remove-btn flex items-center gap-2 px-3 py-2 text-xs w-full text-left transition-colors"
                     style="color:#ef4444;"
-                    onmouseover="this.style.background='var(--bg-tab-pill)'"
+                    onmouseover="this.style.background='var(--bg-hover)'"
                     onmouseout="this.style.background='transparent'">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -199,37 +196,40 @@ function renderRequests() {
     const list = document.getElementById('friend-requests-list');
 
     if (requests.length === 0) {
-        list.innerHTML = `<p class="text-xs" style="color:var(--text-fine);">No pending requests</p>`;
+        list.innerHTML = `<p class="text-xs" style="color:var(--text-muted);">No pending requests</p>`;
         return;
     }
 
     list.innerHTML = requests.map(r => `
         <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.id}">
             <div class="flex items-center gap-2 min-w-0 cursor-pointer"
-                onclick="openProfilePopup('${escHtml(r.username)}')">
+                onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false)">
                 <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
                     style="background:var(--blue);">${escHtml(r.username[0].toUpperCase())}</span>
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
             </div>
             <div class="flex items-center gap-1 shrink-0">
-                <button onclick="acceptRequest(${r.id}, ${r.user_id}, '${escHtml(r.username)}')" title="Accept"
-                    class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                    style="background:#dcfce7; color:#16a34a;"
-                    onmouseover="this.style.background='#bbf7d0'"
-                    onmouseout="this.style.background='#dcfce7'">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                </button>
-                <button onclick="rejectRequest(${r.id})" title="Reject"
-                    class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                    style="background:#fee2e2; color:#dc2626;"
-                    onmouseover="this.style.background='#fecaca'"
-                    onmouseout="this.style.background='#fee2e2'">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
+                ${r.direction === 'outgoing'
+                    ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--bg-hover);color:var(--text-secondary);">Sent</span>`
+                    : `<button onclick="acceptRequest(${r.id}, ${r.user_id}, '${escHtml(r.username)}')" title="Accept"
+                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                        style="background:#dcfce7; color:#16a34a;"
+                        onmouseover="this.style.background='#bbf7d0'"
+                        onmouseout="this.style.background='#dcfce7'">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </button>
+                    <button onclick="rejectRequest(${r.id})" title="Reject"
+                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                        style="background:#fee2e2; color:#dc2626;"
+                        onmouseover="this.style.background='#fecaca'"
+                        onmouseout="this.style.background='#fee2e2'">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>`
+                }
             </div>
         </div>`).join('');
 }
@@ -311,6 +311,43 @@ function getMockProfile(username) {
     };
 }
 
+function friendReqPopup(userId, username, showButton = true) {
+    const p = getMockProfile(username);
+
+    document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
+    document.getElementById('frq-username').textContent = username;
+    document.getElementById('frq-bio').textContent      = p.bio;
+
+    document.getElementById('frq-hobbies').innerHTML = p.hobbies.map(h =>
+        `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
+            style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
+    ).join('');
+
+    document.getElementById('frq-mutual-friends').innerHTML = p.mutualFriends.length
+        ? p.mutualFriends.map(u =>
+            `<div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    style="background:var(--blue);">${escHtml(u[0].toUpperCase())}</span>
+                <span class="text-xs">${escHtml(u)}</span>
+            </div>`).join('')
+        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
+
+    const btn = document.getElementById('send-friend-req-btn');
+    btn.style.display = showButton ? '' : 'none';
+    btn.onclick = showButton ? () => {
+        closeFriendReqPopup();
+        document.getElementById('friend-search-results').style.display = 'none';
+        document.getElementById('friend-search').value = '';
+        sendRequest(userId, username);
+    } : null;
+
+    document.getElementById('friend-req-profile-overlay').classList.add('open');
+}
+
+function closeFriendReqPopup() {
+    document.getElementById('friend-req-profile-overlay').classList.remove('open');
+}
+
 function openProfilePopup(username) {
     const p = getMockProfile(username);
 
@@ -321,7 +358,7 @@ function openProfilePopup(username) {
 
     document.getElementById('fp-hobbies').innerHTML = p.hobbies.map(h =>
         `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-            style="background:var(--bg-tab-pill);color:var(--dark);">${escHtml(h)}</span>`
+            style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
     ).join('');
 
     document.getElementById('fp-mutual-friends').innerHTML = p.mutualFriends.length
@@ -331,12 +368,12 @@ function openProfilePopup(username) {
                     style="background:var(--blue);">${escHtml(u[0].toUpperCase())}</span>
                 <span class="text-xs">${escHtml(u)}</span>
             </div>`).join('')
-        : `<span class="text-xs" style="color:var(--text-fine);">None</span>`;
+        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
 
     document.getElementById('fp-mutual-groups').innerHTML = p.mutualGroups.length
         ? p.mutualGroups.map(g =>
             `<span class="text-xs">${escHtml(g)}</span>`).join('')
-        : `<span class="text-xs" style="color:var(--text-fine);">None</span>`;
+        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
 
     document.getElementById('friend-profile-overlay').classList.add('open');
 }
@@ -345,21 +382,3 @@ function closeProfilePopup() {
     document.getElementById('friend-profile-overlay').classList.remove('open');
 }
 
-function showToast(msg, isError = false) {
-    let toast = document.getElementById('friends-toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'friends-toast';
-        toast.style.cssText = `
-            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-            padding: 0.5rem 1.25rem; border-radius: 9999px; font-size: 0.8rem;
-            z-index: 100; pointer-events: none; transition: opacity 0.3s;`;
-        document.body.appendChild(toast);
-    }
-    toast.textContent = msg;
-    toast.style.background = isError ? '#fee2e2' : 'var(--dark)';
-    toast.style.color       = isError ? '#dc2626' : 'var(--bg-page)';
-    toast.style.opacity = '1';
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
-}

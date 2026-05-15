@@ -1,60 +1,37 @@
 :root {
-    /* GLOBAL COLOURS */
-    /* Theme colours */
-    --blue:       #1252D3;
-    --blue-light: #4A7FE8;
-    --blue-ring:  rgba(18,82,211,0.14);
-    --dark:       #1A1714;
+    --blue:                rgb(18, 82, 211);
+    --blue-light:          rgb(74, 127, 232);
+    --blue-ring:           rgb(220, 232, 251);
+    --primary-text-colour: rgb(26, 23, 20);
 
-    /* Background colours */
-    --bg-page:           rgb(239,239,238);
-    --bg-surface:        rgb(239,239,238);
-    --bg-input:          rgb(255,255,255);
-    --bg-input-autofill: #f8f8f7;
-    --bg-tab-pill:       rgba(26,23,20,0.10);
-    --bg-close-btn:      rgba(255,255,255);
-    --overlay-bg:        rgba(26,23,20,0.5);
-    --bg-timetable:      #c4d5f9;
+    --bg-page-surface: rgb(239, 238, 238);
+    --bg-input:        rgb(255, 255, 255);
+    --bg-autofill:     rgb(248, 248, 247);
+    --bg-hover:        rgb(216, 216, 215);
+    --bg-overlay:      rgba(26, 23, 20, 0.5);
+    --bg-accent:       rgb(196, 213, 249);
 
-    /* Border colours */
-    --border-glass: rgba(255,255,255,0.65);
-    --border-card:  #d1d5db;
-    --border-ui:    #9ca3af;
-    --grid-line:    #bcc0c9;
+    --border-light:  rgb(229, 228, 227);
+    --border-darker: rgb(209, 213, 219);
 
-    /* Text colours */
-    --text-ui:          #9ca3af;
-    --text-subtitle:    rgba(26,23,20,0.48);
-    --text-label:       rgba(26,23,20,0.45);
-    --text-tab:         rgba(26,23,20,0.42);
-    --text-fine:        rgba(26,23,20,0.38);
-    --text-placeholder: rgba(26,23,20,0.35);
+    --text-ui:        rgb(156, 163, 175);
+    --text-secondary: rgb(136, 134, 133);
+    --text-muted:     rgb(164, 162, 160);
 }
 
-/* Dark mode overrides */
 html.dark {
-    --dark:       #ece9e6;
-
-    --bg-page:           #1e1c1a;
-    --bg-surface:        #27231f;
-    --bg-input:          rgba(255,255,255,0.07);
-    --bg-input-autofill: #36322f;
-    --bg-tab-pill:       rgba(255,255,255,0.07);
-    --bg-close-btn:      rgba(255,255,255,0.1);
-    --overlay-bg:        rgba(0,0,0,0.65);
-    --bg-timetable:      #13213d;
-
-    --border-glass: rgba(255,255,255,0.1);
-    --border-card:  #3d3a37;
-    --border-ui:    #5c5956;
-    --grid-line:    #3d3a37;
-
-    --text-ui:          #7a7774;
-    --text-subtitle:    rgba(236,233,230,0.6);
-    --text-label:       rgba(236,233,230,0.55);
-    --text-tab:         rgba(236,233,230,0.5);
-    --text-fine:        rgba(236,233,230,0.45);
-    --text-placeholder: rgba(236,233,230,0.35);
+    --primary-text-colour: rgb(236, 233, 230);
+    --bg-page-surface: rgb(30, 28, 26);
+    --bg-input:        rgb(45, 43, 41);
+    --bg-autofill:     rgb(54, 50, 47);
+    --bg-hover:        rgb(45, 43, 41);
+    --bg-overlay:      rgba(0, 0, 0, 0.65);
+    --bg-accent:       rgb(19, 33, 61);
+    --border-light:  rgb(58, 56, 53);
+    --border-darker: rgb(61, 58, 55);
+    --text-ui:        rgb(122, 119, 116);
+    --text-secondary: rgb(144, 142, 140);
+    --text-muted:     rgb(101, 99, 97);
 }
 
 /* Navbar tabs */
@@ -65,16 +42,16 @@ html.dark {
     z-index: 1;
     white-space: nowrap;
     background: transparent;
-    color: var(--text-subtitle);
+    color: var(--text-secondary);
     transition: color 0.15s;
     font-size: 0.875rem;
     overflow: visible;
 }
-.nav-tab:hover { color: var(--dark); }
+.nav-tab:hover { color: var(--primary-text-colour); }
 
 .nav-tab.active {
-    background: var(--bg-timetable);
-    color: var(--dark);
+    background: var(--bg-accent);
+    color: var(--primary-text-colour);
     font-weight: 600;
     z-index: 3;
     border-radius: 18px 18px 0 0;
@@ -103,7 +80,7 @@ button {
     color: var(--text-ui);
     transition: background 0.2s, color 0.2s;
 }
-.btn-icon:hover { background: var(--bg-tab-pill); }
+.btn-icon:hover { background: var(--bg-hover); }
 
 .btn-blue {
     background: var(--blue);
@@ -119,10 +96,10 @@ button {
     box-shadow: 0 6px 22px rgba(18,82,211,0.42);
 }
 
-/* Authentication tab styles */
+/* Authentication overlay */
 .auth-overlay {
     position: fixed; inset: 0;
-    background: var(--overlay-bg);
+    background: var(--bg-overlay);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     z-index: 50;
@@ -138,10 +115,10 @@ button {
 .auth-overlay.open { opacity: 1; pointer-events: all; }
 
 .auth-box {
-    background: var(--bg-surface);
+    background: var(--bg-page-surface);
     backdrop-filter: blur(28px) saturate(1.8);
     -webkit-backdrop-filter: blur(28px) saturate(1.8);
-    border: 1px solid var(--border-glass);
+    border: 1px solid var(--border-light);
     border-radius: 1.5rem;
     box-shadow: 0 30px 80px rgba(0,0,0,0.16);
     width: 100%;
@@ -154,14 +131,43 @@ button {
 }
 .auth-overlay.open .auth-box { transform: translateY(0) scale(1); }
 
+.popup-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg-overlay);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s;
+}
+.popup-overlay.open { opacity: 1; pointer-events: all; }
+.popup-anim {
+    transform: translateY(16px) scale(0.97);
+    transition: transform 0.32s cubic-bezier(0.34,1.3,0.64,1);
+}
+.popup-overlay.open .popup-anim { transform: translateY(0) scale(1); }
+
+.popup-inner {
+    background: var(--bg-page-surface);
+    border-color: var(--border-light);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.16);
+    backdrop-filter: blur(28px) saturate(1.8);
+    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+}
+
 .tp-input {
     width: 100%;
     background: var(--bg-input);
-    border: 1px solid var(--border-glass);
+    border: 1px solid var(--border-light);
     border-radius: 0.75rem;
     padding: 0.6rem 1rem;
     font-size: 0.875rem;
-    color: var(--dark);
+    color: var(--primary-text-colour);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -169,13 +175,13 @@ button {
     border-color: var(--blue);
     box-shadow: 0 0 0 3px var(--blue-ring);
 }
-.tp-input::placeholder { color: var(--text-placeholder); }
+.tp-input::placeholder { color: var(--text-muted); }
 .tp-input:-webkit-autofill,
 .tp-input:-webkit-autofill:hover,
 .tp-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px var(--bg-input-autofill) inset;
-    box-shadow: 0 0 0 1000px var(--bg-input-autofill) inset;
-    -webkit-text-fill-color: var(--dark);
+    -webkit-box-shadow: 0 0 0 1000px var(--bg-autofill) inset;
+    box-shadow: 0 0 0 1000px var(--bg-autofill) inset;
+    -webkit-text-fill-color: var(--primary-text-colour);
     transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -187,7 +193,7 @@ button {
     border-radius: 9999px;
     cursor: pointer;
     transition: background 0.22s, color 0.22s;
-    color: var(--text-tab);
+    color: var(--text-secondary);
 }
 .auth-tab.active { background: var(--blue); color: #fff; }
 
@@ -201,8 +207,8 @@ select.tp-input {
     cursor: pointer;
 }
 html.dark select.tp-input option {
-    background: #27231f;
-    color: #ece9e6;
+    background: var(--bg-page-surface);
+    color: var(--primary-text-colour);
 }
 
 /* Mobile navigation dropdown */
@@ -211,8 +217,8 @@ html.dark select.tp-input option {
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--bg-page);
-    border-bottom: 1px solid var(--border-card);
+    background: var(--bg-page-surface);
+    border-bottom: 1px solid var(--border-darker);
     z-index: 40;
     overflow: hidden;
     max-height: 0;
@@ -229,11 +235,11 @@ html.dark select.tp-input option {
     text-align: left;
     background: transparent;
     border: none;
-    border-top: 1px solid var(--border-card);
-    color: var(--text-subtitle);
+    border-top: 1px solid var(--border-darker);
+    color: var(--text-secondary);
     font-size: 0.875rem;
     font-family: inherit;
     transition: background 0.15s, color 0.15s;
 }
-.mobile-nav-item:hover { background: var(--bg-tab-pill); color: var(--dark); }
-.mobile-nav-item.active { color: var(--dark); font-weight: 600; }
+.mobile-nav-item:hover { background: var(--bg-hover); color: var(--primary-text-colour); }
+.mobile-nav-item.active { color: var(--primary-text-colour); font-weight: 600; }

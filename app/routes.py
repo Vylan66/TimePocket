@@ -1,3 +1,4 @@
+import uuid
 from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
@@ -10,53 +11,109 @@ main = Blueprint('main', __name__)
 @main.route('/personal')
 @login_required
 def personal():
-    return render_template('personal.html')
+    return render_template('personal.html', pageName="Personal Calendar")
 
 @main.route('/group')
 @login_required
 def group():
-    return render_template('group.html')
+    return render_template('group.html', pageName="Groups")
 
 @main.route('/friends')
 @login_required
 def friends():
-    return render_template('friends.html')
+    return render_template('friends.html', pageName="Friends")
 
 @main.route('/dashboard')
 @login_required
 def dashboard():
     all_users = User.query.all()
     my_availability = Availability.query.filter_by(user_id=current_user.id).all()
-    return render_template('dashboard.html', users=all_users, my_availability=my_availability)
+    return render_template('dashboard.html', users=all_users, my_availability=my_availability, pageName="Dashboard")
+
+@main.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', pageName="Profile")
 
 @main.route('/availability', methods=['GET'])
 @login_required
 def get_my_availability():
     slots = Availability.query.filter_by(user_id=current_user.id).all()
     return jsonify([{
-        'id':         s.id,
-        'date':       s.date,
-        'start_time': s.start_time,
-        'end_time':   s.end_time,
-        'title':      s.title or '',
-        'category':   s.category or 'Personal',
-        'notes':      s.notes or '',
+        'id':                  s.id,
+        'date':                s.date,
+        'start_time':          s.start_time,
+        'end_time':            s.end_time,
+        'title':               s.title or '',
+        'category':            s.category or 'Personal',
+        'notes':               s.notes or '',
+        'is_recurring':        s.is_recurring,
+        'recurrence':          s.recurrence or 'none',
+        'recurrence_group_id': s.recurrence_group_id,
     } for s in slots])
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> main
 @main.route('/availability', methods=['POST'])
 @login_required
 def add_availability():
-    data = request.get_json()
+    data       = request.get_json()
+    recurrence = data.get('recurrence', 'none')
+
+    if recurrence != 'none':
+        start_date = datetime.strptime(data['date'], '%Y-%m-%d')
+        end_date   = start_date.replace(year=start_date.year + 1)
+        group_id   = str(uuid.uuid4())
+        slots      = []
+        current    = start_date
+
+        while current <= end_date:
+            slot = Availability(
+                user_id             = current_user.id,
+                date                = current.strftime('%Y-%m-%d'),
+                start_time          = data['start_time'],
+                end_time            = data['end_time'],
+                title               = data.get('title', ''),
+                category            = data.get('category'),
+                notes               = data.get('notes'),
+                is_recurring        = True,
+                recurrence          = recurrence,
+                recurrence_end      = end_date.strftime('%Y-%m-%d'),
+                recurrence_group_id = group_id,
+            )
+            db.session.add(slot)
+            slots.append(slot)
+
+            if recurrence == 'weekly':
+                current += timedelta(weeks=1)
+            elif recurrence == 'biweekly':
+                current += timedelta(weeks=2)
+            elif recurrence == 'monthly':
+                month   = current.month + 1
+                year    = current.year + (month - 1) // 12
+                month   = (month - 1) % 12 + 1
+                days    = [31, 29 if year%4==0 and (year%100!=0 or year%400==0) else 28,
+                           31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                current = current.replace(year=year, month=month, day=min(current.day, days[month-1]))
+
+        db.session.commit()
+        return jsonify({'message': f'{recurrence} events added!', 'count': len(slots)})
+
     slot = Availability(
-        user_id    = current_user.id,
-        date       = data['date'],
-        start_time = data['start_time'],
-        end_time   = data['end_time'],
-        title      = data.get('title', ''),
-        category   = data.get('category'),
-        notes      = data.get('notes'),
+        user_id             = current_user.id,
+        date                = data['date'],
+        start_time          = data['start_time'],
+        end_time            = data['end_time'],
+        title               = data.get('title', ''),
+        category            = data.get('category'),
+        notes               = data.get('notes'),
+        is_recurring        = False,
+        recurrence          = None,
+        recurrence_end      = None,
+        recurrence_group_id = None,
     )
     db.session.add(slot)
     db.session.commit()
@@ -79,10 +136,41 @@ def update_availability(slot_id):
 @main.route('/availability/<int:slot_id>', methods=['DELETE'])
 @login_required
 def delete_availability(slot_id):
-    slot = Availability.query.get_or_404(slot_id)
+    slot = Availability.query.filter_by(id=slot_id, user_id=current_user.id).first_or_404()
     db.session.delete(slot)
     db.session.commit()
     return jsonify({'message': 'Deleted!'})
+
+@main.route('/availability/recurring/<string:group_id>/from/<string:from_date>', methods=['DELETE'])
+@login_required
+def delete_recurring_from_date(group_id, from_date):
+    slots = Availability.query.filter(
+        Availability.recurrence_group_id == group_id,
+        Availability.user_id == current_user.id,
+        Availability.date >= from_date
+    ).all()
+    for slot in slots:
+        db.session.delete(slot)
+    db.session.commit()
+    return jsonify({'message': f'Deleted {len(slots)} events from {from_date}'})
+
+@main.route('/availability/recurring/<string:group_id>/from/<string:from_date>', methods=['PUT'])
+@login_required
+def update_recurring_from_date(group_id, from_date):
+    data  = request.get_json()
+    slots = Availability.query.filter(
+        Availability.recurrence_group_id == group_id,
+        Availability.user_id == current_user.id,
+        Availability.date >= from_date
+    ).all()
+    for slot in slots:
+        if 'title'      in data: slot.title      = data['title']
+        if 'start_time' in data: slot.start_time = data['start_time']
+        if 'end_time'   in data: slot.end_time   = data['end_time']
+        if 'category'   in data: slot.category   = data['category']
+        if 'notes'      in data: slot.notes      = data['notes']
+    db.session.commit()
+    return jsonify({'message': f'Updated {len(slots)} events'})
 
 @main.route('/availability/all', methods=['GET'])
 @login_required
@@ -214,22 +302,18 @@ def group_heatmap(group_id):
         Availability.date <= end_str,
     ).all()
 
-    # Group raw intervals by (user_id, day_index) so overlapping events from the same user can be merged into one before counting.
     from collections import defaultdict
     user_day_intervals = defaultdict(list)
     for slot in avail:
         try:
             dt      = datetime.strptime(slot.date, '%Y-%m-%d')
-            day_idx = (dt.weekday() + 1) % 7  # Mon=0…Sun=6 → Sun=0, Mon=1…Sat=6
+            day_idx = (dt.weekday() + 1) % 7
             start_h = int(slot.start_time.split(':')[0])
             end_h   = int(slot.end_time.split(':')[0])
         except (ValueError, AttributeError):
             continue
         user_day_intervals[(slot.user_id, day_idx)].append((start_h, end_h))
 
-    # For each (user, day), merge overlapping intervals so one user can 
-    # contribute at most 1 to the count per hour regardless of how many
-    # events they have covering that slot.
     heatmap = {str(i): {} for i in range(7)}
     for (_, day_idx), intervals in user_day_intervals.items():
         intervals.sort()
@@ -259,7 +343,6 @@ def search_users():
     return jsonify({'users': [{'id': u.id, 'username': u.username} for u in users]})
 
 def _friend_ids():
-    """Return set of user IDs who are accepted friends of current_user."""
     rows = Friendship.query.filter(
         db.or_(
             db.and_(Friendship.requester_id == current_user.id, Friendship.status == 'accepted'),
@@ -290,8 +373,12 @@ def search_friends():
 @main.route('/api/friends/requests', methods=['GET'])
 @login_required
 def get_friend_requests():
-    rows = Friendship.query.filter_by(receiver_id=current_user.id, status='pending').all()
-    return jsonify({'requests': [{'id': f.id, 'user_id': f.requester_id, 'username': f.requester.username} for f in rows]})
+    incoming = Friendship.query.filter_by(receiver_id=current_user.id, status='pending').all()
+    outgoing = Friendship.query.filter_by(requester_id=current_user.id, status='pending').all()
+    return jsonify({'requests':
+        [{'id': f.id, 'user_id': f.requester_id, 'username': f.requester.username, 'direction': 'incoming'} for f in incoming] +
+        [{'id': f.id, 'user_id': f.receiver_id,  'username': f.receiver.username,  'direction': 'outgoing'} for f in outgoing]
+    })
 
 @main.route('/api/friends/request', methods=['POST'])
 @login_required
@@ -334,11 +421,6 @@ def remove_friend(friendship_id):
     db.session.delete(f)
     db.session.commit()
     return jsonify({'message': 'Removed'})
-
-@main.route('/profile')
-@login_required
-def profile():
-    return render_template('profile.html')
 
 # Profile API routes
 

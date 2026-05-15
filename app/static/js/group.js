@@ -75,20 +75,20 @@ function renderGroupsList(groups, filter = '') {
         : groups;
 
     if (filtered.length === 0) {
-        list.innerHTML = `<p class="text-xs text-center mt-4" style="color:var(--text-fine);">${filter ? 'No groups found' : 'No groups yet'}</p>`;
+        list.innerHTML = `<p class="text-xs text-center mt-4" style="color:var(--text-muted);">${filter ? 'No groups found' : 'No groups yet'}</p>`;
         return;
     }
 
     list.innerHTML = filtered.map(g => `
         <button onclick="selectGroup(${g.id},'${escHtml(g.name)}','${g.role}')"
             class="flex items-center gap-2 px-3 py-2 rounded-xl text-left w-full text-sm transition-colors"
-            style="color:var(--dark); background:${selectedGroupId === g.id ? 'var(--bg-tab-pill)' : 'transparent'};"
-            onmouseover="this.style.background='var(--bg-tab-pill)'"
-            onmouseout="this.style.background='${selectedGroupId === g.id ? 'var(--bg-tab-pill)' : 'transparent'}'">
+            style="color:var(--primary-text-colour); background:${selectedGroupId === g.id ? 'var(--bg-hover)' : 'transparent'};"
+            onmouseover="this.style.background='var(--bg-hover)'"
+            onmouseout="this.style.background='${selectedGroupId === g.id ? 'var(--bg-hover)' : 'transparent'}'">
             <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                 style="background:var(--blue);">${escHtml(g.name.charAt(0).toUpperCase())}</div>
             <span class="truncate flex-1">${escHtml(g.name)}</span>
-            <span class="text-[10px] shrink-0" style="color:var(--text-fine);">${g.member_count}</span>
+            <span class="text-[10px] shrink-0" style="color:var(--text-muted);">${g.member_count}</span>
         </button>`).join('');
 }
 
@@ -112,7 +112,7 @@ async function selectGroup(id, name, role) {
         renderMembersList(data.members);
     } catch {
         document.getElementById('members-list').innerHTML =
-            `<p class="text-xs text-center mt-4" style="color:var(--text-fine);">Failed to load members</p>`;
+            `<p class="text-xs text-center mt-4" style="color:var(--text-muted);">Failed to load members</p>`;
     }
 
     await fetchHeatmap(id);
@@ -134,7 +134,7 @@ function backToGroups() {
 function renderMembersList(members) {
     const list = document.getElementById('members-list');
     if (!members || members.length === 0) {
-        list.innerHTML = `<p class="text-xs text-center mt-4" style="color:var(--text-fine);">No members</p>`;
+        list.innerHTML = `<p class="text-xs text-center mt-4" style="color:var(--text-muted);">No members</p>`;
         return;
     }
     list.innerHTML = members.map(m => `
@@ -144,7 +144,7 @@ function renderMembersList(members) {
                 style="background: ${m.role === 'owner' ? '#7c3aed' : 'var(--blue)'};">
                 ${escHtml(m.username.charAt(0).toUpperCase())}
             </div>
-            <span class="flex-1 text-sm truncate" style="color:var(--dark);">${escHtml(m.username)}</span>
+            <span class="flex-1 text-sm truncate" style="color:var(--primary-text-colour);">${escHtml(m.username)}</span>
             ${m.role === 'owner' ? `<span class="text-[10px] px-1.5 py-0.5 rounded-full" style="background:rgba(124,58,237,0.1);color:#7c3aed;">owner</span>` : ''}
         </div>`).join('');
 }
@@ -201,12 +201,12 @@ async function searchUsersForCreate(q) {
     results.innerHTML = filtered.map(u => `
         <button onclick="addPendingMember(${u.id},'${escHtml(u.username)}')"
             class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm w-full text-left transition-colors"
-            style="color:var(--dark);"
-            onmouseover="this.style.background='var(--bg-tab-pill)'"
+            style="color:var(--primary-text-colour);"
+            onmouseover="this.style.background='var(--bg-hover)'"
             onmouseout="this.style.background='transparent'">
             <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0" style="background:var(--blue);">${escHtml(u.username.charAt(0).toUpperCase())}</div>
             ${escHtml(u.username)}
-        </button>`).join('') || (q.length >= 2 ? `<p class="text-xs px-3 py-1" style="color:var(--text-fine);">No friends found</p>` : '');
+        </button>`).join('') || (q.length >= 2 ? `<p class="text-xs px-3 py-1" style="color:var(--text-muted);">No friends found</p>` : '');
 }
 
 function addPendingMember(id, username) {
@@ -226,9 +226,9 @@ function removePendingMember(id) {
 function renderPendingMembers() {
     document.getElementById('new-member-pending').innerHTML = pendingMembers.map(m => `
         <span class="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs"
-            style="background:var(--bg-tab-pill);color:var(--dark);">
+            style="background:var(--bg-hover);color:var(--primary-text-colour);">
             ${escHtml(m.username)}
-            <button onclick="removePendingMember(${m.id})" class="ml-0.5 leading-none" style="color:var(--text-fine);">&times;</button>
+            <button onclick="removePendingMember(${m.id})" class="ml-0.5 leading-none" style="color:var(--text-muted);">&times;</button>
         </span>`).join('');
 }
 
@@ -245,6 +245,7 @@ async function createGroup() {
     if (res.ok) {
         closeCreateGroupPopup();
         await loadGroups();
+        showToast(`Group "${name}" created`);
     } else {
         const data = await res.json();
         alert(data.error || 'Failed to create group');
@@ -291,7 +292,7 @@ function renderSettingsMembersList(members, isOwner) {
                 style="background:${m.role === 'owner' ? '#7c3aed' : 'var(--blue)'};">
                 ${escHtml(m.username.charAt(0).toUpperCase())}
             </div>
-            <span class="flex-1 text-sm truncate" style="color:var(--dark);">${escHtml(m.username)}</span>
+            <span class="flex-1 text-sm truncate" style="color:var(--primary-text-colour);">${escHtml(m.username)}</span>
             ${m.role === 'owner'
                 ? `<span class="text-[10px] px-1.5 py-0.5 rounded-full" style="background:rgba(124,58,237,0.1);color:#7c3aed;">owner</span>`
                 : isOwner
@@ -310,12 +311,12 @@ async function searchUsersForSettings(q) {
     results.innerHTML = users.map(u => `
         <button onclick="addMemberToGroup(${u.id},'${escHtml(u.username)}')"
             class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm w-full text-left transition-colors"
-            style="color:var(--dark);"
-            onmouseover="this.style.background='var(--bg-tab-pill)'"
+            style="color:var(--primary-text-colour);"
+            onmouseover="this.style.background='var(--bg-hover)'"
             onmouseout="this.style.background='transparent'">
             <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0" style="background:var(--blue);">${escHtml(u.username.charAt(0).toUpperCase())}</div>
             ${escHtml(u.username)}
-        </button>`).join('') || (q.length >= 2 ? `<p class="text-xs px-3 py-1" style="color:var(--text-fine);">No friends found</p>` : '');
+        </button>`).join('') || (q.length >= 2 ? `<p class="text-xs px-3 py-1" style="color:var(--text-muted);">No friends found</p>` : '');
 }
 
 async function addMemberToGroup(userId, username) {
@@ -334,6 +335,7 @@ async function addMemberToGroup(userId, username) {
         const g = cachedGroups.find(x => x.id === selectedGroupId);
         if (g) g.member_count = data.members.length;
         renderGroupsList(cachedGroups);
+        showToast(`${username} added`);
     } else {
         const data = await res.json();
         alert(data.error || 'Failed to add member');
@@ -351,6 +353,7 @@ async function removeMember(userId) {
         const g = cachedGroups.find(x => x.id === selectedGroupId);
         if (g) g.member_count = data.members.length;
         renderGroupsList(cachedGroups);
+        showToast('Member removed');
     }
 }
 
@@ -370,6 +373,7 @@ async function saveGroupSettings() {
         const g = cachedGroups.find(x => x.id === selectedGroupId);
         if (g) g.name = data.name;
         closeSettingsPopup();
+        showToast('Settings saved');
     } else {
         alert('Failed to save settings');
     }
@@ -382,6 +386,7 @@ async function confirmDeleteGroup() {
         closeSettingsPopup();
         backToGroups();
         await loadGroups();
+        showToast('Group deleted');
     } else {
         alert('Failed to delete group');
     }
@@ -397,28 +402,6 @@ async function fetchFriends(q) {
     } catch { return []; }
 }
 
-function showOverlay(id) {
-    const el = document.getElementById(id);
-    el.style.display = 'flex';
-}
+function showOverlay(id) { document.getElementById(id).classList.add('open'); }
+function hideOverlay(id) { document.getElementById(id).classList.remove('open'); }
 
-function hideOverlay(id) {
-    document.getElementById(id).style.display = 'none';
-}
-
-function escHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-function debounce(fn, ms) {
-    let timer;
-    return function (...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn.apply(this, args), ms);
-    };
-}

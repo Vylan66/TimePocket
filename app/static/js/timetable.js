@@ -1,6 +1,4 @@
 // Hour range 
-// HOUR_HEIGHT is read from --hour-h so CSS is the single source of truth.
-// --num-hours is written to CSS so calc() in the stylesheet stays in sync.
 const START_HOUR  = 4;
 const END_HOUR    = 23;
 const NUM_HOURS   = END_HOUR - START_HOUR + 1;
@@ -60,7 +58,12 @@ function toDateStr(d) {
     return `${yyyy}-${mm}-${dd}`;
 }
 
-// Week headers — updates existing static DOM elements 
+function recurrenceLabel(recurrence) {
+    const labels = { weekly: 'Repeats weekly', biweekly: 'Repeats every 2 weeks', monthly: 'Repeats monthly' };
+    return labels[recurrence] || '';
+}
+
+// Week headers
 function renderWeekHeaders() {
     const weekStart = getWeekStart();
     const today     = new Date();
@@ -76,7 +79,7 @@ function renderWeekHeaders() {
         const dateEl = document.getElementById(`hdr-date-${i}`);
         dateEl.textContent      = d.getDate();
         dateEl.style.background = isTod ? 'var(--blue)' : '';
-        dateEl.style.color      = isTod ? '#fff' : 'var(--dark)';
+        dateEl.style.color      = isTod ? '#fff' : 'var(--primary-text-colour)';
     }
 }
 
@@ -96,18 +99,14 @@ function goToWeekContaining(date) {
     buildColumns();
 }
 
-// Overlap layout — assigns each event a horizontal slot so overlapping
-// events sit side-by-side instead of stacking on top of each other.
+// Overlap layout
 function computeLayout(dayEvents) {
     if (dayEvents.length === 0) return [];
 
-    // Sort by start time so we process events in chronological order
     const sorted = [...dayEvents]
         .map((ev, i) => ({ ev, i }))
         .sort((a, b) => timeToFrac(a.ev.start) - timeToFrac(b.ev.start));
 
-    // Greedily assign each event to the first available slot.
-    // slotEnds[i] = end-time fraction of the last event placed in slot i.
     const slotEnds = [];
     const assigned = sorted.map(({ ev, i }) => {
         const start = timeToFrac(ev.start);
@@ -118,8 +117,6 @@ function computeLayout(dayEvents) {
         return { ev, i, slot };
     });
 
-    // For each event, find how many slots are active at the same time —
-    // that determines how wide each event should be drawn.
     return assigned.map(item => {
         const start = timeToFrac(item.ev.start);
         const end   = timeToFrac(item.ev.end);
@@ -132,7 +129,7 @@ function computeLayout(dayEvents) {
     });
 }
 
-// Day columns — only injects events + now-line; layout is CSS
+// Day columns
 function buildColumns() {
     const weekStart = getWeekStart();
     const today     = new Date(); today.setHours(0, 0, 0, 0);
@@ -144,7 +141,7 @@ function buildColumns() {
 
         col.innerHTML = '';
 
-        const dateStr  = toDateStr(day);
+        const dateStr   = toDateStr(day);
         const dayEvents = events.filter(e => e.date === dateStr);
         computeLayout(dayEvents).forEach(({ ev, slot, totalCols }) => {
             const top    = fracToY(timeToFrac(ev.start));
@@ -156,7 +153,6 @@ function buildColumns() {
             el.style.backgroundColor = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
             el.innerHTML             = `<div class="ev-title">${ev.title}</div><div class="ev-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>`;
 
-            // Position event within its horizontal slot
             const pct      = 100 / totalCols;
             el.style.left  = `calc(${slot * pct}% + 1.5px)`;
             el.style.right = 'auto';
@@ -179,39 +175,40 @@ function buildColumns() {
         }
     }
 
-    // Populate popup day select (only present on personal page)
     const evDay = document.getElementById('evDay');
-    if (evDay) {
-        evDay.innerHTML = '';
-        for (let i = 0; i < 7; i++) {
-            const d   = new Date(weekStart); d.setDate(d.getDate() + i);
-            const opt = document.createElement('option');
-            opt.value       = toDateStr(d);
-            opt.textContent = `${DAY_NAMES[d.getDay()]} ${d.getDate()}`;
-            evDay.appendChild(opt);
-        }
+    if (evDay && !evDay.min) {
+        evDay.min = toDateStr(new Date());
     }
 
     if (typeof window.onAfterBuildColumns === 'function') window.onAfterBuildColumns();
 }
 
-// New Event Pop-up (only on personal page)
+// New Event Pop-up
 const popupOverlay = document.getElementById('popupOverlay');
 
 function closepopup() {
-    if (popupOverlay) popupOverlay.style.display = 'none';
+    if (popupOverlay) popupOverlay.classList.remove('open');
     editingIdx = null;
     const pt = document.getElementById('popup-title');
     if (pt) pt.textContent = 'New Event';
+    const rc = document.getElementById('evRecurring');
+    if (rc) rc.value = 'none';
 }
+
 function handleOverlayClick(e) { if (e.target === popupOverlay) closepopup(); }
+
+// Recurring dropdown — no end date needed
+const evRecurring = document.getElementById('evRecurring');
+if (evRecurring) {
+    evRecurring.addEventListener('change', () => {
+        // nothing to show/hide since no end date wrapper
+    });
+}
 
 if (document.getElementById('addEventBtn')) {
     document.getElementById('addEventBtn').addEventListener('click', () => {
-        popupOverlay.style.display    = 'flex';
-        popupOverlay.style.background = 'var(--overlay-bg)';
+        popupOverlay.classList.add('open');
 
-        // Default day: mini cal selection if it falls in current week, else today
         const weekStart = getWeekStart();
         const target    = (typeof calSelected !== 'undefined' && calSelected)
                             ? new Date(calSelected)
@@ -223,36 +220,77 @@ if (document.getElementById('addEventBtn')) {
             if (sameDay(d, target)) { defaultDate = toDateStr(d); break; }
         }
         if (defaultDate) document.getElementById('evDay').value = defaultDate;
-
         document.getElementById('evTitle').focus();
     });
 }
-if (document.getElementById('cancelBtn'))   document.getElementById('cancelBtn').addEventListener('click', closepopup);
+if (document.getElementById('cancelBtn'))       document.getElementById('cancelBtn').addEventListener('click', closepopup);
 if (document.getElementById('btn-popup-close')) document.getElementById('btn-popup-close').addEventListener('click', closepopup);
 
 if (document.getElementById('saveBtn')) {
-    document.getElementById('saveBtn').addEventListener('click', () => {
-        const title    = document.getElementById('evTitle').value.trim();
-        const date     = document.getElementById('evDay').value;
-        const start    = document.getElementById('evStart').value;
-        const end      = document.getElementById('evEnd').value;
-        const category = document.getElementById('evCategory').value;
-        const note     = document.getElementById('evNote').value.trim();
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+        const title      = document.getElementById('evTitle').value.trim();
+        const date       = document.getElementById('evDay').value;
+        const start      = document.getElementById('evStart').value;
+        const end        = document.getElementById('evEnd').value;
+        const category   = document.getElementById('evCategory').value;
+        const note       = document.getElementById('evNote').value.trim();
+        const recurrence = document.getElementById('evRecurring')?.value || 'none';
 
         if (!title || !date || !start || !end || start >= end) {
             alert('Please fill in all fields and ensure start time is before end time.');
             return;
         }
 
-        if (editingIdx !== null) {
+        const wasEditing = editingIdx !== null;
+
+        if (wasEditing) {
             const old = events[editingIdx];
-            events.splice(editingIdx, 1, { title, date, start, end, category, note, dbId: old.dbId });
+            events.splice(editingIdx, 1, {
+                title, date, start, end, category, note,
+                dbId:              old.dbId,
+                isRecurring:       recurrence !== 'none',
+                recurrence,
+                recurrenceGroupId: old.recurrenceGroupId,
+            });
+
+            if (old.recurrenceGroupId && recurrence === 'none') {
+                // Stop this and all future recurring events
+                if (typeof window.onDeleteRecurringFrom === 'function') {
+                    await window.onDeleteRecurringFrom(old.recurrenceGroupId, date);
+                }
+                // Save this one as a non-recurring event
+                if (old.dbId) {
+                    await fetch(`/availability/${old.dbId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ date, start_time: start, end_time: end, title, category, notes: note }),
+                    });
+                }
+            } else if (old.recurrenceGroupId) {
+                // Update this and all future events in the group
+                if (typeof window.onUpdateRecurringFrom === 'function') {
+                    await window.onUpdateRecurringFrom(old.recurrenceGroupId, date, {
+                        title, start_time: start, end_time: end, category, notes: note
+                    });
+                }
+            } else if (old.dbId) {
+                // Single event edit
+                await fetch(`/availability/${old.dbId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date, start_time: start, end_time: end, title, category, notes: note }),
+                });
+            }
         } else {
-            events.push({ title, date, start, end, category, note });
-            if (typeof window.onEventSave === 'function') window.onEventSave({ title, date, start, end, category, note });
+            events.push({ title, date, start, end, category, note, isRecurring: recurrence !== 'none', recurrence });
+            if (typeof window.onEventSave === 'function') {
+                await window.onEventSave({ title, date, start, end, category, note, recurrence });
+            }
         }
+
         closepopup();
         buildColumns();
+        showToast(wasEditing ? 'Event updated' : 'Event saved');
         document.getElementById('evTitle').value = '';
         document.getElementById('evNote').value  = '';
     });
@@ -269,7 +307,7 @@ document.getElementById('todayBtn').addEventListener('click', () => {
 const evDetailOverlay = document.getElementById('evDetailOverlay');
 
 function closeEventDetail() {
-    if (evDetailOverlay) evDetailOverlay.style.display = 'none';
+    if (evDetailOverlay) evDetailOverlay.classList.remove('open');
 }
 
 function handleDetailOverlayClick(e) {
@@ -292,11 +330,22 @@ function openEventDetail(idx) {
     document.getElementById('det-note').textContent = ev.note || '';
     noteRow.style.display = ev.note ? '' : 'none';
 
+    // Show recurring label if applicable
+    const recurRow = document.getElementById('det-recurring-row');
+    const recurLabel = document.getElementById('det-recurring-label');
+    if (recurRow && recurLabel) {
+        if (ev.isRecurring && ev.recurrence !== 'none') {
+            recurLabel.textContent = recurrenceLabel(ev.recurrence);
+            recurRow.style.display = '';
+        } else {
+            recurRow.style.display = 'none';
+        }
+    }
+
     document.getElementById('det-edit-btn').onclick   = () => editEvent(idx);
     document.getElementById('det-delete-btn').onclick = () => deleteEvent(idx);
 
-    evDetailOverlay.style.display    = 'flex';
-    evDetailOverlay.style.background = 'var(--overlay-bg)';
+    evDetailOverlay.classList.add('open');
 }
 
 function editEvent(idx) {
@@ -312,16 +361,56 @@ function editEvent(idx) {
     document.getElementById('evCategory').value = ev.category;
     document.getElementById('evNote').value     = ev.note || '';
 
+    const rc = document.getElementById('evRecurring');
+    if (rc) rc.value = ev.recurrence || 'none';
+
     const pt = document.getElementById('popup-title');
     if (pt) pt.textContent = 'Edit Event';
 
-    popupOverlay.style.display    = 'flex';
-    popupOverlay.style.background = 'var(--overlay-bg)';
+    popupOverlay.classList.add('open');
 }
 
-function deleteEvent(idx) {
-    // Frontend-only placeholder — no action yet
+async function deleteEvent(idx) {
+    const ev = events[idx];
+    if (!ev) return;
+
+    if (ev.isRecurring && ev.recurrenceGroupId) {
+        const choice = confirm('Delete this and all following events?\n\nOK = Yes, delete this and future\nCancel = Delete just this one');
+        closeEventDetail();
+        if (choice) {
+            if (typeof window.onDeleteRecurringFrom === 'function') {
+                await window.onDeleteRecurringFrom(ev.recurrenceGroupId, ev.date);
+            }
+            showToast('This and future events deleted');
+        } else {
+            if (ev.dbId) {
+                try {
+                    await fetch(`/availability/${ev.dbId}`, { method: 'DELETE' });
+                } catch (err) {
+                    console.error('Failed to delete event:', err);
+                    return;
+                }
+            }
+            events.splice(idx, 1);
+            buildColumns();
+            showToast('Event deleted');
+        }
+        return;
+    }
+
+    if (!confirm('Are you sure you want to delete this event?')) return;
+    if (ev.dbId) {
+        try {
+            await fetch(`/availability/${ev.dbId}`, { method: 'DELETE' });
+        } catch (err) {
+            console.error('Failed to delete event:', err);
+            return;
+        }
+    }
+    events.splice(idx, 1);
     closeEventDetail();
+    buildColumns();
+    showToast('Event deleted');
 }
 
 if (document.getElementById('btn-detail-close')) {
