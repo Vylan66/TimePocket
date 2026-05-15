@@ -57,6 +57,52 @@ const setAvatar = (user) => {
 const setupEvents = () => {
     document.getElementById("btn-change-avatar").onclick = () => showAvatarDialog();
     document.getElementById("update-bio").onclick = () => showBioDialog();
+    document.getElementById("change-email").onclick = () => showEmailDialog();
+}
+
+// Activates dialog for changing email
+const showEmailDialog = () => {
+    const emailDialog = document.getElementById("email-dialog");
+    emailDialog.classList.add('open');
+
+    const emailInput = document.getElementById("email-input-field");
+
+    document.getElementById("email-save").onclick = () => saveEmailChanges(emailInput);
+
+    document.getElementById("email-close").onclick = () => hideEmailDialog();
+    document.getElementById("email-exit").onclick = () => hideEmailDialog();
+}
+
+// Saves changes made to email
+const saveEmailChanges = async (emailInput) => {
+    const emailError = document.getElementById("email-error");
+
+    if (emailInput.value === "") {
+        emailError.innerHTML = `Please enter an email.`;
+    }
+    else if (!emailInput.checkValidity()) {
+        emailError.innerHTML = `Please enter a valid email.`;
+    }
+    else {
+        await fetch(`/api/user`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: emailInput.value })
+        });
+        user["email"] = emailInput.value;
+        hideEmailDialog();
+        fillEmail(user);
+    }
+}
+
+// Closes email dialog
+const hideEmailDialog = () => {
+    const emailDialog = document.getElementById("email-dialog");
+    const emailInput = document.getElementById("email-input-field");
+    const emailError = document.getElementById("email-error");
+    emailError.innerHTML = ``;
+    emailInput.value = "";
+    emailDialog.classList.remove('open');
 }
 
 // Activates dialog for updating bio

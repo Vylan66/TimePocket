@@ -48,11 +48,11 @@
             </div>
         </div>
         <div id="account-modifications" class="flex gap-2 flex-wrap justify-center md:justify-start">
-            <button id="change-username"class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change username </button>
-            <button id="change-email" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change email </button>
-            <button id="update-bio" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Update bio </button>
+            <button id="change-username"class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Username </button>
+            <button id="change-email" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Email </button>
+            <button id="update-bio" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Update Bio </button>
             <button id="update-interests" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Choose Interests </button>
-            <button id="change-password" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change password </button>
+            <button id="change-password" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Rassword </button>
         </div>
     </div>
 </div>
@@ -101,17 +101,35 @@
  </div>
 
 <!-- CHANGE EMAIL DIALOG -->
- <div id="email-dialog">
+ <div id="email-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="email-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Change Your Email </p>
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> New email: </p>
+        
+        <p id="email-error" class="text-xs italic text-red-500"></p>
+        <input id="email-input-field" class="tp-input mb-2" type="email" placeholder="email@example.com">
+
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="email-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="email-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+
+    </div>
+ </div>
+
+<!-- CHANGE USERNAME DIALOG -->
+ <div id="username-dialog" class="auth-overlay">
 
  </div>
 
 <!-- CHANGE PASSWORD DIALOG -->
- <div id="password-dialog">
+ <div id="password-dialog" class="auth-overlay">
 
  </div>
 
 <!-- UPDATE INTERESTS DIALOG -->
- <div id="interests-dialog">
+ <div id="interests-dialog" class="auth-overlay">
 
  </div>
 
