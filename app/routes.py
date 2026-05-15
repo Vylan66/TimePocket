@@ -79,7 +79,7 @@ def update_availability(slot_id):
 @main.route('/availability/<int:slot_id>', methods=['DELETE'])
 @login_required
 def delete_availability(slot_id):
-    slot = Availability.query.get_or_404(slot_id)
+    slot = Availability.query.filter_by(id=slot_id, user_id=current_user.id).first_or_404()
     db.session.delete(slot)
     db.session.commit()
     return jsonify({'message': 'Deleted!'})
