@@ -56,6 +56,65 @@ const setAvatar = (user) => {
 // Adds all event listeners
 const setupEvents = () => {
     document.getElementById("btn-change-avatar").onclick = () => showAvatarDialog();
+    document.getElementById("update-bio").onclick = () => showBioDialog();
+}
+
+// Activates dialog for updating bio
+const showBioDialog = () => {
+    const bioDialog = document.getElementById("bio-dialog");
+    bioDialog.classList.add('open');
+
+    const bioInput = document.getElementById("bio-input-field");
+    const currentBio = user["bio"];
+    if (currentBio != null) {
+        bioInput.value = currentBio;
+    }
+    updateCharCount(bioInput);
+
+    bioInput.oninput = () => updateCharCount(bioInput);
+
+    document.getElementById("bio-save").onclick = () => saveBioChanges(bioInput.value, currentBio);
+
+    document.getElementById("bio-close").onclick = () => hideBioDialog();
+    document.getElementById("bio-exit").onclick = () => hideBioDialog();
+}
+
+// Updates the character count of bio input
+const updateCharCount = (bioInput) => {
+    const charCount = bioInput.value.length;
+    const displayCount = document.getElementById("bio-char-count");
+    displayCount.innerHTML = charCount;
+}
+
+// Saves changes made to bio
+const saveBioChanges = async (bioInput, currentBio) => {
+    if (bioInput === currentBio) {
+        hideBioDialog();
+    }
+    else if (bioInput === "") {
+        const errorMessage = document.getElementById("bio-error");
+        errorMessage.innerHTML = `Bio needs at least 1 character.`
+    }
+    else {
+        await fetch(`/api/user/bio`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bio: bioInput })
+        });
+        user["bio"] = bioInput;
+        hideBioDialog();
+        fillBio(user);
+    }
+}
+
+// Closes dialog for updating bio
+const hideBioDialog = () => {
+    const bioDialog = document.getElementById("bio-dialog");
+    const bioInput = document.getElementById("bio-input-field");
+    const bioError = document.getElementById("bio-error");
+    bioError.innerHTML = ``;
+    bioInput.value = "";
+    bioDialog.classList.remove('open');
 }
 
 // Activates dialog for changing avatar

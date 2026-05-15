@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block css %} {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}"></link>
+{% endblock %}
 
 {% block script %} 
 <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
@@ -82,7 +84,20 @@
 
 <!-- UPDATE BIO DIALOG -->
  <div id="bio-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="bio-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Update Your Bio </p>
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> Share a little information about you to your friends! (Max 200 characters) </p>
 
+        <p id="bio-error" class="text-xs italic text-red-500"></p>
+        <textarea id="bio-input-field" class="tp-input h-[12rem]" style="resize: none;" maxlength="200" placeholder="Write your bio here!"></textarea>
+        <p class="text-xs italic" style="color: var(--text-secondary)"><span id="bio-char-count"></span> of 200 characters used</p>
+    
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="bio-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="bio-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+    </div>
  </div>
 
 <!-- CHANGE EMAIL DIALOG -->
@@ -101,6 +116,6 @@
  </div>
 
 <style>
-    
+
 </style>
 {% endblock %}
