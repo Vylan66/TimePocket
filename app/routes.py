@@ -52,11 +52,8 @@ def get_my_availability():
         'recurrence_group_id': s.recurrence_group_id,
     } for s in slots])
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> main
 @main.route('/availability', methods=['POST'])
 @login_required
 def add_availability():
