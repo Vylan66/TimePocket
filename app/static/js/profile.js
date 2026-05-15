@@ -59,6 +59,69 @@ const setupEvents = () => {
     document.getElementById("update-bio").onclick = () => showBioDialog();
     document.getElementById("change-email").onclick = () => showEmailDialog();
     document.getElementById("change-username").onclick = () => showUsernameDialog();
+    document.getElementById("change-password").onclick = () => showPasswordDialog();
+}
+
+// Activates dialog for changing password
+const showPasswordDialog = () => {
+    const passwordDialog = document.getElementById("password-dialog");
+    passwordDialog.classList.add('open');
+
+    const passwordInputOld = document.getElementById("password-old-input-field");
+    const passwordInputNew = document.getElementById("password-new-input-field");
+
+    document.getElementById("password-save").onclick = () => savePasswordChanges(passwordInputOld, passwordInputNew);
+
+    document.getElementById("password-close").onclick = () => hidePasswordDialog();
+    document.getElementById("password-exit").onclick = () => hidePasswordDialog();
+}
+
+// Saves changes to password
+const savePasswordChanges = async (passwordInputOld, passwordInputNew) => {
+    const passwordOldError = document.getElementById("password-old-error");
+    const passwordNewError = document.getElementById("password-new-error");
+    passwordOldError.innerHTML = ``;
+    passwordNewError.innerHTML = ``;
+
+    if (passwordInputOld.value === "" || passwordInputNew.value === "") {
+        if (passwordInputOld.value === "") passwordOldError.innerHTML = `Please enter your old password.`
+        if (passwordInputNew.value === "") passwordNewError.innerHTML = `Please enter your new password.`
+        passwordInputNew.value = "";
+        passwordInputOld.value = "";
+    }
+    else {
+        const result = await fetch(`/api/user/password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ old_password: passwordInputOld.value, new_password: passwordInputNew.value })
+        });
+        if (!result.ok) {
+            passwordOldError.innerHTML = `Current password is incorrect.`;
+            passwordInputNew.value = "";
+            passwordInputOld.value = "";
+            return;
+        }
+        else {
+            const data = await result.json();
+            if (data["success"]) {
+                hidePasswordDialog();
+            }
+        }
+    }
+}
+
+// Closes password dialog
+const hidePasswordDialog = () => {
+    const passwordDialog = document.getElementById("password-dialog");
+    const passwordOldInput = document.getElementById("password-old-input-field");
+    const passwordNewInput = document.getElementById("password-new-input-field");
+    const passwordOldError = document.getElementById("password-old-error");
+    const passwordNewError = document.getElementById("password-new-error");
+    passwordNewError.innerHTML = ``;
+    passwordOldError.innerHTML = ``;
+    passwordOldInput.value = "";
+    passwordNewInput.value = "";
+    passwordDialog.classList.remove('open');
 }
 
 // Activates dialog for changing username
@@ -78,7 +141,7 @@ const showUsernameDialog = () => {
 const saveUsernameChanges = async (usernameInput) => {
     const usernameError = document.getElementById("username-error");
 
-    if (usernameInput === "") {
+    if (usernameInput.value === "") {
         usernameError.innerHTML = `Please enter a username.`
     }
     else {
