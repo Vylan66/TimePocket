@@ -115,7 +115,7 @@ const setAvatar = (user) => {
     const avatar = user["avatar"];
     const location = document.getElementById("profile-picture");
     if (avatar === "avatar_1") {
-        location.innerHTML = `<p class="text-white text-[128px] font-bold"> ${user.username[0].toUpperCase()} </p>`
+        location.innerHTML = `<p class="text-white md:text-[128px] text-[92px] font-bold"> ${user.username[0].toUpperCase()} </p>`
     }
     else {
         location.innerHTML = `<p> ${avatar} </p>`;
@@ -464,6 +464,8 @@ const showAvatarDialog = () => {
     const av_4 = document.getElementById("av-4");
     const av_5 = document.getElementById("av-5");
     const av_6 = document.getElementById("av-6");
+
+    av_1.innerHTML = `<p class="text-white text-[36px] font-bold"> ${user.username[0].toUpperCase()} </p>`
 
     switch (current) {
         case "avatar_1":
