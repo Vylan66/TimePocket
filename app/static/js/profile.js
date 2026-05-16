@@ -114,7 +114,12 @@ const buildInterest = (newInterest, type) => { // type=0: on profile, type=1: se
 const setAvatar = (user) => {
     const avatar = user["avatar"];
     const location = document.getElementById("profile-picture");
-    location.innerHTML = `<p> ${avatar} </p>`;
+    if (avatar === "avatar_1") {
+        location.innerHTML = `<p class="text-white text-[128px] font-bold"> ${user.username[0].toUpperCase()} </p>`
+    }
+    else {
+        location.innerHTML = `<p> ${avatar} </p>`;
+    }
 }
 
 // Adds all event listeners
