@@ -55,13 +55,14 @@
 #day-columns > div {
     height: calc(var(--hour-h) * var(--num-hours));
     position: relative;
+    overflow: hidden;
 }
 
 /* Scrollbar */
 .styled-scroll::-webkit-scrollbar { width: 4px; }
 .styled-scroll::-webkit-scrollbar-track { background: transparent; }
-.styled-scroll::-webkit-scrollbar-thumb { background: var(--border-darker); border-radius: 99px; }
-.styled-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-ui); }
+.styled-scroll::-webkit-scrollbar-thumb { background: var(--text-ui); border-radius: 99px; }
+.styled-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
 /* Event blocks */
 .cal-event {
