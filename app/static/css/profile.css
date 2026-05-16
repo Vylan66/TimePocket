@@ -22,3 +22,17 @@
 .avatar-option.chosen {
     border-color: var(--blue) !important;
 }
+
+.interest {
+    background-color: var(--bg-hover);
+}
+
+.interest.selectable:hover {
+    background-color: var(--text-secondary) !important;
+}
+
+.interest.selectable.chosen {
+    border-color: var(--blue);
+    border-style: solid;
+    border-width: 2px;
+}

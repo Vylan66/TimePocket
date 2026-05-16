@@ -1,10 +1,10 @@
 import uuid
 from flask import Blueprint, render_template, jsonify, request
-from flask_login import login_required, current_user, logout_user
+from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
-from app.models import Availability, User, Group, GroupMember, Friendship, ICalFeed
+from app.models import Availability, User, Group, GroupMember, Friendship, ICalFeed, Interest
 from app.ical_sync import sync_feed
 
 main = Blueprint('main', __name__)
@@ -420,6 +420,18 @@ def remove_friend(friendship_id):
 
 # Profile API routes
 
+@main.route('/api/interests', methods=['GET'])
+@login_required
+def get_interests():
+    interests = Interest.query.all()
+    result = []
+    for i in interests:
+        result.append({
+            "id": i.id,
+            "name": i.name,
+        })
+    return jsonify(result)
+
 @main.route('/api/user', methods=['GET'])
 @login_required
 def get_user():
@@ -429,7 +441,10 @@ def get_user():
         'email': current_user.email,
         'bio': current_user.bio or '',
         'avatar': current_user.avatar,
-        'bio': current_user.bio
+        'bio': current_user.bio,
+        'interest_1': current_user.interest_1,
+        'interest_2': current_user.interest_2,
+        'interest_3': current_user.interest_3
     })
 
 @main.route('/api/user', methods=['PUT'])
@@ -479,13 +494,20 @@ def update_bio():
     db.session.commit()
     return jsonify({'success': True, 'message': 'Bio updated!'})
 
-@main.route('/logout')
+@main.route('/api/user/interests', methods=['PUT'])
 @login_required
-def logout():
-    logout_user()
-    return
-
-# iCal feed routes
+def update_interests():
+    data = request.get_json()
+    int_1 = data.get('int_1')
+    int_2 = data.get('int_2')
+    int_3 = data.get('int_3')
+    if (not int_1 or not int_2 or not int_3):
+        return jsonify({'success': False, 'message': '3 interests required.'}), 400
+    current_user.interest_1 = int_1
+    current_user.interest_2 = int_2
+    current_user.interest_3 = int_3
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Interests updated!'})
 
 # iCal feed routes
 @main.route('/api/ical', methods=['GET'])

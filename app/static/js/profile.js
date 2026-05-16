@@ -1,7 +1,10 @@
-let user = {}; // {id, username, email, avatar, bio}
+let user = {}; // {id, username, email, avatar, bio, interest_1, interest_2, interest_3}
+let interests = {}; // each entry in the form 1:"Photography"
+let selectedInterests = {};
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadUser();
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadInterests();
+    await loadUser();
     setupEvents();
 });
 
@@ -16,9 +19,39 @@ const loadUser = async () => {
     fillUsername(user);
     fillEmail(user);
     fillBio(user);
-    // setInterests(user);
+    setInterests(user);
     setAvatar(user);
     return user;
+}
+
+const loadInterests = async () => {
+    const result = await fetch('/api/interests')
+    if (!result.ok) {
+        return;
+    }
+    const data = await result.json();
+    for (let i in data) {
+        const id = data[i]["id"];
+        const name = data[i]["name"];
+        interests[id] = name;
+    }
+
+    const interestList = document.getElementById("interest-list");
+    let n = 0;
+    for (let i in interests) {
+        if (n === 0) {
+            n++;
+            continue;
+        }
+        let interestLabel = buildInterest(interests[i], 1);
+        interestLabel.id = `interest_${n}`;
+        interestList.appendChild(interestLabel);
+        interestLabel.onclick = () => {
+            let result = toggleInterestList(i);
+            if (result === 1) interestLabel.classList.toggle("chosen");
+        }
+        n++;
+    }
 }
 
 // Displays username
@@ -44,7 +77,38 @@ const fillBio = (user) => {
     }
 };
 
-// set interests
+// Displays the user's chosen interests
+const setInterests = (user) => {
+    const userInterests = [user["interest_1"], user["interest_2"], user["interest_3"]];
+    let allNull = true;
+    const location = document.getElementById("interests-container");
+    location.innerHTML = ``;
+
+    for (let int_n in userInterests) {
+        if (userInterests[int_n] != "null") {
+            allNull = false;
+            location.appendChild(buildInterest(interests[userInterests[int_n]], 0));
+        }
+    }
+    if (allNull) {
+        location.innerHTML = `<p id="interest-placeholder" class="italic" style="color: var(--text-secondary)"> No interests selected... pick some below! </p>`
+    }
+}
+
+// Creates an interest label
+const buildInterest = (newInterest, type) => { // type=0: on profile, type=1: selection menu
+    const newInt = document.createElement('div');
+    if (type === 0) {
+        newInt.className = 'interest';
+        newInt.innerHTML = `${newInterest}`;
+        return newInt;
+    }
+    else {
+        newInt.className = 'interest selectable';
+        newInt.innerHTML = `${newInterest}`;
+        return newInt;
+    }
+}
 
 // Displays the user's chosen avatar
 const setAvatar = (user) => {
@@ -61,6 +125,94 @@ const setupEvents = () => {
     document.getElementById("change-username").onclick = () => showUsernameDialog();
     document.getElementById("change-password").onclick = () => showPasswordDialog();
     document.getElementById("logout-button").onclick = () => showLogoutDialog();
+    document.getElementById("update-interests").onclick = () => showInterestsDialog();
+}
+
+// Activates dialog for choosing interests
+const showInterestsDialog = () => {
+    const interestDialog = document.getElementById("interest-dialog");
+    interestDialog.classList.add('open');
+
+    const interestList = document.getElementById("interest-list");
+
+    document.getElementById("interest-save").onclick = () => saveInterestChanges();
+
+    document.getElementById("interest-close").onclick = () => hideInterestDialog();
+    document.getElementById("interest-exit").onclick = () => hideInterestDialog();
+}
+
+const toggleInterestList = (num) => {
+    let clickedIn = (num in selectedInterests);
+
+    if (clickedIn) {
+        delete selectedInterests[num];
+        return 1;
+    }
+    else if (Object.keys(selectedInterests).length < 3) {
+        selectedInterests[num] = interests[num];
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+// Saves changes made to user interests
+const saveInterestChanges = async () => {
+    let selectedKeys = Object.keys(selectedInterests);
+    let selectedLength = selectedKeys.length;
+    if (selectedLength === 0) {
+        const interestError = document.getElementById("interest-error");
+        interestError.innerHTML = `Please select at least one interest.`
+        return;
+    }
+    else if (selectedLength < 3) {
+        for (; selectedLength < 3; selectedLength++) {
+            selectedKeys.push("0");
+        }
+    }
+    let message = {};
+    let n = 1;
+    for (let i in selectedKeys) {
+        let colName = "int_" + n;
+        if (selectedKeys[i] === "0") {
+            message[colName] = "null";
+        }
+        else {
+            message[colName] = Number(selectedKeys[i]);
+        }
+        n++;
+    }
+    
+    await fetch(`/api/user/interests`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "int_1": message["int_1"], "int_2": message["int_2"], "int_3": message["int_3"] })
+    });
+    user["interest_1"] = message["int_1"];
+    user["interest_2"] = message["int_2"];
+    user["interest_3"] = message["int_3"];
+    hideInterestDialog();
+    setInterests(user);
+}
+
+// Closes interests dialog
+const hideInterestDialog = () => {
+    const interestDialog = document.getElementById("interest-dialog");
+    const interestList = document.getElementById("interest-list");
+    const interestElements = interestList.children;
+    const interestError = document.getElementById("interest-error");
+    interestError.innerHTML = ``;
+    interestDialog.classList.remove('open');
+    selectedInterests = {};
+    for (let j = 0; j < interestElements.length; j++) {
+        let i = interestElements[j];
+        let i_classes = i.classList;
+        
+        if (i_classes.length === 3) {
+            i.classList.remove("chosen");
+        }
+    }
 }
 
 // Activates dialog for logging out

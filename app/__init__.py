@@ -38,6 +38,36 @@ def create_app():
         migrate_001(db_path)
         migrate_002(db_path)
 
+    @app.cli.command('seed-interests')
+    def seed_interests():
+        """Add interests to the database"""
+        from app.models import Interest
+
+        interests = [
+            (0, "null"),
+            (1, 'Hiking'), 
+            (2, 'Photography'), 
+            (3, 'Travel'),
+            (4, 'Coffee'), 
+            (5, 'Coding'), 
+            (6, 'Gaming'),
+            (7, 'Music'), 
+            (8, 'Board Games'), 
+            (9, 'Film'),
+            (10, 'Reading'), 
+            (11, 'Running'), 
+            (12, 'Yoga'),
+            (13, 'Cooking'), 
+            (14, 'Art'), 
+            (15, 'Cinema')
+        ]
+
+        for id, name in interests:
+            i = Interest(id=id, name=name)
+            db.session.add(i)
+        db.session.commit()
+        click.echo('Interests added')
+
     @app.cli.command('seed-demo')
     def seed_demo():
         """Create demo users with multi-week events and two groups. password: password123"""
@@ -54,14 +84,14 @@ def create_app():
             return (base + timedelta(days=offsets[day_name])).strftime('%Y-%m-%d')
 
         demo_users = [
-            ('alice',   'alice@demo.com',   'password123'),
-            ('bob',     'bob@demo.com',     'password123'),
-            ('charlie', 'charlie@demo.com', 'password123'),
-            ('diana',   'diana@demo.com',   'password123'),
+            ('alice',   'alice@demo.com',   'password123', 'Into music production and board games.', 7, 8, 9),
+            ('bob',     'bob@demo.com',     'password123', 'Avid reader and occasional runner.', 10, 11, 12),
+            ('charlie', 'charlie@demo.com', 'password123', 'Foodie who enjoys trying new restaurants.', 13, 14, 15),
+            ('diana',   'diana@demo.com',   'password123', 'Loves hiking and photography on weekends.', 1, 2, 3),
         ]
-        for username, email, password in demo_users:
+        for username, email, password, bio, int_1, int_2, int_3 in demo_users:
             if not User.query.filter_by(username=username).first():
-                u = User(username=username, email=email)
+                u = User(username=username, email=email, bio=bio, interest_1=int_1, interest_2=int_2, interest_3=int_3)
                 u.set_password(password)
                 u.is_verified = True
                 db.session.add(u)
