@@ -352,7 +352,7 @@ def _friend_ids():
 def get_friends():
     id_map = _friend_ids()
     users = User.query.filter(User.id.in_(id_map.keys())).all()
-    return jsonify({'friends': [{'id': u.id, 'username': u.username, 'friendship_id': id_map[u.id]} for u in users]})
+    return jsonify({'friends': [{'id': u.id, 'username': u.username, 'avatar': u.avatar, 'bio': u.bio, 'int_1': u.interest_1, 'int_2': u.interest_2, 'int_3': u.interest_3, 'friendship_id': id_map[u.id]} for u in users]})
 
 @main.route('/api/friends/search', methods=['GET'])
 @login_required
