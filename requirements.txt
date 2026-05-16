@@ -5,3 +5,6 @@ pytest
 python-dotenv
 flask-mail
 flask-migrate
+icalendar
+recurring-ical-events
+requests

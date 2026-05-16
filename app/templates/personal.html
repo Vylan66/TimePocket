@@ -9,6 +9,7 @@
 <script src="{{ url_for('static', filename='js/mini_cal.js') }}"></script>
 <script src="{{ url_for('static', filename='js/timetable.js') }}"></script>
 <script src="{{ url_for('static', filename='js/personal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ical.js') }}"></script>
 {% endblock %}
 
 {% block main %}
@@ -52,6 +53,34 @@
             <span class="text-xs [color:var(--text-secondary)]">{{ label }}</span>
         </div>
         {% endfor %}
+    </div>
+
+    <!-- iCal Import Card -->
+    <div class="rounded-[20px] p-6 flex flex-col gap-3 [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+        <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-secondary)]">Import Calendar</p>
+
+        <!-- Connect form (shown when no feed is connected) -->
+        <div id="ical-connect-form">
+            <p class="text-xs [color:var(--text-muted)] mb-3">Paste your Google Calendar or other iCal link to sync events automatically.</p>
+            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">iCal URL</label>
+            <input id="ical-url-input" type="url" placeholder="webcal://…" class="tp-input mb-3" />
+            <button id="ical-connect-btn" class="btn-blue w-full px-3 py-1.5 text-xs">Connect</button>
+            <p id="ical-connect-error" class="text-xs mt-2 hidden" style="color:#ef4444;"></p>
+        </div>
+
+        <!-- Connected state (shown when a feed exists) -->
+        <div id="ical-connected-state" class="hidden flex-col gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+                <span class="text-xs font-medium" style="color: var(--text-primary);">Connected</span>
+            </div>
+            <p id="ical-last-synced" class="text-xs [color:var(--text-muted)]">Last synced: never</p>
+            <div class="flex gap-2 mt-1">
+                <button id="ical-sync-btn" class="btn-blue flex-1 px-3 py-1.5 text-xs">Refresh</button>
+                <button id="ical-disconnect-btn" class="flex-1 px-3 py-1.5 text-xs rounded-full border" style="border-color:#fca5a5; color:#ef4444; background:transparent;">Disconnect</button>
+            </div>
+            <p id="ical-sync-error" class="text-xs hidden" style="color:#ef4444;"></p>
+        </div>
     </div>
 </div>
 
