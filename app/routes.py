@@ -441,7 +441,9 @@ def get_user():
         'email': current_user.email,
         'avatar': current_user.avatar,
         'bio': current_user.bio,
-        'interests': [current_user.interest_1, current_user.interest_2, current_user.interest_3]
+        'interest_1': current_user.interest_1,
+        'interest_2': current_user.interest_2,
+        'interest_3': current_user.interest_3
     })
 
 @main.route('/api/user', methods=['PUT'])

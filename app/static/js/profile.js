@@ -1,10 +1,10 @@
 let user = {}; // {id, username, email, avatar, bio}
-let interests = []
+let interests = {}
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadUser();
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadInterests();
+    await loadUser();
     setupEvents();
-    loadInterests(); // put into setInterests when it is defined
 });
 
 const loadUser = async () => {
@@ -18,7 +18,7 @@ const loadUser = async () => {
     fillUsername(user);
     fillEmail(user);
     fillBio(user);
-    // setInterests(user);
+    setInterests(user);
     setAvatar(user);
     return user;
 }
@@ -29,7 +29,11 @@ const loadInterests = async () => {
         return;
     }
     const data = await result.json();
-    interests = data;
+    for (let i in data) {
+        const id = data[i]["id"];
+        const name = data[i]["name"];
+        interests[id] = name;
+    }
 }
 
 // Displays username
@@ -55,7 +59,31 @@ const fillBio = (user) => {
     }
 };
 
-// set interests
+// Displays the user's chosen interests
+const setInterests = (user) => {
+    const userInterests = [user["interest_1"], user["interest_2"], user["interest_3"]];
+    let allNull = true;
+    const location = document.getElementById("interests-container");
+    location.innerHTML = ``;
+
+    for (let int_n in userInterests) {
+        if (userInterests[int_n] != null) {
+            allNull = false;
+            location.appendChild(buildInterest(interests[userInterests[int_n]]));
+        }
+    }
+    if (allNull) {
+        location.innerHTML = `<p id="interest-placeholder" class="italic" style="color: var(--text-secondary)"> No interests selected... pick some below! </p>`
+    }
+}
+
+// Creates an interest label
+const buildInterest = (newInterest) => {
+    const newInt = document.createElement('div');
+    newInt.className = 'interest';
+    newInt.innerHTML = `${newInterest}`;
+    return newInt;
+}
 
 // Displays the user's chosen avatar
 const setAvatar = (user) => {

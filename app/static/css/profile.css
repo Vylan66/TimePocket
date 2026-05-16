@@ -22,3 +22,7 @@
 .avatar-option.chosen {
     border-color: var(--blue) !important;
 }
+
+.interest {
+    background-color: var(--bg-hover);
+}
