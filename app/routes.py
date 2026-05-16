@@ -4,7 +4,8 @@ from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
-from app.models import Availability, User, Group, GroupMember, Friendship
+from app.models import Availability, User, Group, GroupMember, Friendship, ICalFeed
+from app.ical_sync import sync_feed
 
 main = Blueprint('main', __name__)
 
@@ -476,3 +477,73 @@ def update_bio():
     current_user.bio = bio
     db.session.commit()
     return jsonify({'success': True, 'message': 'Bio updated!'})
+
+# iCal feed routes
+@main.route('/api/ical', methods=['GET'])
+@login_required
+def get_ical():
+    feed = ICalFeed.query.filter_by(user_id=current_user.id).first()
+    if not feed:
+        return jsonify({'feed': None})
+    return jsonify({'feed': {
+        'id':          feed.id,
+        'url':         feed.url,
+        'last_synced': feed.last_synced.isoformat() if feed.last_synced else None,
+        'is_active':   feed.is_active,
+    }})
+
+@main.route('/api/ical', methods=['POST'])
+@login_required
+def save_ical():
+    data = request.get_json()
+    url  = (data.get('url') or '').strip()
+    if not url:
+        return jsonify({'error': 'URL required'}), 400
+
+    feed = ICalFeed.query.filter_by(user_id=current_user.id).first()
+    if feed:
+        feed.url       = url
+        feed.is_active = True
+    else:
+        feed = ICalFeed(user_id=current_user.id, url=url)
+        db.session.add(feed)
+    db.session.flush()
+    db.session.commit()
+
+    count, err = sync_feed(feed.id)
+    if err:
+        return jsonify({'error': err}), 400
+
+    return jsonify({
+        'message': f'Calendar connected! {count} events imported.',
+        'feed': {
+            'id':          feed.id,
+            'url':         feed.url,
+            'last_synced': feed.last_synced.isoformat() if feed.last_synced else None,
+        },
+    })
+
+@main.route('/api/ical/sync', methods=['POST'])
+@login_required
+def sync_ical():
+    feed = ICalFeed.query.filter_by(user_id=current_user.id, is_active=True).first()
+    if not feed:
+        return jsonify({'error': 'No active calendar connected'}), 404
+    count, err = sync_feed(feed.id)
+    if err:
+        return jsonify({'error': err}), 400
+    return jsonify({
+        'message':     f'Synced! {count} events updated.',
+        'last_synced': feed.last_synced.isoformat(),
+    })
+
+@main.route('/api/ical', methods=['DELETE'])
+@login_required
+def delete_ical():
+    feed = ICalFeed.query.filter_by(user_id=current_user.id).first()
+    if not feed:
+        return jsonify({'error': 'No calendar connected'}), 404
+    Availability.query.filter_by(user_id=current_user.id, ical_feed_id=feed.id).delete()
+    db.session.delete(feed)
+    db.session.commit()
+    return jsonify({'message': 'Calendar disconnected and imported events removed.'})

@@ -29,6 +29,15 @@ class User(UserMixin, db.Model):
         self.verification_token = secrets.token_urlsafe(32)
         return self.verification_token
 
+class ICalFeed(db.Model):
+    __tablename__ = 'ical_feed'
+    id          = db.Column(db.Integer, primary_key=True)
+    user_id     = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
+    url         = db.Column(db.Text, nullable=False)
+    last_synced = db.Column(db.DateTime, nullable=True)
+    is_active   = db.Column(db.Boolean, default=True)
+    user        = db.relationship('User', backref=db.backref('ical_feed', uselist=False))
+
 class Availability(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
     user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -42,6 +51,8 @@ class Availability(db.Model):
     recurrence_end = db.Column(db.String(10), nullable=True)
     recurrence_group_id = db.Column(db.String(36), nullable=True)
     recurrence          = db.Column(db.String(20), nullable=True)
+    ical_uid     = db.Column(db.String(500), nullable=True)
+    ical_feed_id = db.Column(db.Integer, db.ForeignKey('ical_feed.id'), nullable=True)
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
