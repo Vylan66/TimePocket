@@ -1,6 +1,6 @@
 import uuid
 from flask import Blueprint, render_template, jsonify, request
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
@@ -477,6 +477,14 @@ def update_bio():
     current_user.bio = bio
     db.session.commit()
     return jsonify({'success': True, 'message': 'Bio updated!'})
+
+@main.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return
+
+# iCal feed routes
 
 # iCal feed routes
 @main.route('/api/ical', methods=['GET'])

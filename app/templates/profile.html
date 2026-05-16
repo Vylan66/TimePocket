@@ -48,6 +48,7 @@
             </div>
         </div>
         <div id="account-modifications" class="flex gap-2 flex-wrap justify-center md:justify-start">
+            <button id="logout-button" class="text-sm btn-blue"> Logout </button>
             <button id="change-username"class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Username </button>
             <button id="change-email" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Email </button>
             <button id="update-bio" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Update Bio </button>
@@ -154,6 +155,19 @@
             <button id="password-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
             <button id="password-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
         </div>
+    </div>
+ </div>
+
+<!-- LOGOUT DIALOG -->
+ <div id="logout-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="logout-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Logout? </p>
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="logout-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="logout-save" class="btn-blue px-4 py-2 text-sm"> Logout </button>
+        </div>
+
     </div>
  </div>
 
