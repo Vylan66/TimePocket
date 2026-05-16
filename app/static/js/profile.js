@@ -60,6 +60,29 @@ const setupEvents = () => {
     document.getElementById("change-email").onclick = () => showEmailDialog();
     document.getElementById("change-username").onclick = () => showUsernameDialog();
     document.getElementById("change-password").onclick = () => showPasswordDialog();
+    document.getElementById("logout-button").onclick = () => showLogoutDialog();
+}
+
+// Activates dialog for logging out
+const showLogoutDialog = () => {
+    const logoutDialog = document.getElementById("logout-dialog");
+    logoutDialog.classList.add('open');
+
+    document.getElementById("logout-save").onclick = () => confirmLogout();
+
+    document.getElementById("logout-close").onclick = () => hideLogoutDialog();
+    document.getElementById("logout-exit").onclick = () => hideLogoutDialog();
+}
+
+// Closes password dialog
+const hideLogoutDialog = () => {
+    const logoutDialog = document.getElementById("logout-dialog");
+    logoutDialog.classList.remove('open');
+}
+
+// Logs out user
+const confirmLogout = () => {
+    window.location.href = '/logout';
 }
 
 // Activates dialog for changing password
