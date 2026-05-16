@@ -13,8 +13,8 @@
 {% endblock %}
 
 {% block main %}
-<div class="w-full md:w-68 shrink-0 flex flex-row md:flex-col gap-4 p-4 overflow-y-auto">
-    <div class="cal-widget rounded-[20px] flex-1 md:flex-none">
+<div class="w-full md:w-68 shrink-0 flex flex-col sm:flex-row md:flex-col gap-4 p-4 md:pr-2 overflow-y-auto styled-scroll">
+    <div class="cal-widget rounded-[20px] sm:flex-1 sm:self-stretch md:flex-none">
         <div class="cal-header">
             <button class="btn-icon text-base leading-none" id="prevBtn">&#8249;</button>
             <div class="cal-title" id="calTitle">
@@ -37,55 +37,64 @@
         <div class="cal-grid" id="calGrid"></div>
     </div>
     
-    <div class="flex-1 md:h-full rounded-[20px] p-6 flex flex-col gap-2 [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
-        <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-secondary)]">Categories</p>
-        {% set categories = [
-            ('Work',     '#f68383'),
-            ('Health',   '#f2a061'),
-            ('Personal', '#d6bf6c'),
-            ('Finance',  '#5bbb81'),
-            ('Studies',  '#5e99f0'),
-            ('Social',   '#a729d0'),
-        ] %}
-        {% for label, colour in categories %}
-        <div class="flex items-center gap-2 px-1 py-1">
-            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:{{ colour }};"></span>
-            <span class="text-xs [color:var(--text-secondary)]">{{ label }}</span>
-        </div>
-        {% endfor %}
-    </div>
+    <!-- Categories + iCal wrapper -->
+    <div class="flex flex-row sm:flex-col sm:flex-1 gap-4">
 
-    <!-- iCal Import Card -->
-    <div class="rounded-[20px] p-6 flex flex-col gap-3 [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
-        <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-secondary)]">Import Calendar</p>
-
-        <!-- Connect form (shown when no feed is connected) -->
-        <div id="ical-connect-form">
-            <p class="text-xs [color:var(--text-muted)] mb-3">Paste your Google Calendar or other iCal link to sync events automatically.</p>
-            <label class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);">iCal URL</label>
-            <input id="ical-url-input" type="url" placeholder="webcal://…" class="tp-input mb-3" />
-            <button id="ical-connect-btn" class="btn-blue w-full px-3 py-1.5 text-xs">Connect</button>
-            <p id="ical-connect-error" class="text-xs mt-2 hidden" style="color:#ef4444;"></p>
+        <!-- Categories -->
+        <div class="shrink-0 rounded-[20px] p-4 flex flex-col gap-2 [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+            <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-secondary)]">Categories</p>
+            {% set categories = [
+                ('Work',     '#f68383'),
+                ('Health',   '#f2a061'),
+                ('Personal', '#d6bf6c'),
+                ('Finance',  '#5bbb81'),
+                ('Studies',  '#5e99f0'),
+                ('Social',   '#a729d0'),
+            ] %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-1">
+                {% for label, colour in categories %}
+                <div class="flex items-center gap-2 px-1 py-1">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:{{ colour }};"></span>
+                    <span class="text-xs [color:var(--text-secondary)]">{{ label }}</span>
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
-        <!-- Connected state (shown when a feed exists) -->
-        <div id="ical-connected-state" class="hidden flex-col gap-2">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
-                <span class="text-xs font-medium" style="color: var(--text-primary);">Connected</span>
+        <!-- iCal Import Card -->
+        <div class="flex-1 rounded-[20px] p-4 flex flex-col gap-3 [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+            <p class="text-[13px] font-bold tracking-widest text-center [color:var(--text-secondary)]">Import Calendar</p>
+
+            <!-- Connect form (shown when no feed is connected) -->
+            <div id="ical-connect-form" class="flex-1 flex flex-col">
+                <p class="text-xs [color:var(--text-muted)]">Insert your Google Calendar or other iCal link to sync events automatically.</p>
+                <div class="mt-auto flex flex-col gap-2">
+                    <label class="block text-xs tracking-widest" style="color: var(--text-secondary);">iCal URL</label>
+                    <input id="ical-url-input" type="url" placeholder="webcal://…" class="tp-input" />
+                    <button id="ical-connect-btn" class="btn-blue w-full px-3 py-1.5 text-xs">Connect</button>
+                    <p id="ical-connect-error" class="text-xs hidden" style="color:#ef4444;"></p>
+                </div>
             </div>
-            <p id="ical-last-synced" class="text-xs [color:var(--text-muted)]">Last synced: never</p>
-            <div class="flex gap-2 mt-1">
-                <button id="ical-sync-btn" class="btn-blue flex-1 px-3 py-1.5 text-xs">Refresh</button>
-                <button id="ical-disconnect-btn" class="flex-1 px-3 py-1.5 text-xs rounded-full border" style="border-color:#fca5a5; color:#ef4444; background:transparent;">Disconnect</button>
+
+            <!-- Connected state (shown when a feed exists) -->
+            <div id="ical-connected-state" class="hidden flex-col gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+                    <span class="text-xs font-medium" style="color: var(--text-primary);">Connected</span>
+                </div>
+                <p id="ical-last-synced" class="text-xs [color:var(--text-muted)]">Last synced: never</p>
+                <div class="flex gap-2 mt-1">
+                    <button id="ical-sync-btn" class="btn-blue flex-1 px-3 py-1.5 text-xs">Refresh</button>
+                    <button id="ical-disconnect-btn" class="flex-1 px-3 py-1.5 text-xs rounded-full border" style="border-color:#fca5a5; color:#ef4444; background:transparent;">Disconnect</button>
+                </div>
+                <p id="ical-sync-error" class="text-xs hidden" style="color:#ef4444;"></p>
             </div>
-            <p id="ical-sync-error" class="text-xs hidden" style="color:#ef4444;"></p>
         </div>
     </div>
 </div>
 
 <!-- Right Column: Timetable -->
-<div class="flex-1 min-h-0 flex gap-4 p-4 pt-0 md:p-4 md:pl-0">
+<div class="flex-1 min-h-0 flex gap-4 p-4 pt-0 md:p-4 md:pl-2">
     <div class="h-full w-full rounded-[20px] flex flex-col overflow-hidden [background:var(--bg-page-surface)] border [border-color:var(--border-darker)]" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
 
         <!-- Toolbar -->

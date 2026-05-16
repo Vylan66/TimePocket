@@ -141,3 +141,21 @@ html.dark .cal-widget .picker-select option {
 .cal-widget .cal-day.other-month { color: var(--text-muted); }
 .cal-widget .cal-day.today       { background: var(--blue); color: #fff; font-weight: 500; }
 .cal-widget .cal-day.selected    { background: var(--blue-ring); color: var(--blue); font-weight: 500; }
+
+/* sm–md only: extend widget to fill row height, distribute grid rows evenly */
+@media (min-width: 640px) and (max-width: 767px) {
+    .cal-widget {
+        display: flex;
+        flex-direction: column;
+    }
+    .cal-widget .cal-grid {
+        flex: 1;
+        align-content: space-evenly;
+    }
+    .cal-widget .cal-day {
+        place-self: center;
+    }
+    .cal-widget .cal-day-label {
+        align-self: center;
+    }
+}
