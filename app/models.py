@@ -15,6 +15,9 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     avatar = db.Column(db.String(20), default='avatar_1')
     bio = db.Column(db.String(200), nullable=True)
+    interest_1 = db.Column(db.Integer, nullable=True)
+    interest_2 = db.Column(db.Integer, nullable=True)
+    interest_3 = db.Column(db.Integer, nullable=True)
     is_verified = db.Column(db.Boolean, default=False)
     verification_token = db.Column(db.String(100), nullable=True)
     availability = db.relationship('Availability', backref='user', lazy=True)
@@ -77,3 +80,7 @@ class Friendship(db.Model):
     requester = db.relationship('User', foreign_keys=[requester_id], backref=db.backref('sent_requests', lazy=True))
     receiver = db.relationship('User', foreign_keys=[receiver_id], backref=db.backref('received_requests', lazy=True))
     __table_args__ = (db.UniqueConstraint('requester_id', 'receiver_id', name='uq_friendship'),)
+
+class Interest(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(20), nullable = False)
