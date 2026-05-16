@@ -440,7 +440,7 @@ def get_user():
         'username': current_user.username,
         'email': current_user.email,
         'avatar': current_user.avatar,
-        'bio': current_user.bio,
+        'bio': current_user.bio or '',
         'interest_1': current_user.interest_1,
         'interest_2': current_user.interest_2,
         'interest_3': current_user.interest_3
