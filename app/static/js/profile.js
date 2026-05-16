@@ -1,5 +1,6 @@
 let user = {}; // {id, username, email, avatar, bio}
-let interests = {}
+let interests = {}; // each entry in the form 1:"Photography"
+let selectedInterests = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadInterests();
@@ -33,6 +34,19 @@ const loadInterests = async () => {
         const id = data[i]["id"];
         const name = data[i]["name"];
         interests[id] = name;
+    }
+
+    const interestList = document.getElementById("interest-list");
+    let n = 0;
+    for (let i in interests) {
+        let interestLabel = buildInterest(interests[i], 1);
+        interestLabel.id = `interest_${n}`;
+        interestList.appendChild(interestLabel);
+        interestLabel.onclick = () => {
+            let result = toggleInterestList(i);
+            if (result === 1) interestLabel.classList.toggle("chosen");
+        }
+        n++;
     }
 }
 
@@ -69,7 +83,7 @@ const setInterests = (user) => {
     for (let int_n in userInterests) {
         if (userInterests[int_n] != null) {
             allNull = false;
-            location.appendChild(buildInterest(interests[userInterests[int_n]]));
+            location.appendChild(buildInterest(interests[userInterests[int_n]], 0));
         }
     }
     if (allNull) {
@@ -78,11 +92,18 @@ const setInterests = (user) => {
 }
 
 // Creates an interest label
-const buildInterest = (newInterest) => {
+const buildInterest = (newInterest, type) => { // type=0: on profile, type=1: selection menu
     const newInt = document.createElement('div');
-    newInt.className = 'interest';
-    newInt.innerHTML = `${newInterest}`;
-    return newInt;
+    if (type === 0) {
+        newInt.className = 'interest';
+        newInt.innerHTML = `${newInterest}`;
+        return newInt;
+    }
+    else {
+        newInt.className = 'interest selectable';
+        newInt.innerHTML = `${newInterest}`;
+        return newInt;
+    }
 }
 
 // Displays the user's chosen avatar
@@ -100,6 +121,58 @@ const setupEvents = () => {
     document.getElementById("change-username").onclick = () => showUsernameDialog();
     document.getElementById("change-password").onclick = () => showPasswordDialog();
     document.getElementById("logout-button").onclick = () => showLogoutDialog();
+    document.getElementById("update-interests").onclick = () => showInterestsDialog();
+}
+
+// Activates dialog for choosing interests
+const showInterestsDialog = () => {
+    const interestDialog = document.getElementById("interest-dialog");
+    interestDialog.classList.add('open');
+
+    const interestList = document.getElementById("interest-list");
+
+    document.getElementById("interest-save").onclick = () => saveInterestChanges();
+
+    document.getElementById("interest-close").onclick = () => hideInterestDialog();
+    document.getElementById("interest-exit").onclick = () => hideInterestDialog();
+}
+
+const toggleInterestList = (num) => {
+    let clickedIn = (num in selectedInterests);
+
+    if (clickedIn) {
+        delete selectedInterests[num];
+        return 1;
+    }
+    else if (Object.keys(selectedInterests).length < 3) {
+        selectedInterests[num] = interests[num];
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+// Saves changes made to user interests
+const saveInterestChanges = async () => {
+    
+}
+
+// Closes interests dialog
+const hideInterestDialog = () => {
+    const interestDialog = document.getElementById("interest-dialog");
+    const interestList = document.getElementById("interest-list");
+    const interestElements = interestList.children;
+    interestDialog.classList.remove('open');
+    selectedInterests = {};
+    for (let j = 0; j < interestElements.length; j++) {
+        let i = interestElements[j];
+        let i_classes = i.classList;
+        
+        if (i_classes.length === 3) {
+            i.classList.remove("chosen");
+        }
+    }
 }
 
 // Activates dialog for logging out
