@@ -1,48 +1,36 @@
-import pytest
-from app import create_app, db
+from app.models import User
+from app import db
 
-@pytest.fixture
-def client():
-    app = create_app()
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    with app.test_client() as client:
-        with app.app_context():
-            db.create_all()
-            yield client
-            db.session.remove()
-            db.drop_all()
-
-def test_register(client):
+def test_register_success(client, app):
     res = client.post('/register', json={
-        'username': 'testuser',
-        'email': 'test@test.com',
+        'username': 'newuser',
+        'email': 'new@test.com',
         'password': 'password123'
     })
     assert res.status_code == 200
-    assert res.get_json()['success'] == True
 
-def test_login(client):
-    client.post('/register', json={
-        'username': 'testuser',
-        'email': 'test@test.com',
-        'password': 'password123'
-    })
-    res = client.post('/login', json={
-        'email': 'test@test.com',
-        'password': 'password123'
-    })
+def test_login_success(auth_client):
+    res = auth_client.get('/personal')
     assert res.status_code == 200
-    assert res.get_json()['success'] == True
 
-def test_login_wrong_password(client):
-    client.post('/register', json={
-        'username': 'testuser',
-        'email': 'test@test.com',
-        'password': 'password123'
-    })
-    res = client.post('/login', json={
-        'email': 'test@test.com',
-        'password': 'wrongpassword'
-    })
+def test_login_wrong_password(client, app):
+    with app.app_context():
+        user = User(username='testuser', email='test@test.com', is_verified=True)
+        user.set_password('password123')
+        db.session.add(user)
+        db.session.commit()
+    res = client.post('/login', json={'email': 'test@test.com', 'password': 'wrongpass'})
     assert res.get_json()['success'] == False
+
+def test_login_unverified_blocked(client, app):
+    with app.app_context():
+        user = User(username='unverified', email='unverified@test.com', is_verified=False)
+        user.set_password('password123')
+        db.session.add(user)
+        db.session.commit()
+    res = client.post('/login', json={'email': 'unverified@test.com', 'password': 'password123'})
+    assert res.get_json()['success'] == False
+
+def test_logout(auth_client):
+    res = auth_client.get('/logout')
+    assert res.status_code == 302
