@@ -486,6 +486,7 @@ def logout():
 
 # iCal feed routes
 
+# iCal feed routes
 @main.route('/api/ical', methods=['GET'])
 @login_required
 def get_ical():
