@@ -427,7 +427,8 @@ def get_user():
         'id': current_user.id,
         'username': current_user.username,
         'email': current_user.email,
-        'avatar': current_user.avatar
+        'avatar': current_user.avatar,
+        'bio': current_user.bio
     })
 
 @main.route('/api/user', methods=['PUT'])
@@ -464,8 +465,20 @@ def update_avatar():
     db.session.commit()
     return jsonify({'success': True, 'message': 'Avatar updated!'})
 
-# iCal feed routes
+@main.route('/api/user/bio', methods=['PUT'])
+@login_required
+def update_bio():
+    data = request.get_json()
+    bio = data.get('bio')
+    if not bio:
+        return jsonify({'success': False, 'message': 'Bio required.'}), 400
+    if len(bio) > 200:
+        return jsonify({'success': False, 'message': 'Bio must be 200 characters or less.'})
+    current_user.bio = bio
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Bio updated!'})
 
+# iCal feed routes
 @main.route('/api/ical', methods=['GET'])
 @login_required
 def get_ical():

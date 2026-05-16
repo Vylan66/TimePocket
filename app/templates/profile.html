@@ -1,35 +1,44 @@
 {% extends "base.html" %}
 
-{% block css %} {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}"></link>
+{% endblock %}
 
-{% block script %} {% endblock %}
+{% block script %} 
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}
 
 {% block main %}
 <!-- SETTINGS WINDOW -->
 <div id="settings-window" class="grow m-4 p-4 rounded-3xl flex md:flex-row flex-col content-center" style="background: var(--bg-page-surface); color: var(--primary-text-colour);">
     <div id="profile-picture-container" class="flex flex-col justify-center items-center shrink-0 p-4">
         <div id="profile-picture" class="rounded-full md:size-64 size-48 border-4" style="border-color: var(--border-light);">
-
         </div>
         <button id="btn-change-avatar" class="btn-blue m-2">Change Avatar</button>
     </div>
     <div id="user-info" class="grow flex flex-col gap-2 md:justify-center p-4">
-        <div id="username">
+        <div name="username">
             <p class="text-xl"> Username:</p>
             <div class="border-2 rounded-[20px] flex items-center p-3" style="border-color: var(--border-darker);">
-                <p> example </p>
+                <span id="username-display">
+                    <p class="italic" style="color: var(--text-secondary)"> username </p>
+                </span>
             </div>
         </div>
-        <div id="email">
+        <div name="email">
             <p class="text-xl"> Email: </p>
             <div class="border-2 rounded-[20px] flex items-center p-3" style="border-color: var(--border-darker);"> 
-                <p> example@example.com </p>
+                <span id="user-email">
+                    <p class="italic" style="color: var(--text-secondary)"> email </p>
+                </span>
             </div>
         </div>
-        <div id="user-bio">
+        <div name="bio">
             <p class="text-xl"> Bio: </p>
             <div class="border-2 rounded-[20px] flex items-center p-3" style="border-color: var(--border-darker);"> 
-                <p> This is an example! </p>
+                <span id="user-bio">
+                    <p class="italic" style="color: var(--text-secondary)"> No bio... Create one with the button below! </p>
+                </span>
             </div>
         </div>
         <div id="user-interests">
@@ -39,32 +48,121 @@
             </div>
         </div>
         <div id="account-modifications" class="flex gap-2 flex-wrap justify-center md:justify-start">
-            <button class="text-sm p-2 shrink-0 rounded-full border change-btn"> Update bio </button>
-            <button class="text-sm p-2 shrink-0 rounded-full border change-btn"> Choose Interests </button>
-            <button class="text-sm p-2 shrink-0 rounded-full border change-btn"> Change password </button>
-            <button class="text-sm p-2 shrink-0 rounded-full border change-btn"> Change email </button>
+            <button id="change-username"class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Username </button>
+            <button id="change-email" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Email </button>
+            <button id="update-bio" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Update Bio </button>
+            <button id="update-interests" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Choose Interests </button>
+            <button id="change-password" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Change Password </button>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
+<!-- CHANGE AVATAR DIALOG -->
+ <div id="avatar-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="avatar-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Change Your Avatar </p>
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> Click the avatar that you would like to use. </p>
+        
+        <div id="avatar-list" class="flex flex-wrap justify-evenly gap-6 my-2">
+            <div id="av-1" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_1</div>
+            <div id="av-2" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_2</div>
+            <div id="av-3" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_3</div>
+            <div id="av-4" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_4</div>
+            <div id="av-5" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_5</div>
+            <div id="av-6" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_6</div>
+        </div>
+
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="avatar-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="avatar-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+    </div>
+ </div>
+
+<!-- UPDATE BIO DIALOG -->
+ <div id="bio-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="bio-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Update Your Bio </p>
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> Share a little information about you to your friends! (Max 200 characters) </p>
+
+        <p id="bio-error" class="text-xs italic text-red-500"></p>
+        <textarea id="bio-input-field" class="tp-input h-[12rem]" style="resize: none;" maxlength="200" placeholder="Write your bio here!"></textarea>
+        <p class="text-xs italic" style="color: var(--text-secondary)"><span id="bio-char-count"></span> of 200 characters used</p>
+    
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="bio-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="bio-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+    </div>
+ </div>
+
+<!-- CHANGE EMAIL DIALOG -->
+ <div id="email-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="email-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Change Your Email </p>
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> New email: </p>
+        
+        <p id="email-error" class="text-xs italic text-red-500"></p>
+        <input id="email-input-field" class="tp-input mb-2" type="email" placeholder="email@example.com">
+
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="email-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="email-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+
+    </div>
+ </div>
+
+<!-- CHANGE USERNAME DIALOG -->
+ <div id="username-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="username-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Change Your Username </p>
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> New username: </p>
+        
+        <p id="username-error" class="text-xs italic text-red-500"></p>
+        <input id="username-input-field" class="tp-input mb-2" placeholder="Username">
+
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="username-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="username-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+
+    </div>
+ </div>
+
+<!-- CHANGE PASSWORD DIALOG -->
+ <div id="password-dialog" class="auth-overlay">
+    <div class="auth-box relative p-[1.75rem] max-w-[460px]">
+        <button id="password-exit" class="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none cursor-pointer" style="background: var(--bg-input); color: var(--text-secondary);">&times;</button>
+        <p class="text-lg font-semibold mb-4" style="color: var(--primary-text-colour);"> Change Your Password </p>
+        
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> Old password: </p>
+        <p id="password-old-error" class="text-xs italic text-red-500"></p>
+        <input type="password" id="password-old-input-field" class="tp-input mb-2" placeholder="Old Password">
+
+        <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> New password: </p>
+        <p id="password-new-error" class="text-xs italic text-red-500"></p>
+        <input type="password" id="password-new-input-field" class="tp-input mb-2" placeholder="New Password">
+
+        <div name="buttons" class="flex justify-end gap-2">
+            <button id="password-close" class="text-sm px-4 py-2 shrink-0 rounded-full border change-btn"> Close </button>
+            <button id="password-save" class="btn-blue px-4 py-2 text-sm"> Save </button>
+        </div>
+    </div>
+ </div>
+
+<!-- UPDATE INTERESTS DIALOG -->
+ <div id="interests-dialog" class="auth-overlay">
+
+ </div>
+
 <style>
-    .interest {
-        padding: 0.5rem;
-        padding-inline: 1rem;
-        border-radius: 3rem;
-        font-size: 0.75rem;
-    }
 
-    .change-btn {
-        border-color: var(--border-darker);
-        color: var(--text-secondary);
-        transition: background 0.15s;
-    }
-
-    .change-btn:hover {
-        background-color: var(--bg-hover);
-    }
 </style>
 {% endblock %}
