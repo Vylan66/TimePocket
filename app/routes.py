@@ -427,6 +427,7 @@ def get_user():
         'id': current_user.id,
         'username': current_user.username,
         'email': current_user.email,
+        'bio': current_user.bio or '',
         'avatar': current_user.avatar,
         'bio': current_user.bio
     })
