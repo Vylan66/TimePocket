@@ -4,7 +4,7 @@ from flask_login import login_required, current_user, logout_user
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
-from app.models import Availability, User, Group, GroupMember, Friendship, ICalFeed
+from app.models import Availability, User, Group, GroupMember, Friendship, ICalFeed, Interest
 from app.ical_sync import sync_feed
 
 main = Blueprint('main', __name__)
@@ -420,6 +420,18 @@ def remove_friend(friendship_id):
 
 # Profile API routes
 
+@main.route('/api/interests', methods=['GET'])
+@login_required
+def get_interests():
+    interests = Interest.query.all()
+    result = []
+    for i in interests:
+        result.append({
+            "id": i.id,
+            "name": i.name,
+        })
+    return jsonify(result)
+
 @main.route('/api/user', methods=['GET'])
 @login_required
 def get_user():
@@ -428,7 +440,8 @@ def get_user():
         'username': current_user.username,
         'email': current_user.email,
         'avatar': current_user.avatar,
-        'bio': current_user.bio
+        'bio': current_user.bio,
+        'interests': [current_user.interest_1, current_user.interest_2, current_user.interest_3]
     })
 
 @main.route('/api/user', methods=['PUT'])
@@ -483,8 +496,6 @@ def update_bio():
 def logout():
     logout_user()
     return
-
-# iCal feed routes
 
 # iCal feed routes
 @main.route('/api/ical', methods=['GET'])

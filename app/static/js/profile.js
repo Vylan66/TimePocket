@@ -1,8 +1,10 @@
 let user = {}; // {id, username, email, avatar, bio}
+let interests = []
 
 document.addEventListener("DOMContentLoaded", () => {
     loadUser();
     setupEvents();
+    loadInterests(); // put into setInterests when it is defined
 });
 
 const loadUser = async () => {
@@ -19,6 +21,15 @@ const loadUser = async () => {
     // setInterests(user);
     setAvatar(user);
     return user;
+}
+
+const loadInterests = async () => {
+    const result = await fetch('/api/interests')
+    if (!result.ok) {
+        return;
+    }
+    const data = await result.json();
+    interests = data;
 }
 
 // Displays username
