@@ -1,4 +1,4 @@
-let user = {}; // {id, username, email, avatar, bio}
+let user = {}; // {id, username, email, avatar, bio, interest_1, interest_2, interest_3}
 let interests = {}; // each entry in the form 1:"Photography"
 let selectedInterests = {};
 
@@ -39,6 +39,10 @@ const loadInterests = async () => {
     const interestList = document.getElementById("interest-list");
     let n = 0;
     for (let i in interests) {
+        if (n === 0) {
+            n++;
+            continue;
+        }
         let interestLabel = buildInterest(interests[i], 1);
         interestLabel.id = `interest_${n}`;
         interestList.appendChild(interestLabel);
@@ -81,7 +85,7 @@ const setInterests = (user) => {
     location.innerHTML = ``;
 
     for (let int_n in userInterests) {
-        if (userInterests[int_n] != null) {
+        if (userInterests[int_n] != "null") {
             allNull = false;
             location.appendChild(buildInterest(interests[userInterests[int_n]], 0));
         }
@@ -155,7 +159,41 @@ const toggleInterestList = (num) => {
 
 // Saves changes made to user interests
 const saveInterestChanges = async () => {
+    let selectedKeys = Object.keys(selectedInterests);
+    let selectedLength = selectedKeys.length;
+    if (selectedLength === 0) {
+        const interestError = document.getElementById("interest-error");
+        interestError.innerHTML = `Please select at least one interest.`
+        return;
+    }
+    else if (selectedLength < 3) {
+        for (; selectedLength < 3; selectedLength++) {
+            selectedKeys.push("0");
+        }
+    }
+    let message = {};
+    let n = 1;
+    for (let i in selectedKeys) {
+        let colName = "int_" + n;
+        if (selectedKeys[i] === "0") {
+            message[colName] = "null";
+        }
+        else {
+            message[colName] = Number(selectedKeys[i]);
+        }
+        n++;
+    }
     
+    await fetch(`/api/user/interests`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "int_1": message["int_1"], "int_2": message["int_2"], "int_3": message["int_3"] })
+    });
+    user["interest_1"] = message["int_1"];
+    user["interest_2"] = message["int_2"];
+    user["interest_3"] = message["int_3"];
+    hideInterestDialog();
+    setInterests(user);
 }
 
 // Closes interests dialog
@@ -163,6 +201,8 @@ const hideInterestDialog = () => {
     const interestDialog = document.getElementById("interest-dialog");
     const interestList = document.getElementById("interest-list");
     const interestElements = interestList.children;
+    const interestError = document.getElementById("interest-error");
+    interestError.innerHTML = ``;
     interestDialog.classList.remove('open');
     selectedInterests = {};
     for (let j = 0; j < interestElements.length; j++) {

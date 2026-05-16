@@ -44,6 +44,7 @@ def create_app():
         from app.models import Interest
 
         interests = [
+            (0, "null"),
             (1, 'Hiking'), 
             (2, 'Photography'), 
             (3, 'Travel'),
