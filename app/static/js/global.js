@@ -35,9 +35,6 @@ document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
 // Navbar
 function openPage(pageRequested) {
-    if (pageRequested === "dashboard") {
-        window.location.href = '/dashboard';
-    }
     if (pageRequested === "personal") {
         window.location.href = '/personal';
     }
@@ -53,7 +50,6 @@ function openPage(pageRequested) {
 }
 
 const navLinks = {
-    'dash-link': 'dashboard',
     'personal-timetable-link': 'personal',
     'groups-link': 'group',
     'profile-link': 'profile',
@@ -65,7 +61,6 @@ Object.entries(navLinks).forEach(([id, page]) => {
 
 // Highlight active nav tab
 const pathMap = {
-    '/dashboard': 'dash-link',
     '/personal':  'personal-timetable-link',
     '/group':     'groups-link',
     '/friends':   'friends-link',
@@ -128,7 +123,6 @@ function showToast(msg, isError = false) {
 
 // Mobile nav item clicks + active state
 const mobilePageMap = {
-    '/dashboard': 'dashboard',
     '/personal':  'personal',
     '/group':     'group',
     '/friends':   'friends',
