@@ -8,9 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='assets/icon-timepocket.png') }}">
+    <style>
+        html.dark  .slide-img-light { display: none; }
+        html.dark  .slide-img-dark  { display: block; }
+        html:not(.dark) .slide-img-dark  { display: none; }
+        html:not(.dark) .slide-img-light { display: block; }
+    </style>
 </head>
 
-<body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page-surface); color: var(--primary-text-colour); transition: background 0.3s, color 0.3s;">
+<body class="min-h-screen flex flex-col overflow-auto font-mono" style="background: var(--bg-page-surface); color: var(--primary-text-colour); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
         <div class="flex items-center gap-2">
@@ -42,7 +48,7 @@
     </nav>
 
     <!-- MAIN -->
-    <main class="flex flex-col md:flex-row flex-1 md:overflow-hidden">
+    <main class="flex flex-col md:flex-row flex-1">
         <!-- Left Column -->
         <div class="w-full md:flex-1 flex items-center justify-center p-10">
             <div class="w-full max-w-sm h-[480px] md:h-full md:max-h-[520px] flex flex-col justify-center p-8">
@@ -53,12 +59,39 @@
             </div>
         </div>
         <!-- Right Column -->
-        <div class="w-full md:flex-1 flex flex-col items-center justify-center p-20">
-            <div class="px-10 py-3 w-full max-w-lg md:max-w-2xl text-center">
+        <div class="w-full md:flex-1 flex flex-col items-center justify-center px-15 pt-0 pb-20 md:py-8 md:pr-20">
+            <div class="py-2 w-full text-center">
                 <h2>How it works:</h2>
             </div>
-            <div class="w-full max-w-lg md:max-w-2xl h-[320px] md:flex-1 md:max-h-[340px] rounded-3xl border-2 [border-color:var(--border-darker)] flex items-center justify-center">
-                <p class="text-sm [color:var(--text-ui)]">slideshow</p>
+            <div class="w-full min-h-[250px] flex-1 max-h-[353px] rounded-3xl border-2 [border-color:var(--border-darker)] relative overflow-hidden">
+
+                {% set slides = [
+                    ('assets/light_1_personal_.png', 'assets/dark_1_personal.png', 'Your personal calendar'),
+                    ('assets/light_2_friends_.png',  'assets/dark_2_friends.png',  'Add Friends'),
+                    ('assets/light_3_groups_.png',   'assets/dark_3_group.png',    'Create groups & view heatmap'),
+                    ('assets/light_4_iCal_.png',     'assets/dark_4_iCal.png',     'Link your calendar with iCal'),
+                ] %}
+                {% for light_src, dark_src, caption in slides %}
+                <div class="slide absolute inset-0 transition-opacity duration-700 {{ 'opacity-100' if loop.first else 'opacity-0' }}">
+                    <img class="slide-img-light w-full h-full object-cover object-top" src="{{ url_for('static', filename=light_src) }}" alt="{{ caption }}" />
+                    <img class="slide-img-dark w-full h-full object-cover object-top" src="{{ url_for('static', filename=dark_src) }}" alt="{{ caption }}" />
+                    <div class="absolute bottom-0 left-0 right-0 px-4 py-14" style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);"></div>
+                    <div class="absolute bottom-0 left-0 right-0 px-4 py-8">
+                        <p class="text-white text-xs font-semibold tracking-widest">{{ caption }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Prev / Next -->
+                <button id="slide-prev" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-white text-lg leading-none" style="background:rgba(0,0,0,0.3);">&#8249;</button>
+                <button id="slide-next" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-white text-lg leading-none" style="background:rgba(0,0,0,0.3);">&#8250;</button>
+
+                <!-- Dot indicators -->
+                <div class="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5">
+                    {% for i in range(slides|length) %}
+                    <button class="slide-dot w-1.5 h-1.5 rounded-full transition-all duration-300 {{ 'bg-white' if loop.first else 'bg-white opacity-40' }}" data-idx="{{ loop.index0 }}"></button>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </main>
@@ -117,5 +150,32 @@
 
 <script src="{{ url_for('static', filename='js/global.js') }}"></script>
 <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script>
+(function () {
+    const slides  = document.querySelectorAll('.slide');
+    const dots    = document.querySelectorAll('.slide-dot');
+    let current   = 0;
+    let timer;
+
+    function goTo(idx) {
+        slides[current].classList.replace('opacity-100', 'opacity-0');
+        dots[current].classList.add('opacity-40');
+        current = (idx + slides.length) % slides.length;
+        slides[current].classList.replace('opacity-0', 'opacity-100');
+        dots[current].classList.remove('opacity-40');
+    }
+
+    function startTimer() {
+        clearInterval(timer);
+        timer = setInterval(() => goTo(current + 1), 4000);
+    }
+
+    document.getElementById('slide-prev').addEventListener('click', () => { goTo(current - 1); startTimer(); });
+    document.getElementById('slide-next').addEventListener('click', () => { goTo(current + 1); startTimer(); });
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); startTimer(); }));
+
+    startTimer();
+})();
+</script>
 </body>
 </html>
