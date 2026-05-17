@@ -40,3 +40,11 @@
     border-style: solid;
     border-width: 2px;
 }
+
+.avatar {
+    display: none;
+}
+
+.avatar.current {
+    display: block;
+}
