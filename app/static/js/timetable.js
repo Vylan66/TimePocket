@@ -214,7 +214,7 @@ function closepopup() {
 
 function handleOverlayClick(e) { if (e.target === popupOverlay) closepopup(); }
 
-// Recurring dropdown — no end date needed
+// Recurring dropdown
 const evRecurring = document.getElementById('evRecurring');
 if (evRecurring) {
     evRecurring.addEventListener('change', () => {
@@ -262,20 +262,15 @@ if (document.getElementById('saveBtn')) {
 
         if (wasEditing) {
             const old = events[editingIdx];
-            events.splice(editingIdx, 1, {
-                title, date, start, end, category, note,
-                dbId:              old.dbId,
-                isRecurring:       recurrence !== 'none',
-                recurrence,
-                recurrenceGroupId: old.recurrenceGroupId,
-            });
 
             if (old.recurrenceGroupId && recurrence === 'none') {
-                // Stop this and all future recurring events
+                // Keep this event, delete all FUTURE ones (day after selected date)
                 if (typeof window.onDeleteRecurringFrom === 'function') {
-                    await window.onDeleteRecurringFrom(old.recurrenceGroupId, date);
+                    const nextDay = new Date(date);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    await window.onDeleteRecurringFrom(old.recurrenceGroupId, toDateStr(nextDay));
                 }
-                // Save this one as a non-recurring event
+                // Update this event as non-recurring
                 if (old.dbId) {
                     await fetch(`/availability/${old.dbId}`, {
                         method: 'PUT',
@@ -283,20 +278,43 @@ if (document.getElementById('saveBtn')) {
                         body: JSON.stringify({ date, start_time: start, end_time: end, title, category, notes: note }),
                     });
                 }
-            } else if (old.recurrenceGroupId) {
-                // Update this and all future events in the group
-                if (typeof window.onUpdateRecurringFrom === 'function') {
-                    await window.onUpdateRecurringFrom(old.recurrenceGroupId, date, {
-                        title, start_time: start, end_time: end, category, notes: note
+                if (typeof window.reloadEvents === 'function') await window.reloadEvents();
+
+            } else if (old.recurrenceGroupId && recurrence !== 'none') {
+                // Delete future events from old date, recreate from new date
+                if (typeof window.onDeleteRecurringFrom === 'function') {
+                    await window.onDeleteRecurringFrom(old.recurrenceGroupId, old.date);
+                }
+                if (typeof window.onEventSave === 'function') {
+                    await window.onEventSave({ title, date, start, end, category, note, recurrence });
+                }
+
+            } else if (!old.recurrenceGroupId && recurrence !== 'none') {
+                // Was single, now recurring — delete old single event, create recurring series
+                if (old.dbId) {
+                    await fetch(`/availability/${old.dbId}`, { method: 'DELETE' });
+                }
+                events.splice(editingIdx, 1);
+                if (typeof window.onEventSave === 'function') {
+                    await window.onEventSave({ title, date, start, end, category, note, recurrence });
+                }
+
+            } else {
+                // Single event edit, no recurrence change
+                events.splice(editingIdx, 1, {
+                    title, date, start, end, category, note,
+                    dbId:              old.dbId,
+                    isRecurring:       false,
+                    recurrence:        'none',
+                    recurrenceGroupId: null,
+                });
+                if (old.dbId) {
+                    await fetch(`/availability/${old.dbId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ date, start_time: start, end_time: end, title, category, notes: note }),
                     });
                 }
-            } else if (old.dbId) {
-                // Single event edit
-                await fetch(`/availability/${old.dbId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ date, start_time: start, end_time: end, title, category, notes: note }),
-                });
             }
         } else {
             events.push({ title, date, start, end, category, note, isRecurring: recurrence !== 'none', recurrence });
@@ -394,26 +412,19 @@ async function deleteEvent(idx) {
     if (!ev) return;
 
     if (ev.isRecurring && ev.recurrenceGroupId) {
-        const choice = confirm('Delete this and all following events?\n\nOK = Yes, delete this and future\nCancel = Delete just this one');
+        if (!confirm('Delete this event?')) return;
         closeEventDetail();
-        if (choice) {
-            if (typeof window.onDeleteRecurringFrom === 'function') {
-                await window.onDeleteRecurringFrom(ev.recurrenceGroupId, ev.date);
+        if (ev.dbId) {
+            try {
+                await fetch(`/availability/${ev.dbId}`, { method: 'DELETE' });
+            } catch (err) {
+                console.error('Failed to delete event:', err);
+                return;
             }
-            showToast('This and future events deleted');
-        } else {
-            if (ev.dbId) {
-                try {
-                    await fetch(`/availability/${ev.dbId}`, { method: 'DELETE' });
-                } catch (err) {
-                    console.error('Failed to delete event:', err);
-                    return;
-                }
-            }
-            events.splice(idx, 1);
-            buildColumns();
-            showToast('Event deleted');
         }
+        events.splice(idx, 1);
+        buildColumns();
+        showToast('Event deleted');
         return;
     }
 
