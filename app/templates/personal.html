@@ -69,10 +69,10 @@
             <div id="ical-connect-form" class="flex-1 flex flex-col">
                 <p class="text-xs [color:var(--text-muted)]">Insert your Google Calendar or other iCal link to sync events automatically.</p>
                 <div class="mt-auto flex flex-col gap-2">
-                    <label class="block text-xs tracking-widest" style="color: var(--text-secondary);">iCal URL</label>
+                    <label class="block text-xs tracking-widest" style="color: var(--text-secondary);">iCal URL (.ics format)</label>
                     <input id="ical-url-input" type="url" placeholder="webcal://…" class="tp-input" />
                     <button id="ical-connect-btn" class="btn-blue w-full px-3 py-1.5 text-xs">Connect</button>
-                    <p id="ical-connect-error" class="text-xs hidden" style="color:#ef4444;"></p>
+                    <p id="ical-connect-error" class="text-xs hidden overflow-hidden" style="color:#ef4444; display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical;"></p>
                 </div>
             </div>
 
