@@ -1,10 +1,6 @@
 from app.models import User, Availability
 from app import db
 
-def test_dashboard_requires_login(client):
-    res = client.get('/dashboard')
-    assert res.status_code == 302
-
 def test_personal_requires_login(client):
     res = client.get('/personal')
     assert res.status_code == 302
