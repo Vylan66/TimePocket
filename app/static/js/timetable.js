@@ -143,15 +143,21 @@ function buildColumns() {
 
         const dateStr   = toDateStr(day);
 
-        events.filter(e => e.date === dateStr && e.start === 'allday').forEach(ev => {
-            const el = document.createElement('div');
-            el.className = 'cal-event-allday';
-            el.style.backgroundColor = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
-            el.textContent = ev.title;
-            const capturedIdx = events.indexOf(ev);
-            el.addEventListener('click', (e) => { e.stopPropagation(); openEventDetail(capturedIdx); });
-            col.appendChild(el);
-        });
+        const alldayEvents = events.filter(e => e.date === dateStr && e.start === 'allday');
+        if (alldayEvents.length) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'allday-wrapper';
+            alldayEvents.forEach(ev => {
+                const el = document.createElement('div');
+                el.className = 'cal-event-allday';
+                el.style.backgroundColor = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
+                el.textContent = ev.title;
+                const capturedIdx = events.indexOf(ev);
+                el.addEventListener('click', (e) => { e.stopPropagation(); openEventDetail(capturedIdx); });
+                wrapper.appendChild(el);
+            });
+            col.appendChild(wrapper);
+        }
 
         const dayEvents = events.filter(e => e.date === dateStr && e.start !== 'allday');
         computeLayout(dayEvents).forEach(({ ev, slot, totalCols }) => {
