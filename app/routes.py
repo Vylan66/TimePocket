@@ -24,13 +24,6 @@ def group():
 def friends():
     return render_template('friends.html', pageName="Friends")
 
-@main.route('/dashboard')
-@login_required
-def dashboard():
-    all_users = User.query.all()
-    my_availability = Availability.query.filter_by(user_id=current_user.id).all()
-    return render_template('dashboard.html', users=all_users, my_availability=my_availability, pageName="Dashboard")
-
 @main.route('/profile')
 @login_required
 def profile():
