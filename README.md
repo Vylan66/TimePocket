@@ -11,7 +11,6 @@
 ### Purpose
 ---
 TimePocket is a shared scheduling web application that helps groups of friends and colleagues find common free time. Users can add their weekly availability, connect with friends, create groups, and view a heatmap of when everyone is free — making it easy to plan meetings, hangouts, and events without the back-and-forth.
----
 
 ### How to Launch
 ---
@@ -56,9 +55,14 @@ flask db upgrade
 6. Seed demo data:
 ```
 flask seed-demo
+flask seed-interests
 ```
 
 7. Launch the app:
+```
+flask run
+```
+or
 ```
 python run.py
 ```
@@ -93,7 +97,8 @@ Selenium tests require the app to be running first.
 ```
 flask db upgrade
 flask seed-demo
-python run.py
+flask seed-interests
+flask run
 ```
 
 2. In a second terminal, run the selenium tests:
@@ -102,5 +107,3 @@ python -m pytest tests/test_selenium.py -v
 ```
 
 > Note: Selenium tests require Google Chrome to be installed. ChromeDriver is installed automatically via webdriver-manager.
----
-
