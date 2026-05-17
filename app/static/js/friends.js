@@ -307,32 +307,9 @@ function getMockProfile(username) {
 
 function friendReqPopup(userId, username, showButton = true) {
     const p = getMockProfile(username);
-    let target = {};
-    let targetInts = [];
-    for (let f in friends) {
-        if (friends[f].id === userId) {
-            target = friends[f];
-            break;
-        }
-    }
-    if (target === {}) return;
-    
-    for (let x = 1; x < 4; x++) {
-        const intNum = "int_" + x;
-        const intVal = target[intNum];
-        if (intVal != "null") {
-            targetInts.push(interests[intVal]);
-        }
-    }
 
     document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
     document.getElementById('frq-username').textContent = username;
-    document.getElementById('frq-bio').textContent      = target.bio;
-
-    document.getElementById('frq-hobbies').innerHTML = targetInts.map(h =>
-        `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-            style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
-    ).join('');
 
     document.getElementById('frq-mutual-friends').innerHTML = p.mutualFriends.length
         ? p.mutualFriends.map(u =>
