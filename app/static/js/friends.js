@@ -137,15 +137,7 @@ function buildFriendRow(f) {
     row.style.cssText = 'border: 1px solid var(--border-darker);';
     row.onmouseover = () => row.style.background = 'var(--bg-hover)';
     row.onmouseout  = () => row.style.background = 'transparent';
-    let avatarImage = ``;
-
-    if (f["avatar"] === "avatar_1") {
-        avatarImage = `<span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                style="background:var(--blue);">${escHtml(f.username[0].toUpperCase())}</span>`
-    }
-    else {
-        avatarImage = `<img class="w-7 h-7 rounded-full" src='static/assets/${f["avatar"]}.png' />`
-    }
+    let avatarImage = loadAvatarImageSmall(f);
 
     row.innerHTML = `
         <div class="flex items-center gap-3 cursor-pointer friend-info-btn">
@@ -214,8 +206,7 @@ function renderRequests() {
         <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.id}">
             <div class="flex items-center gap-2 min-w-0 cursor-pointer"
                 onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false)">
-                <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style="background:var(--blue);">${escHtml(r.username[0].toUpperCase())}</span>
+                ${loadAvatarImageSmall(r)}
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
             </div>
             <div class="flex items-center gap-1 shrink-0">
@@ -399,4 +390,17 @@ const loadInterests = async () => {
         const name = data[i]["name"];
         interests[id] = name;
     }
+}
+
+const loadAvatarImageSmall = (f) => {
+    let avatarImage = ``;
+
+    if (f["avatar"] === "avatar_1") {
+        avatarImage = `<span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                style="background:var(--blue);">${escHtml(f.username[0].toUpperCase())}</span>`
+    }
+    else {
+        avatarImage = `<img class="w-7 h-7 rounded-full" src='static/assets/${f["avatar"]}.png' />`;
+    }
+    return avatarImage;
 }
