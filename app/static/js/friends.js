@@ -137,11 +137,11 @@ function buildFriendRow(f) {
     row.style.cssText = 'border: 1px solid var(--border-darker);';
     row.onmouseover = () => row.style.background = 'var(--bg-hover)';
     row.onmouseout  = () => row.style.background = 'transparent';
+    let avatarImage = loadAvatarImageSmall(f);
 
     row.innerHTML = `
         <div class="flex items-center gap-3 cursor-pointer friend-info-btn">
-            <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                style="background:var(--blue);">${escHtml(f.username[0].toUpperCase())}</span>
+            ${avatarImage}
             <span class="text-sm">${escHtml(f.username)}</span>
         </div>
         <div class="relative">
@@ -206,8 +206,7 @@ function renderRequests() {
         <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.id}">
             <div class="flex items-center gap-2 min-w-0 cursor-pointer"
                 onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false)">
-                <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style="background:var(--blue);">${escHtml(r.username[0].toUpperCase())}</span>
+                ${loadAvatarImageSmall(r)}
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
             </div>
             <div class="flex items-center gap-1 shrink-0">
@@ -291,7 +290,17 @@ function _renderMutualFriends(list) {
 }
 
 async function friendReqPopup(userId, username, showButton = true) {
-    document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
+    let target = {};
+    for (let r in requests) {
+        if (requests[r].user_id === userId) {
+            target = requests[r];
+            break;
+        }
+    }
+    if (target === {}) return;
+
+    let avatarImage = loadAvatarImageLarge(target);
+    document.getElementById('frq-avatar').innerHTML   = avatarImage;
     document.getElementById('frq-username').textContent = username;
     document.getElementById('frq-bio').textContent      = '';
     document.getElementById('frq-hobbies').innerHTML    = '';
@@ -324,7 +333,17 @@ function closeFriendReqPopup() {
 }
 
 async function openProfilePopup(user_id, username) {
-    document.getElementById('fp-avatar').textContent    = username[0].toUpperCase();
+    let friend = {};
+    for (let f in friends) {
+        if (friends[f].id === user_id) {
+            friend = friends[f];
+            break;
+        }
+    }
+    if (friend === {}) return;
+
+    let avatarImage = loadAvatarImageLarge(friend);
+    document.getElementById('fp-avatar').innerHTML    = avatarImage;
     document.getElementById('fp-username').textContent  = username;
     document.getElementById('fp-bio').textContent       = '';
     document.getElementById('fp-hobbies').innerHTML     = '';
@@ -365,3 +384,28 @@ const loadInterests = async () => {
         interests[entry.id] = entry.name;
     }
 };
+
+const loadAvatarImageSmall = (f) => {
+    let avatarImage = ``;
+
+    if (f["avatar"] === "avatar_1") {
+        avatarImage = `<span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+            style="background:var(--blue);">${escHtml(f.username[0].toUpperCase())}</span>`;
+    }
+    else {
+        avatarImage = `<img class="w-7 h-7 rounded-full" src='static/assets/${f["avatar"]}.png' />`;
+    }
+    return avatarImage;
+}
+
+const loadAvatarImageLarge = (f) => {
+    let avatarImage = ``;
+
+    if (f["avatar"] === "avatar_1") {
+        avatarImage = `<p class="text-white text-xl font-bold">${escHtml(f.username[0].toUpperCase())}</p>`;
+    }
+    else {
+        avatarImage = `<img class="rounded-full" src='static/assets/${f["avatar"]}.png' />`;
+    }
+    return avatarImage;
+}
