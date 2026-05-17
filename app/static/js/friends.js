@@ -137,11 +137,19 @@ function buildFriendRow(f) {
     row.style.cssText = 'border: 1px solid var(--border-darker);';
     row.onmouseover = () => row.style.background = 'var(--bg-hover)';
     row.onmouseout  = () => row.style.background = 'transparent';
+    let avatarImage = ``;
+
+    if (f["avatar"] === "avatar_1") {
+        avatarImage = `<span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                style="background:var(--blue);">${escHtml(f.username[0].toUpperCase())}</span>`
+    }
+    else {
+        avatarImage = `<img class="w-7 h-7 rounded-full" src='static/assets/${f["avatar"]}.png' />`
+    }
 
     row.innerHTML = `
         <div class="flex items-center gap-3 cursor-pointer friend-info-btn">
-            <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                style="background:var(--blue);">${escHtml(f.username[0].toUpperCase())}</span>
+            ${avatarImage}
             <span class="text-sm">${escHtml(f.username)}</span>
         </div>
         <div class="relative">
