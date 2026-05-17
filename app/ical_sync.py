@@ -46,10 +46,10 @@ def fetch_and_parse(url, window_days=365):
         dt_end   = dtend.dt
 
         if isinstance(dt_start, date) and not isinstance(dt_start, datetime):
-            # All-day event — map to 08:00–09:00
+            # All-day event — stored with sentinel so UI can render in the all-day strip
             event_date = dt_start.strftime('%Y-%m-%d')
-            start_time = '08:00'
-            end_time   = '09:00'
+            start_time = 'allday'
+            end_time   = 'allday'
         else:
             # Strip timezone info, convert to local naive datetime
             if hasattr(dt_start, 'tzinfo') and dt_start.tzinfo:
