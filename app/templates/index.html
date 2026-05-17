@@ -6,14 +6,18 @@
     <title>TimePocket</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/icon-timepocket.png') }}">
 </head>
 
 <body class="min-h-screen flex flex-col overflow-auto md:h-screen md:overflow-hidden font-mono" style="background: var(--bg-page-surface); color: var(--primary-text-colour); transition: background 0.3s, color 0.3s;">
     <!-- NAVBAR -->
     <nav class="flex items-center justify-between px-10 h-16 shrink-0">
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 rounded-full border-2 [border-color:var(--text-ui)]"></div>
-            <span class="font-semibold [color:var(--text-ui)]">Logo</span>
+            <div class="w-12 h-12 rounded-full">
+                <img id="logo-light" src="{{ url_for('static', filename='assets/logo-light.png') }}" />
+                <img id="logo-dark" src="{{ url_for('static', filename='assets/logo-dark.png') }}" style="display:none;" />
+            </div>
+            <span class="font-semibold [color:var(--blue)]"> TimePocket </span>
         </div>
         <div class="flex items-center gap-3">
             <button id="theme-toggle" class="btn-icon" title="Toggle dark mode">
