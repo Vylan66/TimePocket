@@ -1,10 +1,12 @@
-let friends  = []; // {id, username, friendship_id}
+let friends  = []; // {id, username, avatar, bio, int_1, int_2, int_3, friendship_id}
 let requests = []; // {id: friendship_id, user_id, username}
+let interests = {}; // each entry in the form 1:"Photography"
 
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFriends();
     loadRequests();
+    loadInterests();
 
     document.getElementById('friend-search').addEventListener('input',
         debounce(e => searchUsers(e.target.value), 280));
@@ -164,7 +166,7 @@ function buildFriendRow(f) {
             </div>
         </div>`;
 
-    row.querySelector('.friend-info-btn').addEventListener('click', () => openProfilePopup(f.username));
+    row.querySelector('.friend-info-btn').addEventListener('click', () => openProfilePopup(f.id, f.username));
 
     row.querySelector('.friend-menu-btn').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -267,20 +269,6 @@ async function rejectRequest(friendshipId) {
 }
 
 // Mock profile popup (kept as demo UI)
-const MOCK_BIOS = [
-    'Loves hiking and photography on weekends.',
-    'Coffee enthusiast and part-time coder.',
-    'Into music production and board games.',
-    'Avid reader and occasional runner.',
-    'Foodie who enjoys trying new restaurants.',
-];
-const MOCK_HOBBIES = [
-    ['Hiking', 'Photography', 'Travel'],
-    ['Coffee', 'Coding', 'Gaming'],
-    ['Music', 'Board Games', 'Film'],
-    ['Reading', 'Running', 'Yoga'],
-    ['Cooking', 'Art', 'Cinema'],
-];
 const MOCK_GROUPS = [
     ['Study Group', 'Dev Team'],
     ['Dev Team'],
@@ -303,8 +291,6 @@ function getMockProfile(username) {
         .slice(0, (username.charCodeAt(0) % 3) + 1)
         .map(f => f.username);
     return {
-        bio:          MOCK_BIOS[i],
-        hobbies:      MOCK_HOBBIES[i],
         mutualFriends,
         mutualGroups: MOCK_GROUPS[i],
         nextFree:     MOCK_TIMES[i],
@@ -313,12 +299,29 @@ function getMockProfile(username) {
 
 function friendReqPopup(userId, username, showButton = true) {
     const p = getMockProfile(username);
+    let target = {};
+    let targetInts = [];
+    for (let f in friends) {
+        if (friends[f].id === userId) {
+            target = friends[f];
+            break;
+        }
+    }
+    if (target === {}) return;
+    
+    for (let x = 1; x < 4; x++) {
+        const intNum = "int_" + x;
+        const intVal = target[intNum];
+        if (intVal != "null") {
+            targetInts.push(interests[intVal]);
+        }
+    }
 
     document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
     document.getElementById('frq-username').textContent = username;
-    document.getElementById('frq-bio').textContent      = p.bio;
+    document.getElementById('frq-bio').textContent      = target.bio;
 
-    document.getElementById('frq-hobbies').innerHTML = p.hobbies.map(h =>
+    document.getElementById('frq-hobbies').innerHTML = targetInts.map(h =>
         `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
             style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
     ).join('');
@@ -348,15 +351,33 @@ function closeFriendReqPopup() {
     document.getElementById('friend-req-profile-overlay').classList.remove('open');
 }
 
-function openProfilePopup(username) {
+function openProfilePopup(user_id, username) {
     const p = getMockProfile(username);
+    let friend = {};
+    let friendInts = [];
+    for (let f in friends) {
+        if (friends[f].id === user_id) {
+            friend = friends[f];
+            break;
+        }
+    }
 
-    document.getElementById('fp-avatar').textContent    = username[0].toUpperCase();
+    if (friend === {}) return;
+    
+    for (let x = 1; x < 4; x++) {
+        const intNum = "int_" + x;
+        const intVal = friend[intNum];
+        if (intVal != "null") {
+            friendInts.push(interests[intVal]);
+        }
+    }
+
+    document.getElementById('fp-avatar').innerHTML    = username[0].toUpperCase();
     document.getElementById('fp-username').textContent  = username;
-    document.getElementById('fp-bio').textContent       = p.bio;
+    document.getElementById('fp-bio').innerHTML       = friend.bio;
     document.getElementById('fp-next-free').textContent = p.nextFree;
 
-    document.getElementById('fp-hobbies').innerHTML = p.hobbies.map(h =>
+    document.getElementById('fp-hobbies').innerHTML = friendInts.map(h =>
         `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
             style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
     ).join('');
@@ -382,3 +403,15 @@ function closeProfilePopup() {
     document.getElementById('friend-profile-overlay').classList.remove('open');
 }
 
+const loadInterests = async () => {
+    const result = await fetch('/api/interests')
+    if (!result.ok) {
+        return;
+    }
+    const data = await result.json();
+    for (let i in data) {
+        const id = data[i]["id"];
+        const name = data[i]["name"];
+        interests[id] = name;
+    }
+}
