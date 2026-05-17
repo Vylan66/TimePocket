@@ -240,8 +240,9 @@ async function acceptRequest(friendshipId, userId, username) {
     try {
         const res = await fetch(`/api/friends/accept/${friendshipId}`, { method: 'POST' });
         if (res.ok) {
+            const data = await res.json();
             requests = requests.filter(r => r.id !== friendshipId);
-            friends.push({ id: userId, username, friendship_id: friendshipId });
+            friends.push(data.friend);
             renderRequests();
             renderFriends();
             showToast(`${username} is now your friend`);
@@ -268,72 +269,33 @@ async function rejectRequest(friendshipId) {
     }
 }
 
-// Mock profile popup (kept as demo UI)
-const MOCK_GROUPS = [
-    ['Study Group', 'Dev Team'],
-    ['Dev Team'],
-    ['Study Group', 'Book Club'],
-    ['Book Club', 'Fitness Crew'],
-    ['Fitness Crew', 'Study Group'],
-];
-const MOCK_TIMES = [
-    'Tomorrow, 2:00 PM – 4:00 PM',
-    'Today, 6:00 PM – 8:00 PM',
-    'Thu, 10:00 AM – 12:00 PM',
-    'Fri, 3:00 PM – 5:00 PM',
-    'Sat, 11:00 AM – 1:00 PM',
-];
-
-function getMockProfile(username) {
-    const i = username.charCodeAt(0) % 5;
-    const mutualFriends = friends
-        .filter(f => f.username !== username)
-        .slice(0, (username.charCodeAt(0) % 3) + 1)
-        .map(f => f.username);
-    return {
-        mutualFriends,
-        mutualGroups: MOCK_GROUPS[i],
-        nextFree:     MOCK_TIMES[i],
-    };
+function _renderInterestTags(intData) {
+    const vals = [intData.int_1, intData.int_2, intData.int_3]
+        .filter(v => v != null)
+        .map(v => interests[v])
+        .filter(Boolean);
+    return vals.length
+        ? vals.map(h => `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
+            style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`).join('')
+        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
 }
 
-function friendReqPopup(userId, username, showButton = true) {
-    const p = getMockProfile(username);
-    let target = {};
-    let targetInts = [];
-    for (let f in friends) {
-        if (friends[f].id === userId) {
-            target = friends[f];
-            break;
-        }
-    }
-    if (target === {}) return;
-    
-    for (let x = 1; x < 4; x++) {
-        const intNum = "int_" + x;
-        const intVal = target[intNum];
-        if (intVal != "null") {
-            targetInts.push(interests[intVal]);
-        }
-    }
-
-    document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
-    document.getElementById('frq-username').textContent = username;
-    document.getElementById('frq-bio').textContent      = target.bio;
-
-    document.getElementById('frq-hobbies').innerHTML = targetInts.map(h =>
-        `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-            style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
-    ).join('');
-
-    document.getElementById('frq-mutual-friends').innerHTML = p.mutualFriends.length
-        ? p.mutualFriends.map(u =>
-            `<div class="flex items-center gap-1.5">
+function _renderMutualFriends(list) {
+    return list.length
+        ? list.map(u => `<div class="flex items-center gap-1.5">
                 <span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style="background:var(--blue);">${escHtml(u[0].toUpperCase())}</span>
-                <span class="text-xs">${escHtml(u)}</span>
+                    style="background:var(--blue);">${escHtml(u.username[0].toUpperCase())}</span>
+                <span class="text-xs">${escHtml(u.username)}</span>
             </div>`).join('')
         : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
+}
+
+async function friendReqPopup(userId, username, showButton = true) {
+    document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
+    document.getElementById('frq-username').textContent = username;
+    document.getElementById('frq-bio').textContent      = '';
+    document.getElementById('frq-hobbies').innerHTML    = '';
+    document.getElementById('frq-mutual-friends').innerHTML = `<span class="text-xs" style="color:var(--text-muted);">Loading…</span>`;
 
     const btn = document.getElementById('send-friend-req-btn');
     btn.style.display = showButton ? '' : 'none';
@@ -345,58 +307,50 @@ function friendReqPopup(userId, username, showButton = true) {
     } : null;
 
     document.getElementById('friend-req-profile-overlay').classList.add('open');
+
+    try {
+        const res  = await fetch(`/api/friends/${userId}/profile`);
+        const data = await res.json();
+        document.getElementById('frq-bio').textContent      = data.bio || '';
+        document.getElementById('frq-hobbies').innerHTML    = _renderInterestTags(data);
+        document.getElementById('frq-mutual-friends').innerHTML = _renderMutualFriends(data.mutual_friends || []);
+    } catch {
+        document.getElementById('frq-mutual-friends').innerHTML = `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
+    }
 }
 
 function closeFriendReqPopup() {
     document.getElementById('friend-req-profile-overlay').classList.remove('open');
 }
 
-function openProfilePopup(user_id, username) {
-    const p = getMockProfile(username);
-    let friend = {};
-    let friendInts = [];
-    for (let f in friends) {
-        if (friends[f].id === user_id) {
-            friend = friends[f];
-            break;
-        }
-    }
-
-    if (friend === {}) return;
-    
-    for (let x = 1; x < 4; x++) {
-        const intNum = "int_" + x;
-        const intVal = friend[intNum];
-        if (intVal != "null") {
-            friendInts.push(interests[intVal]);
-        }
-    }
-
-    document.getElementById('fp-avatar').innerHTML    = username[0].toUpperCase();
+async function openProfilePopup(user_id, username) {
+    document.getElementById('fp-avatar').textContent    = username[0].toUpperCase();
     document.getElementById('fp-username').textContent  = username;
-    document.getElementById('fp-bio').innerHTML       = friend.bio;
-    document.getElementById('fp-next-free').textContent = p.nextFree;
-
-    document.getElementById('fp-hobbies').innerHTML = friendInts.map(h =>
-        `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-            style="background:var(--bg-hover);color:var(--primary-text-colour);">${escHtml(h)}</span>`
-    ).join('');
-
-    document.getElementById('fp-mutual-friends').innerHTML = p.mutualFriends.length
-        ? p.mutualFriends.map(u =>
-            `<div class="flex items-center gap-1.5">
-                <span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style="background:var(--blue);">${escHtml(u[0].toUpperCase())}</span>
-                <span class="text-xs">${escHtml(u)}</span>
-            </div>`).join('')
-        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
-
-    document.getElementById('fp-mutual-groups').innerHTML = p.mutualGroups.length
-        ? p.mutualGroups.map(g =>
-            `<span class="text-xs">${escHtml(g)}</span>`).join('')
-        : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
-
+    document.getElementById('fp-bio').textContent       = '';
+    document.getElementById('fp-hobbies').innerHTML     = '';
+    document.getElementById('fp-next-free').textContent = '…';
+    document.getElementById('fp-mutual-friends').innerHTML = `<span class="text-xs" style="color:var(--text-muted);">Loading…</span>`;
+    document.getElementById('fp-mutual-groups').innerHTML  = `<span class="text-xs" style="color:var(--text-muted);">Loading…</span>`;
     document.getElementById('friend-profile-overlay').classList.add('open');
+
+    try {
+        const res  = await fetch(`/api/friends/${user_id}/profile`);
+        const data = await res.json();
+
+        document.getElementById('fp-bio').textContent       = data.bio || '';
+        document.getElementById('fp-hobbies').innerHTML     = _renderInterestTags(data);
+        document.getElementById('fp-next-free').textContent = data.next_free || 'No overlap found';
+
+        document.getElementById('fp-mutual-friends').innerHTML = _renderMutualFriends(data.mutual_friends || []);
+
+        document.getElementById('fp-mutual-groups').innerHTML = (data.mutual_groups || []).length
+            ? data.mutual_groups.map(g => `<span class="text-xs">${escHtml(g.name)}</span>`).join('')
+            : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
+    } catch {
+        document.getElementById('fp-mutual-friends').innerHTML = `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
+        document.getElementById('fp-mutual-groups').innerHTML  = `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
+        document.getElementById('fp-next-free').textContent    = 'Unavailable';
+    }
 }
 
 function closeProfilePopup() {
@@ -404,14 +358,10 @@ function closeProfilePopup() {
 }
 
 const loadInterests = async () => {
-    const result = await fetch('/api/interests')
-    if (!result.ok) {
-        return;
-    }
+    const result = await fetch('/api/interests');
+    if (!result.ok) return;
     const data = await result.json();
-    for (let i in data) {
-        const id = data[i]["id"];
-        const name = data[i]["name"];
-        interests[id] = name;
+    for (const entry of data) {
+        interests[entry.id] = entry.name;
     }
-}
+};
