@@ -336,7 +336,7 @@ def search_users():
         User.username.ilike(f'%{q}%'),
         User.id != current_user.id
     ).limit(10).all()
-    return jsonify({'users': [{'id': u.id, 'username': u.username} for u in users]})
+    return jsonify({'users': [{'id': u.id, 'username': u.username, 'avatar': u.avatar} for u in users]})
 
 def _friend_ids_for(uid):
     rows = Friendship.query.filter(

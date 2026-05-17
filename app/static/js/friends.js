@@ -73,8 +73,7 @@ async function searchUsers(q) {
                     style="color:var(--primary-text-colour);"
                     onmouseover="this.style.background='var(--bg-hover)'"
                     onmouseout="this.style.background='transparent'">
-                    <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                        style="background:var(--blue);">${escHtml(u.username[0].toUpperCase())}</span>
+                    ${loadAvatarImageSmall(u)}
                     ${escHtml(u.username)}
                 </button>`).join('');
         }
@@ -205,7 +204,7 @@ function renderRequests() {
     list.innerHTML = requests.map(r => `
         <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.id}">
             <div class="flex items-center gap-2 min-w-0 cursor-pointer"
-                onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false)">
+                onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false")>
                 ${loadAvatarImageSmall(r)}
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
             </div>
@@ -290,19 +289,7 @@ function _renderMutualFriends(list) {
 }
 
 async function friendReqPopup(userId, username, showButton = true) {
-    let target = {};
-    for (let r in requests) {
-        if (requests[r].user_id === userId) {
-            target = requests[r];
-            break;
-        }
-    }
-    if (target === {}) return;
-
-    let avatarImage = loadAvatarImageLarge(target);
-    document.getElementById('frq-avatar').innerHTML   = avatarImage;
     document.getElementById('frq-username').textContent = username;
-    document.getElementById('frq-bio').innerHTML     = target["bio"];
     document.getElementById('frq-mutual-friends').innerHTML = `<span class="text-xs" style="color:var(--text-muted);">Loading…</span>`;
 
     const btn = document.getElementById('send-friend-req-btn');
@@ -319,6 +306,8 @@ async function friendReqPopup(userId, username, showButton = true) {
     try {
         const res  = await fetch(`/api/friends/${userId}/profile`);
         const data = await res.json();
+        let avatarImage = loadAvatarImageLarge(data);
+        document.getElementById('frq-avatar').innerHTML   = avatarImage;
         document.getElementById('frq-bio').textContent      = data.bio || '';
         document.getElementById('frq-hobbies').innerHTML    = _renderInterestTags(data);
         document.getElementById('frq-mutual-friends').innerHTML = _renderMutualFriends(data.mutual_friends || []);
@@ -386,7 +375,6 @@ const loadInterests = async () => {
 
 const loadAvatarImageSmall = (f) => {
     let avatarImage = ``;
-
     if (f["avatar"] === "avatar_1") {
         avatarImage = `<span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
             style="background:var(--blue);">${escHtml(f.username[0].toUpperCase())}</span>`;
