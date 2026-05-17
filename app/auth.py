@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
 from flask_login import login_user, logout_user, login_required
 from flask_mail import Message
-from app import db, mail
+from app import db, mail, csrf
 from app.models import User
 
 auth_bp = Blueprint('auth', __name__)
@@ -11,6 +11,7 @@ def index():
     return render_template('index.html')
 
 @auth_bp.route('/register', methods=['POST'])
+@csrf.exempt
 def register():
     data = request.get_json()
     username = data.get('username')
@@ -29,7 +30,6 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    # Send verification email
     verify_url = url_for('auth.verify_email', token=token, _external=True)
     msg = Message(
         subject='Verify your TimePocket account',
@@ -52,6 +52,7 @@ def verify_email(token):
     return redirect(url_for('main.personal'))
 
 @auth_bp.route('/login', methods=['POST'])
+@csrf.exempt
 def login():
     data = request.get_json()
     email = data.get('email')

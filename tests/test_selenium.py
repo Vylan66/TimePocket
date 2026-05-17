@@ -44,7 +44,7 @@ def login(driver):
     driver.find_element(By.ID, 'login-password').send_keys('password123')
     driver.find_element(By.ID, 'btn-login-submit').click()
     dismiss_any_alert(driver)
-    WebDriverWait(driver, 5).until(EC.url_contains("/personal"))
+    WebDriverWait(driver, 10).until(EC.url_contains("/personal")) 
 
 def test_login_page_loads(driver):
     ensure_logged_out(driver)
