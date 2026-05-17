@@ -6,6 +6,8 @@ function applyTheme(dark) {
     root.classList.toggle('dark', dark);
     document.getElementById('icon-moon').style.display = dark ? 'none' : '';
     document.getElementById('icon-sun').style.display  = dark ? '' : 'none';
+    document.getElementById('logo-light').style.display = dark ? 'none' : '';
+    document.getElementById('logo-dark').style.display = dark ? '' : 'none';
 }
 
 function toggleTheme() {
