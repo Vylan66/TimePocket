@@ -1,6 +1,18 @@
 // Global JavaScript for each page
 const root = document.documentElement;
 
+// CSRF token for all fetch requests
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+const originalFetch = window.fetch;
+window.fetch = function(url, options = {}) {
+    if (options.method && options.method.toUpperCase() !== 'GET') {
+        options.headers = options.headers || {};
+        options.headers['X-CSRFToken'] = csrfToken;
+    }
+    return originalFetch(url, options);
+};
+
 // Dark mode toggle for each page
 function applyTheme(dark) {
     root.classList.toggle('dark', dark);
