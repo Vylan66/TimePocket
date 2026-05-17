@@ -23,6 +23,10 @@
     border-color: var(--blue) !important;
 }
 
+.avatar-option.av1.chosen {
+    border-color: var(--text-secondary) !important;
+}
+
 .interest {
     background-color: var(--bg-hover);
 }
@@ -35,4 +39,12 @@
     border-color: var(--blue);
     border-style: solid;
     border-width: 2px;
+}
+
+.avatar {
+    display: none;
+}
+
+.avatar.current {
+    display: block;
 }

@@ -7,14 +7,18 @@
     <title>TimePocket - {{ pageName }}</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/icon-timepocket.png') }}">
     {% block css %} {% endblock %}
 </head>
 
     <body class="min-h-screen md:h-screen flex flex-col md:overflow-hidden font-mono" style="background: var(--bg-page-surface); color: var(--primary-text-colour); transition: background 0.3s, color 0.3s;">
         <nav class="flex items-center justify-between px-10 h-16 shrink-0 relative">
-            <div class="flex items-center gap-2 shrink-0">
-                <div class="w-9 h-9 rounded-full border-2 [border-color:var(--text-ui)]"></div>
-                <span class="font-semibold [color:var(--text-ui)]">Logo</span>
+            <div class="flex items-center gap-1 shrink-0">
+                <div class="w-12 h-12 rounded-full">
+                    <img id="logo-light" src="{{ url_for('static', filename='assets/logo-light.png') }}" />
+                    <img id="logo-dark" src="{{ url_for('static', filename='assets/logo-dark.png') }}" style="display:none;" />
+                </div>
+                <span class="font-semibold" style="color: var(--blue);">TimePocket</span>
             </div>
             <div id="nav-bar" class="hidden md:flex flex-row gap-1 self-end">
                 <button class="text-sm nav-tab" id="dash-link">Dashboard</button>
