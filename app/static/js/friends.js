@@ -90,7 +90,6 @@ async function sendRequest(userId, username) {
 
     if (friends.find(f => f.id === userId) || requests.find(r => r.user_id === userId)) {
         showToast('Already a friend or request pending', true);
-        return;
     }
 
     try {
@@ -101,8 +100,7 @@ async function sendRequest(userId, username) {
         });
         if (res.ok) {
             const data = await res.json();
-            requests.push({ id: data.id, user_id: userId, username, direction: 'outgoing' });
-            renderRequests();
+            await loadRequests();
             showToast(`Friend request sent to ${username}`);
         } else {
             const data = await res.json();
