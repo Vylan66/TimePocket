@@ -312,6 +312,7 @@ function friendReqPopup(userId, username, showButton = true) {
 
     document.getElementById("frq-avatar").innerHTML = avatarImage;
     document.getElementById('frq-username').textContent = username;
+    document.getElementById('frq-bio').textContent = target["bio"];
 
     document.getElementById('frq-mutual-friends').innerHTML = p.mutualFriends.length
         ? p.mutualFriends.map(u =>
