@@ -12,9 +12,15 @@
 <!-- SETTINGS WINDOW -->
 <div id="settings-window" class="grow m-4 p-4 rounded-3xl flex md:flex-row flex-col content-center" style="background: var(--bg-page-surface); color: var(--primary-text-colour);">
     <div id="profile-picture-container" class="flex flex-col justify-center items-center shrink-0 p-4">
-        <div id="profile-picture" class="rounded-full md:size-64 size-48 border-4" style="border-color: var(--border-light);">
+        <div id="profile-picture" class="rounded-full md:size-64 size-48 flex justify-center items-center border-2" style="background-color: var(--blue); border-color: var(--border-darker);">
+            <p id="avatar_1_big" class="text-white md:text-[128px] text-[92px] font-bold avatar"></p>  
+            <img id="avatar_2_big" src="{{ url_for('static', filename='assets/avatar_2.png') }}" class="rounded-full avatar" />
+            <img id="avatar_3_big" src="{{ url_for('static', filename='assets/avatar_3.png') }}" class="rounded-full avatar" />
+            <img id="avatar_4_big" src="{{ url_for('static', filename='assets/avatar_4.png') }}" class="rounded-full avatar" />
+            <img id="avatar_5_big" src="{{ url_for('static', filename='assets/avatar_5.png') }}" class="rounded-full avatar" />
+            <img id="avatar_6_big" src="{{ url_for('static', filename='assets/avatar_6.png') }}" class="rounded-full avatar" />
         </div>
-        <button id="btn-change-avatar" class="btn-blue m-2">Change Avatar</button>
+        <button id="btn-change-avatar" class="btn-blue m-4">Change Avatar</button>
     </div>
     <div id="user-info" class="grow flex flex-col gap-2 md:justify-center p-4">
         <div name="username">
@@ -66,12 +72,22 @@
         <p class="block text-xs tracking-widest mb-1" style="color: var(--text-secondary);"> Click the avatar that you would like to use. </p>
         
         <div id="avatar-list" class="flex flex-wrap justify-evenly gap-6 my-2">
-            <div id="av-1" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_1</div>
-            <div id="av-2" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_2</div>
-            <div id="av-3" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_3</div>
-            <div id="av-4" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_4</div>
-            <div id="av-5" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_5</div>
-            <div id="av-6" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">avatar_6</div>
+            <div id="av-1" class="rounded-full size-[80px] border-2 avatar-option av1 flex justify-center items-center" style="background-color: var(--blue); border-color: var(--blue);"></div>
+            <div id="av-2" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">
+                <img src="{{ url_for('static', filename='assets/avatar_2.png') }}" class="rounded-full" />
+            </div>
+            <div id="av-3" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">
+                <img src="{{ url_for('static', filename='assets/avatar_3.png') }}" class="rounded-full" />
+            </div>
+            <div id="av-4" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">
+                <img src="{{ url_for('static', filename='assets/avatar_4.png') }}" class="rounded-full" />
+            </div>
+            <div id="av-5" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">
+                <img src="{{ url_for('static', filename='assets/avatar_5.png') }}" class="rounded-full" />
+            </div>
+            <div id="av-6" class="rounded-full size-[80px] border-2 avatar-option" style="border-color: var(--border-light);">
+                <img src="{{ url_for('static', filename='assets/avatar_6.png') }}" class="rounded-full" />
+            </div>
         </div>
 
         <div name="buttons" class="flex justify-end gap-2">
@@ -185,4 +201,5 @@
         </div>
     </div>
  </div>
+
 {% endblock %}

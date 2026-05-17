@@ -20,7 +20,7 @@ const loadUser = async () => {
     fillEmail(user);
     fillBio(user);
     setInterests(user);
-    setAvatar(user);
+    setAvatar(user, null);
     return user;
 }
 
@@ -111,10 +111,21 @@ const buildInterest = (newInterest, type) => { // type=0: on profile, type=1: se
 }
 
 // Displays the user's chosen avatar
-const setAvatar = (user) => {
-    const avatar = user["avatar"];
-    const location = document.getElementById("profile-picture");
-    location.innerHTML = `<p> ${avatar} </p>`;
+const setAvatar = (user, old) => {
+    const avatar = user["avatar"] + "_big";
+    
+    if (old === null) {
+        const av1 = document.getElementById("avatar_1_big");
+        av1.innerHTML = `${user.username[0].toUpperCase()}`
+    }
+    const location = document.getElementById(avatar);
+    location.classList.add('current');
+
+    if (old != null) {
+        const oldLocation = document.getElementById(old + "_big");
+        oldLocation.classList.remove('current');
+    }
+
 }
 
 // Adds all event listeners
@@ -460,6 +471,8 @@ const showAvatarDialog = () => {
     const av_5 = document.getElementById("av-5");
     const av_6 = document.getElementById("av-6");
 
+    av_1.innerHTML = `<p class="text-white text-[36px] font-bold"> ${user.username[0].toUpperCase()} </p>`
+
     switch (current) {
         case "avatar_1":
             av_1.classList.add("chosen");
@@ -513,7 +526,7 @@ const showAvatarDialog = () => {
             });
             user["avatar"] = selectedElement;
             hideAvatarDialog();
-            setAvatar(user);
+            setAvatar(user, current);
         }
     }
 }
