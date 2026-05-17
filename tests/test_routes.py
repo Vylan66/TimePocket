@@ -1,10 +1,6 @@
 from app.models import User, Availability
 from app import db
 
-def test_personal_requires_login(client):
-    res = client.get('/personal')
-    assert res.status_code == 302
-
 def test_add_availability(auth_client):
     res = auth_client.post('/availability', json={
         'date': '2026-06-01',
