@@ -10,6 +10,8 @@
 
 ### Purpose
 ---
+TimePocket is a shared scheduling web application that helps groups of friends and colleagues find common free time. Users can add their weekly availability, connect with friends, create groups, and view a heatmap of when everyone is free — making it easy to plan meetings, hangouts, and events without the back-and-forth.
+---
 
 ### How to Launch
 ---
