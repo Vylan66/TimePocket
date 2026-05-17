@@ -95,6 +95,7 @@ window.onUpdateRecurringFrom = async function (groupId, fromDate, updateData) {
 };
 
 function availTitle(start, end) {
+    if (start === 'allday') return 'All day';
     return `${fmt12(start)} – ${fmt12(end)}`;
 }
 

@@ -12,10 +12,11 @@ function fmtLastSynced(iso) {
     if (!iso) return 'Last synced: never';
     const d = new Date(iso);
     const diffMin = Math.round((Date.now() - d) / 60000);
-    if (diffMin < 1)  return 'Last synced: just now';
-    if (diffMin < 60) return `Last synced: ${diffMin} min ago`;
+    if (diffMin <= 1)  return 'Last synced: just now';
+    if (diffMin < 60) return `Last synced: ${diffMin} minutes ago`;
     const diffHr = Math.round(diffMin / 60);
-    if (diffHr < 24)  return `Last synced: ${diffHr} hr ago`;
+    if (diffHr <= 1)  return `Last synced: ${diffHr} hour ago`;
+    if (diffHr < 24)  return `Last synced: ${diffHr} hour(s) ago`;
     return `Last synced: ${d.toLocaleDateString()}`;
 }
 
@@ -76,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 icalConnectBtn.addEventListener('click', async () => {
     const url = icalUrlInput.value.trim();
-    if (!url) { setConnectError('Please enter an iCal URL.'); return; }
+    if (!url.toLowerCase().endsWith('.ics')) { setConnectError('Please enter a valid iCal URL.'); return; }
     setConnectError('');
     icalConnectBtn.disabled = true;
     icalConnectBtn.textContent = 'Connecting…';
@@ -88,7 +89,18 @@ icalConnectBtn.addEventListener('click', async () => {
             body:    JSON.stringify({ url }),
         });
         const data = await res.json();
-        if (!res.ok) { setConnectError(data.error || 'Failed to connect.'); return; }
+        if (!res.ok) {
+            const err = data.error || '';
+            let msg = 'Failed to connect. Please check the URL and try again.';
+            if (err.includes('404') || err.toLowerCase().includes('not found'))
+                msg = 'Calendar not found. Make sure it is set to public.';
+            else if (err.includes('403') || err.toLowerCase().includes('forbidden'))
+                msg = 'Access denied. Make sure your calendar is set to public.';
+            else if (err.toLowerCase().includes('invalid') || err.toLowerCase().includes('parse'))
+                msg = 'Invalid iCal data. Please check the URL is a valid .ics feed.';
+            setConnectError(msg);
+            return;
+        }
         showConnected(data.feed);
         await reloadEvents();
     } catch (_) {
@@ -107,7 +119,16 @@ icalSyncBtn.addEventListener('click', async () => {
     try {
         const res  = await fetch('/api/ical/sync', { method: 'POST' });
         const data = await res.json();
-        if (!res.ok) { setSyncError(data.error || 'Sync failed.'); return; }
+        if (!res.ok) {
+            const err = data.error || '';
+            let msg = 'Sync failed. Please try again.';
+            if (err.includes('404') || err.toLowerCase().includes('not found'))
+                msg = 'Calendar not found. Make sure it is set to public.';
+            else if (err.includes('403') || err.toLowerCase().includes('forbidden'))
+                msg = 'Access denied. Make sure your calendar is set to public.';
+            setSyncError(msg);
+            return;
+        }
         icalLastSynced.textContent = fmtLastSynced(data.last_synced);
         await reloadEvents();
     } catch (_) {

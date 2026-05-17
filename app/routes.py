@@ -519,7 +519,7 @@ def get_ical():
     return jsonify({'feed': {
         'id':          feed.id,
         'url':         feed.url,
-        'last_synced': feed.last_synced.isoformat() if feed.last_synced else None,
+        'last_synced': (feed.last_synced.isoformat() + 'Z') if feed.last_synced else None,
         'is_active':   feed.is_active,
     }})
 
@@ -539,18 +539,20 @@ def save_ical():
         feed = ICalFeed(user_id=current_user.id, url=url)
         db.session.add(feed)
     db.session.flush()
-    db.session.commit()
 
     count, err = sync_feed(feed.id)
     if err:
+        db.session.rollback()
         return jsonify({'error': err}), 400
+
+    db.session.commit()
 
     return jsonify({
         'message': f'Calendar connected! {count} events imported.',
         'feed': {
             'id':          feed.id,
             'url':         feed.url,
-            'last_synced': feed.last_synced.isoformat() if feed.last_synced else None,
+            'last_synced': (feed.last_synced.isoformat() + 'Z') if feed.last_synced else None,
         },
     })
 
@@ -565,7 +567,7 @@ def sync_ical():
         return jsonify({'error': err}), 400
     return jsonify({
         'message':     f'Synced! {count} events updated.',
-        'last_synced': feed.last_synced.isoformat(),
+        'last_synced': feed.last_synced.isoformat() + 'Z',
     })
 
 @main.route('/api/ical', methods=['DELETE'])

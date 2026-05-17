@@ -70,7 +70,7 @@ function renderWeekHeaders() {
     const weekEnd   = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
 
     const fmt = d => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
-    document.getElementById('weekLabel').textContent = `${fmt(weekStart)} – ${fmt(weekEnd)}`;
+    document.getElementById('weekLabel').textContent = `${fmt(weekStart)} – ${fmt(weekEnd)} | GMT +08`;
 
     for (let i = 0; i < 7; i++) {
         const d    = new Date(weekStart); d.setDate(d.getDate() + i);
@@ -142,7 +142,24 @@ function buildColumns() {
         col.innerHTML = '';
 
         const dateStr   = toDateStr(day);
-        const dayEvents = events.filter(e => e.date === dateStr);
+
+        const alldayEvents = events.filter(e => e.date === dateStr && e.start === 'allday');
+        if (alldayEvents.length) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'allday-wrapper';
+            alldayEvents.forEach(ev => {
+                const el = document.createElement('div');
+                el.className = 'cal-event-allday';
+                el.style.backgroundColor = CATEGORY_COLORS[ev.category] || CATEGORY_COLORS['Personal'];
+                el.textContent = ev.title;
+                const capturedIdx = events.indexOf(ev);
+                el.addEventListener('click', (e) => { e.stopPropagation(); openEventDetail(capturedIdx); });
+                wrapper.appendChild(el);
+            });
+            col.appendChild(wrapper);
+        }
+
+        const dayEvents = events.filter(e => e.date === dateStr && e.start !== 'allday');
         computeLayout(dayEvents).forEach(({ ev, slot, totalCols }) => {
             const top    = fracToY(timeToFrac(ev.start));
             const height = fracToY(timeToFrac(ev.end)) - top;
@@ -324,7 +341,9 @@ function openEventDetail(idx) {
 
     const d = new Date(ev.date + 'T00:00:00');
     document.getElementById('det-date').textContent = d.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    document.getElementById('det-time').textContent = `${formatTime(ev.start)} – ${formatTime(ev.end)}`;
+    const isAllDay = ev.start === 'allday';
+    document.getElementById('det-time').textContent = isAllDay ? 'All day' : `${formatTime(ev.start)} – ${formatTime(ev.end)}`;
+    document.getElementById('det-edit-btn').style.display = isAllDay ? 'none' : '';
 
     const noteRow = document.getElementById('det-note-row');
     document.getElementById('det-note').textContent = ev.note || '';

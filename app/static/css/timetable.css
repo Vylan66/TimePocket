@@ -55,7 +55,6 @@
 #day-columns > div {
     height: calc(var(--hour-h) * var(--num-hours));
     position: relative;
-    overflow: hidden;
 }
 
 /* Scrollbar */
@@ -68,7 +67,7 @@
 .cal-event {
     position: absolute;
     left: 4px; right: 4px;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 5px 8px;
     font-size: 0.72rem;
     font-weight: 500;
@@ -76,10 +75,34 @@
     cursor: pointer;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: box-shadow 0.1s, filter 0.1s;
     z-index: 1;
 }
-.cal-event:hover {transform: scale(1.02); box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+.cal-event:hover { filter: brightness(1.08); box-shadow: 0 4px 16px rgba(0,0,0,0.22); }
+
+/* All-day events — wrapper is sticky so all chips move together */
+.allday-wrapper {
+    position: sticky;
+    top: 2px;
+    z-index: 2;
+}
+.cal-event-allday {
+    display: block;
+    width: calc(100% - 8px);
+    margin: 2px 4px;
+    border-radius: 7px;
+    padding: 2px 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: filter 0.1s;
+}
+.cal-event-allday:hover { filter: brightness(1.08); }
 .cal-event .ev-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cal-event .ev-time  { font-size: 0.65rem; opacity: 0.85; margin-top: 2px; }
 
