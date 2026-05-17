@@ -338,6 +338,15 @@ def search_users():
     ).limit(10).all()
     return jsonify({'users': [{'id': u.id, 'username': u.username} for u in users]})
 
+def _friend_ids_for(uid):
+    rows = Friendship.query.filter(
+        db.or_(
+            db.and_(Friendship.requester_id == uid, Friendship.status == 'accepted'),
+            db.and_(Friendship.receiver_id == uid, Friendship.status == 'accepted'),
+        )
+    ).all()
+    return {(f.receiver_id if f.requester_id == uid else f.requester_id) for f in rows}
+
 def _friend_ids():
     rows = Friendship.query.filter(
         db.or_(
@@ -406,7 +415,20 @@ def accept_friend_request(friendship_id):
         return jsonify({'error': 'Unauthorized'}), 403
     f.status = 'accepted'
     db.session.commit()
-    return jsonify({'message': 'Accepted'})
+    u = f.requester
+    return jsonify({
+        'message': 'Accepted',
+        'friend': {
+            'id':            u.id,
+            'username':      u.username,
+            'avatar':        u.avatar,
+            'bio':           u.bio or '',
+            'int_1':         u.interest_1,
+            'int_2':         u.interest_2,
+            'int_3':         u.interest_3,
+            'friendship_id': friendship_id,
+        }
+    })
 
 @main.route('/api/friends/<int:friendship_id>', methods=['DELETE'])
 @login_required
@@ -417,6 +439,59 @@ def remove_friend(friendship_id):
     db.session.delete(f)
     db.session.commit()
     return jsonify({'message': 'Removed'})
+
+@main.route('/api/friends/<int:user_id>/profile', methods=['GET'])
+@login_required
+def get_friend_profile(user_id):
+    from collections import defaultdict
+    user = User.query.get_or_404(user_id)
+
+    my_friend_ids    = _friend_ids_for(current_user.id)
+    their_friend_ids = _friend_ids_for(user_id)
+    mutual_ids       = my_friend_ids & their_friend_ids
+    mutual_friends   = User.query.filter(User.id.in_(mutual_ids)).all() if mutual_ids else []
+
+    my_group_ids     = {m.group_id for m in GroupMember.query.filter_by(user_id=current_user.id).all()}
+    their_group_ids  = {m.group_id for m in GroupMember.query.filter_by(user_id=user_id).all()}
+    mutual_group_ids = my_group_ids & their_group_ids
+    mutual_groups    = Group.query.filter(Group.id.in_(mutual_group_ids)).all() if mutual_group_ids else []
+
+    today    = datetime.now().date().strftime('%Y-%m-%d')
+    my_slots = Availability.query.filter(
+        Availability.user_id == current_user.id,
+        Availability.date >= today,
+    ).order_by(Availability.date, Availability.start_time).all()
+
+    their_by_date = defaultdict(list)
+    for s in Availability.query.filter(
+        Availability.user_id == user_id,
+        Availability.date >= today,
+    ).all():
+        their_by_date[s.date].append(s)
+
+    next_free = None
+    for ms in my_slots:
+        for ts in their_by_date.get(ms.date, []):
+            overlap_start = max(ms.start_time, ts.start_time)
+            overlap_end   = min(ms.end_time,   ts.end_time)
+            if overlap_start < overlap_end:
+                next_free = f"{ms.date} {overlap_start}–{overlap_end}"
+                break
+        if next_free:
+            break
+
+    return jsonify({
+        'id':             user.id,
+        'username':       user.username,
+        'avatar':         user.avatar,
+        'bio':            user.bio or '',
+        'int_1':          user.interest_1,
+        'int_2':          user.interest_2,
+        'int_3':          user.interest_3,
+        'mutual_friends': [{'id': u.id, 'username': u.username} for u in mutual_friends],
+        'mutual_groups':  [{'id': g.id, 'name': g.name} for g in mutual_groups],
+        'next_free':      next_free,
+    })
 
 # Profile API routes
 
@@ -441,7 +516,6 @@ def get_user():
         'email': current_user.email,
         'bio': current_user.bio or '',
         'avatar': current_user.avatar,
-        'bio': current_user.bio or '',
         'interest_1': current_user.interest_1,
         'interest_2': current_user.interest_2,
         'interest_3': current_user.interest_3
