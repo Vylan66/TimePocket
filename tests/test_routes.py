@@ -90,3 +90,48 @@ def test_recurring_availability(auth_client):
     assert res.status_code == 200
     data = res.get_json()
     assert data['count'] > 1
+
+def test_get_user_profile(auth_client):
+    res = auth_client.get('/api/user')
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data['username'] == 'testuser'
+    assert data['email'] == 'test@test.com'
+
+def test_update_username(auth_client):
+    res = auth_client.put('/api/user', json={'username': 'newusername'})
+    assert res.status_code == 200
+    assert res.get_json()['message'] == 'Profile updated!'
+
+def test_create_group(auth_client):
+    res = auth_client.post('/groups', json={'name': 'Test Group'})
+    assert res.status_code == 201
+    assert res.get_json()['name'] == 'Test Group'
+
+def test_get_groups(auth_client):
+    auth_client.post('/groups', json={'name': 'My Group'})
+    res = auth_client.get('/groups')
+    assert res.status_code == 200
+    data = res.get_json()
+    assert len(data['groups']) == 1
+
+def test_send_friend_request(auth_client, app):
+    with app.app_context():
+        other = User(username='otheruser', email='other@test.com', is_verified=True)
+        other.set_password('password123')
+        db.session.add(other)
+        db.session.commit()
+        other_id = other.id
+    res = auth_client.post('/api/friends/request', json={'user_id': other_id})
+    assert res.status_code == 201
+    assert res.get_json()['message'] == 'Friend request sent'
+
+def test_get_ical_no_feed(auth_client):
+    res = auth_client.get('/api/ical')
+    assert res.status_code == 200
+    assert res.get_json()['feed'] is None
+
+def test_delete_ical_no_feed(auth_client):
+    res = auth_client.delete('/api/ical')
+    assert res.status_code == 404
+    assert res.get_json()['error'] == 'No calendar connected'

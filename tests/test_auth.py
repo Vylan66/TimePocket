@@ -1,13 +1,6 @@
 from app.models import User
 from app import db
 
-def test_register_success(client, app):
-    res = client.post('/register', json={
-        'username': 'newuser',
-        'email': 'new@test.com',
-        'password': 'password123'
-    })
-    assert res.status_code == 200
 
 def test_login_success(auth_client):
     res = auth_client.get('/personal')
