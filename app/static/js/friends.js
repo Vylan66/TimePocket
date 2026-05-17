@@ -299,7 +299,18 @@ function getMockProfile(username) {
 function friendReqPopup(userId, username, showButton = true) {
     const p = getMockProfile(username);
 
-    document.getElementById('frq-avatar').textContent   = username[0].toUpperCase();
+    let target = {};
+    for (let r in requests) {
+        if (requests[r].user_id === userId) {
+            target = requests[r];
+            break;
+        }
+    }
+    if (target === {}) return;
+
+    let avatarImage = loadAvatarImageLarge(target);
+
+    document.getElementById("frq-avatar").innerHTML = avatarImage;
     document.getElementById('frq-username').textContent = username;
 
     document.getElementById('frq-mutual-friends').innerHTML = p.mutualFriends.length
@@ -348,7 +359,9 @@ function openProfilePopup(user_id, username) {
         }
     }
 
-    document.getElementById('fp-avatar').innerHTML    = username[0].toUpperCase();
+    let avatarImage = loadAvatarImageLarge(friend);
+
+    document.getElementById("fp-avatar").innerHTML = avatarImage;
     document.getElementById('fp-username').textContent  = username;
     document.getElementById('fp-bio').innerHTML       = friend.bio;
     document.getElementById('fp-next-free').textContent = p.nextFree;
@@ -401,6 +414,17 @@ const loadAvatarImageSmall = (f) => {
     }
     else {
         avatarImage = `<img class="w-7 h-7 rounded-full" src='static/assets/${f["avatar"]}.png' />`;
+    }
+    return avatarImage;
+}
+
+const loadAvatarImageLarge = (f) => {
+    let avatarImage = ``;
+    if (f["avatar"] === "avatar_1") {
+        avatarImage = `<p class="text-white text-xl font-bold">${escHtml(f.username[0].toUpperCase())}</p>`
+    }
+    else {
+        avatarImage = `<img class="rounded-full" src='static/assets/${f["avatar"]}.png' />`;
     }
     return avatarImage;
 }
