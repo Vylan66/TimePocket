@@ -202,7 +202,7 @@ function renderRequests() {
     list.innerHTML = requests.map(r => `
         <div class="flex items-center justify-between gap-2 py-1" data-rid="${r.id}">
             <div class="flex items-center gap-2 min-w-0 cursor-pointer"
-                onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false")>
+                onclick="friendReqPopup(${r.user_id}, '${escHtml(r.username)}', false)">
                 ${loadAvatarImageSmall(r)}
                 <span class="text-xs truncate">${escHtml(r.username)}</span>
             </div>
@@ -279,8 +279,7 @@ function _renderInterestTags(intData) {
 function _renderMutualFriends(list) {
     return list.length
         ? list.map(u => `<div class="flex items-center gap-1.5">
-                <span class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style="background:var(--blue);">${escHtml(u.username[0].toUpperCase())}</span>
+                ${loadAvatarImageSmall(u)}
                 <span class="text-xs">${escHtml(u.username)}</span>
             </div>`).join('')
         : `<span class="text-xs" style="color:var(--text-muted);">None</span>`;
