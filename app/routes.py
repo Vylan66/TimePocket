@@ -481,7 +481,7 @@ def get_friend_profile(user_id):
         'int_1':          user.interest_1,
         'int_2':          user.interest_2,
         'int_3':          user.interest_3,
-        'mutual_friends': [{'id': u.id, 'username': u.username} for u in mutual_friends],
+        'mutual_friends': [{'id': u.id, 'username': u.username, 'avatar': u.avatar} for u in mutual_friends],
         'mutual_groups':  [{'id': g.id, 'name': g.name} for g in mutual_groups],
         'next_free':      next_free,
     })
