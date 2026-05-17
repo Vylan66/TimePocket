@@ -302,8 +302,7 @@ async function friendReqPopup(userId, username, showButton = true) {
     let avatarImage = loadAvatarImageLarge(target);
     document.getElementById('frq-avatar').innerHTML   = avatarImage;
     document.getElementById('frq-username').textContent = username;
-    document.getElementById('frq-bio').textContent      = '';
-    document.getElementById('frq-hobbies').innerHTML    = '';
+    document.getElementById('frq-bio').innerHTML     = target["bio"];
     document.getElementById('frq-mutual-friends').innerHTML = `<span class="text-xs" style="color:var(--text-muted);">Loading…</span>`;
 
     const btn = document.getElementById('send-friend-req-btn');
