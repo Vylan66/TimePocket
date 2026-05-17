@@ -61,7 +61,7 @@ def test_login_overlay_opens(driver):
 
 def test_login_success(driver):
     login(driver)
-    assert "/personal" in driver.current_url or "/dashboard" in driver.current_url
+    assert "/personal" in driver.current_url
 
 def test_personal_page_loads(driver):
     login(driver)
@@ -71,4 +71,4 @@ def test_personal_page_loads(driver):
 def test_logout(driver):
     login(driver)
     ensure_logged_out(driver)
-    assert '/personal' not in driver.current_url and '/dashboard' not in driver.current_url
+    assert '/personal' not in driver.current_url
