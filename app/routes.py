@@ -329,7 +329,7 @@ def search_users():
         User.username.ilike(f'%{q}%'),
         User.id != current_user.id
     ).limit(10).all()
-    return jsonify({'users': [{'id': u.id, 'username': u.username} for u in users]})
+    return jsonify({'users': [{'id': u.id, 'username': u.username, 'avatar': u.avatar} for u in users]})
 
 def _friend_ids_for(uid):
     rows = Friendship.query.filter(
@@ -374,8 +374,8 @@ def get_friend_requests():
     incoming = Friendship.query.filter_by(receiver_id=current_user.id, status='pending').all()
     outgoing = Friendship.query.filter_by(requester_id=current_user.id, status='pending').all()
     return jsonify({'requests':
-        [{'id': f.id, 'user_id': f.requester_id, 'username': f.requester.username, 'direction': 'incoming'} for f in incoming] +
-        [{'id': f.id, 'user_id': f.receiver_id,  'username': f.receiver.username,  'direction': 'outgoing'} for f in outgoing]
+        [{'id': f.id, 'user_id': f.requester_id, 'username': f.requester.username, 'avatar': f.requester.avatar, 'bio': f.requester.bio, 'direction': 'incoming'} for f in incoming] +
+        [{'id': f.id, 'user_id': f.receiver_id,  'username': f.receiver.username,  'avatar': f.receiver.avatar, 'bio': f.receiver.bio, 'direction': 'outgoing'} for f in outgoing]
     })
 
 @main.route('/api/friends/request', methods=['POST'])
